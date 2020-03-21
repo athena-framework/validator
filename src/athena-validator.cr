@@ -1,4 +1,3 @@
-require "./constraint_target"
 require "./constraint"
 require "./execution_context_interface"
 require "./execution_context"

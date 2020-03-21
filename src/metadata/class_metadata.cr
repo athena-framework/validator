@@ -5,7 +5,7 @@ class Athena::Validator::Metadata::ClassMetadata < Athena::Validator::Metadata::
   include Athena::Validator::Metadata::ClassMetadataInterface
 
   getter default_group : String
-  @traversal_strategy : AVD::Metadata::TraversalStrategy = AVD::Metadata::TraversalStrategy::Implicit
+  @cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
 
   @properties : Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase) = Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase).new
 

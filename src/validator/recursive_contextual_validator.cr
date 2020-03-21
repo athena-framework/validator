@@ -262,8 +262,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
       # Cache stuff here
       context.constraint = constraint
 
-      # TODO: Maybe extract this to another type
-      validator = constraint.validator.new
+      validator = @constraint_validator_factory.validator constraint
       validator.context = context
 
       validator.validate value, constraint

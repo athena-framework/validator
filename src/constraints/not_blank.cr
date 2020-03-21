@@ -3,7 +3,7 @@ struct Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
 
   getter? allow_nil : Bool
 
-  def initialize(message : String = "This value should not be blank.", @allow_nil : Bool = false)
-    super message
+  def initialize(message : String = "This value should not be blank.", groups : Array(String)? = nil, payload : Hash(String, String)? = nil, @allow_nil : Bool = false)
+    super message, groups, payload
   end
 end
