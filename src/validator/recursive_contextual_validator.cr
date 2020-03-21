@@ -1,0 +1,276 @@
+struct Athena::Validator::Validator::RecursiveContextualValidator
+  include Athena::Validator::Validator::ContextualValidatorInterface
+
+  @default_groups : Array(String)
+  @default_property_path : String
+
+  def initialize(@context : AVD::ExecutionContextInterface, @constraint_validator_factory : AVD::ConstraintValidatorFactoryInterface)
+    @default_groups = [(g = @context.group) ? g : Constraint::DEFAULT_GROUP]
+    @default_property_path = @context.property_path
+  end
+
+  def at_path(path : String) : AVD::Validator::ContextualValidatorInterface
+    @default_property_path = @context.path path
+
+    self
+  end
+
+  def validate(value : _, constraints : Array(AVD::Constraint)? = nil, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+    groups = groups || @default_groups
+
+    previous_value = @context.value
+    previous_object = @context.object
+    previous_metadata = @context.metadata
+    previous_path = @context.property_path
+    previous_group = @context.group
+    previous_constraint = @context.is_a?(AVD::ExecutionContext) ? @context.constraint : nil
+
+    # Validate the value against explicitly passed constraints
+    unless constraints.nil?
+      metadata = AVD::Metadata::GenericMetadata.new
+      metadata.add_constraint constraints
+
+      self.validate_generic_node(
+        value,
+        previous_object,
+        nil, # cache_key
+        metadata,
+        @default_property_path,
+        groups,
+        nil, # cascaded_groups?
+        AVD::Metadata::TraversalStrategy::Implicit,
+        @context
+      )
+
+      @context.set_node previous_value, previous_object, previous_metadata, previous_path
+      @context.group = previous_group
+
+      unless previous_constraint.nil?
+        @context.constraint = previous_constraint
+      end
+
+      return self
+    end
+
+    if value.is_a? AVD::Validatable
+      self.validate_object(
+        value,
+        @default_property_path,
+        groups,
+        AVD::Metadata::TraversalStrategy::Implicit,
+        @context
+      )
+
+      @context.set_node previous_value, previous_object, previous_metadata, previous_path
+      @context.group = previous_group
+
+      return self
+    end
+
+    if value.is_a? Iterable
+      self.validate_each_object_in(
+        value,
+        @default_property_path,
+        groups,
+        @context
+      )
+
+      @context.set_node previous_value, previous_object, previous_metadata, previous_path
+      @context.group = previous_group
+
+      return self
+    end
+
+    self
+  end
+
+  def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+    class_metadata = object.validation_metadata
+    property_metadata = class_metadata.property_metadata(property_name)
+    groups = groups || @default_groups
+    cache_key = ""
+    property_path = AVD::PropertyPath.append @default_property_path, property_name
+
+    previous_value = @context.value
+    previous_object = @context.object
+    previous_metadata = @context.metadata
+    previous_path = @context.property_path
+    previous_group = @context.group
+
+    property_value = property_metadata.value
+
+    self.validate_generic_node(
+      property_value,
+      object,
+      cache_key,
+      property_metadata,
+      property_path,
+      groups,
+      nil,
+      AVD::Metadata::TraversalStrategy::Implicit,
+      @context
+    )
+
+    @context.set_node previous_value, previous_object, previous_metadata, previous_path
+    @context.group = previous_group
+
+    self
+  end
+
+  def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+    class_metadata = object.validation_metadata
+    property_metadata = class_metadata.property_metadata(property_name)
+    groups = groups || @default_groups
+    cache_key = ""
+    property_path = AVD::PropertyPath.append @default_property_path, property_name
+
+    previous_value = @context.value
+    previous_object = @context.object
+    previous_metadata = @context.metadata
+    previous_path = @context.property_path
+    previous_group = @context.group
+
+    self.validate_generic_node(
+      value,
+      object,
+      cache_key,
+      property_metadata,
+      property_path,
+      groups,
+      nil,
+      AVD::Metadata::TraversalStrategy::Implicit,
+      @context
+    )
+
+    @context.set_node previous_value, previous_object, previous_metadata, previous_path
+    @context.group = previous_group
+
+    self
+  end
+
+  private def validate_each_object_in(
+    collection : Iterable,
+    property_path : String,
+    groups : Array(String),
+    context : AVD::ExecutionContextInterface
+  )
+    collection.each_with_index do |item, idx|
+      case item
+      when Iterable then self.validate_each_object_in(item, "#{property_path}[#{idx}]", groups, context)
+      else               self.validate_object(item, "#{property_path}[#{idx}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
+      end
+    end
+  end
+
+  private def validate_generic_node(
+    value : _,
+    object : _,
+    cache_key : String?,
+    metadata : AVD::Metadata::MetadataInterface?,
+    property_path : String,
+    groups : Array(String),
+    cascaded_groups : Array(String)?,
+    traversal_strategy : AVD::Metadata::TraversalStrategy,
+    context : AVD::ExecutionContextInterface
+  )
+    context.set_node value, object, metadata, property_path
+
+    groups.each do |group|
+      self.validate_in_group value, cache_key, metadata, group, context
+    end
+
+    return if groups.empty?
+    return if value.nil?
+
+    cascading_strategy = metadata.cascading_strategy
+
+    return if cascading_strategy.none?
+
+    traversal_strategy = metadata.traversal_strategy if traversal_strategy.implicit?
+  end
+
+  private def validate_object(object : AVD::Validatable, property_path : String, groups : Array(String), traversal_strategy : AVD::Metadata::TraversalStrategy, context : AVD::ExecutionContextInterface) : Nil
+    class_metadata = object.validation_metadata
+
+    self.validate_class_node(
+      object,
+      "", # Cache thing,
+      class_metadata,
+      property_path,
+      groups,
+      traversal_strategy,
+      context
+    )
+  end
+
+  private def validate_class_node(
+    object : AVD::Validatable,
+    cache_key : String,
+    class_metadata : AVD::Metadata::ClassMetadata,
+    property_path : String,
+    groups : Array(String),
+    traversal_strategy : AVD::Metadata::TraversalStrategy,
+    context : AVD::ExecutionContextInterface
+  ) : Nil
+    context.set_node object, object, class_metadata, property_path
+
+    groups.each_with_index do |group, idx|
+      # Cache stuff
+      #
+      #
+      # Cache stuff
+      self.validate_in_group(object, cache_key, class_metadata, group, context)
+    end
+
+    class_metadata.constrained_properties.each do |property_name|
+      property_metadata = class_metadata.property_metadata(property_name)
+      property_value = property_metadata.value
+
+      self.validate_generic_node(
+        property_value,
+        object,
+        cache_key,
+        property_metadata,
+        AVD::PropertyPath.append(property_path, property_name),
+        groups,
+        nil, # cascaded groups,
+        AVD::Metadata::TraversalStrategy::Implicit,
+        context
+      )
+    end
+
+    traversal_strategy = class_metadata.traversal_strategy if traversal_strategy.implicit?
+    return if traversal_strategy.none?
+    # return if traversal_strategy.implicit? && !object.is_a? Iterable
+
+    # self.validate_each_object_in(
+    #   object,
+    #   property_path,
+    #   groups,
+    #   context
+    # )
+  end
+
+  def validate_in_group(value : _, cache_key : String?, metadata : AVD::Metadata::MetadataInterface, group : String, context : AVD::ExecutionContextInterface) : Nil
+    context.group = group
+
+    metadata.find_constraints(group).each do |constraint|
+      # Cache stuff here
+      #
+      #
+      #
+      # Cache stuff here
+      context.constraint = constraint
+
+      # TODO: Maybe extract this to another type
+      validator = constraint.validator.new
+      validator.context = context
+
+      validator.validate value, constraint
+    end
+  end
+
+  def violations : AVD::Violation::ConstraintViolationListInterface
+    @context.violations
+  end
+end
