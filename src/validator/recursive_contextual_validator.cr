@@ -26,29 +26,29 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     previous_constraint = @context.is_a?(AVD::ExecutionContext) ? @context.constraint : nil
 
     # Validate the value against explicitly passed constraints
-    # unless constraints.nil?
-    #   metadata = AVD::Metadata::GenericMetadata.new
-    #   metadata.add_constraint constraints
+    unless constraints.nil?
+      metadata = AVD::Metadata::Metadata.new
+      metadata.add_constraint constraints
 
-    #   self.validate_generic_node(
-    #     value,
-    #     previous_object,
-    #     metadata,
-    #     @default_property_path,
-    #     groups,
-    #     AVD::Metadata::TraversalStrategy::Implicit,
-    #     @context
-    #   )
+      self.validate_generic_node(
+        value,
+        previous_object,
+        metadata,
+        @default_property_path,
+        groups,
+        AVD::Metadata::TraversalStrategy::Implicit,
+        @context
+      )
 
-    #   @context.set_node previous_value, previous_object, previous_metadata, previous_path
-    #   @context.group = previous_group
+      @context.set_node previous_value, previous_object, previous_metadata, previous_path
+      @context.group = previous_group
 
-    #   unless previous_constraint.nil?
-    #     @context.constraint = previous_constraint
-    #   end
+      unless previous_constraint.nil?
+        @context.constraint = previous_constraint
+      end
 
-    #   return self
-    # end
+      return self
+    end
 
     case value
     when AVD::Validatable
