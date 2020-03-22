@@ -1,13 +1,28 @@
 struct Athena::Validator::Constraints::NotBlankValidator < Athena::Validator::ConstraintValidator
-  def validate(value : _, constraint : AVD::Constraints::NotBlank) : Nil
+  def validate(value : String?, constraint : AVD::Constraints::NotBlank) : Nil
+    value = (v = value) && (normalizer = constraint.normalizer) ? normalizer.call(v) : value
+
+    validate(value, constraint) do
+      value.blank?
+    end
+  end
+
+  def validate(value : Bool?, constraint : AVD::Constraints::NotBlank) : Nil
+    validate(value, constraint) do
+      value == false
+    end
+  end
+
+  def validate(value : Indexable?, constraint : AVD::Constraints::NotBlank) : Nil
+    validate(value, constraint) do
+      value.empty?
+    end
+  end
+
+  private def validate(value : _, constraint : AVD::Constraints::NotBlank, & : -> Bool) : Nil
     return if value.nil? && constraint.allow_nil?
-    return if value == true
 
-    # Break the logic down to make it easier to read
-    is_blank = value.responds_to?(:blank?) && value.blank? # String
-    is_empty = value.responds_to?(:empty?) && value.empty? # Arrays
-
-    if value == false || is_blank || is_empty
+    if value.nil? || yield
       self.context
         .build(constraint.message)
         .add_parameter("{{ value }}", value.to_s)

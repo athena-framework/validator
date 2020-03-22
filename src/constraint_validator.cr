@@ -3,6 +3,6 @@ abstract struct Athena::Validator::ConstraintValidator
 
   property! context : AVD::ExecutionContextInterface
 
-  def validate(value : _, constraint : AVD::Constraint) : Nil
+  protected def validate(value : _, constraint : AVD::Constraint) : Nil
   end
 end
