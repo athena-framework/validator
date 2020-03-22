@@ -44,4 +44,10 @@ struct Athena::Validator::Violation::ConstraintViolationList
   def unsafe_fetch(index : Int) : AVD::Violation::ConstraintViolationInterface
     @violations[index]
   end
+
+  def to_s(io : IO) : Nil
+    @violations.each do |violation|
+      violation.to_s io
+    end
+  end
 end

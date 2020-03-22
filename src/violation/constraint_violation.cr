@@ -35,21 +35,19 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
   end
 
   def to_s(io : IO) : Nil
-    String.build(io) do |str|
-      klass = case @root
-              when Array  then "Array"
-              when Object then "Object#{{{@type}}}"
-              else
-                @root.to_s
-              end
+    klass = case @root
+            when Array  then "Array"
+            when Object then "Object(#{@root.class})"
+            else
+              @root.to_s
+            end
 
-      str << klass
-      str << @property_path
-      str << @message
+    klass += '.' if !@property_path.blank? && !@property_path.starts_with?('[') && !klass.blank?
 
-      if (code = @code) && !code.blank?
-        str << " #{code}"
-      end
+    if (c = code) && !c.blank?
+      code = " (code: #{c})"
     end
+
+    io.puts "#{klass}#{@property_path}:\n\t#{@message}#{code}"
   end
 end

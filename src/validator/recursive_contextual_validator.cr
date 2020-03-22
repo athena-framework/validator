@@ -33,11 +33,9 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
       self.validate_generic_node(
         value,
         previous_object,
-        nil, # cache_key
         metadata,
         @default_property_path,
         groups,
-        nil, # cascaded_groups?
         AVD::Metadata::TraversalStrategy::Implicit,
         @context
       )
@@ -88,7 +86,6 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     class_metadata = object.validation_metadata
     property_metadata = class_metadata.property_metadata(property_name)
     groups = groups || @default_groups
-    cache_key = ""
     property_path = AVD::PropertyPath.append @default_property_path, property_name
 
     previous_value = @context.value
@@ -102,11 +99,9 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     self.validate_generic_node(
       property_value,
       object,
-      cache_key,
       property_metadata,
       property_path,
       groups,
-      nil,
       AVD::Metadata::TraversalStrategy::Implicit,
       @context
     )
@@ -121,7 +116,6 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     class_metadata = object.validation_metadata
     property_metadata = class_metadata.property_metadata(property_name)
     groups = groups || @default_groups
-    cache_key = ""
     property_path = AVD::PropertyPath.append @default_property_path, property_name
 
     previous_value = @context.value
@@ -133,11 +127,9 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     self.validate_generic_node(
       value,
       object,
-      cache_key,
       property_metadata,
       property_path,
       groups,
-      nil,
       AVD::Metadata::TraversalStrategy::Implicit,
       @context
     )
@@ -165,28 +157,34 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
   private def validate_generic_node(
     value : _,
     object : _,
-    cache_key : String?,
     metadata : AVD::Metadata::MetadataInterface?,
     property_path : String,
     groups : Array(String),
-    cascaded_groups : Array(String)?,
     traversal_strategy : AVD::Metadata::TraversalStrategy,
     context : AVD::ExecutionContextInterface
   )
     context.set_node value, object, metadata, property_path
 
     groups.each do |group|
-      self.validate_in_group value, cache_key, metadata, group, context
+      self.validate_in_group value, metadata, group, context
     end
 
-    return if groups.empty?
     return if value.nil?
 
     cascading_strategy = metadata.cascading_strategy
 
-    return if cascading_strategy.none?
+    return unless cascading_strategy.cascade?
 
     traversal_strategy = metadata.traversal_strategy if traversal_strategy.implicit?
+
+    if value.is_a? Iterable
+      self.validate_each_object_in(
+        value,
+        property_path,
+        groups,
+        context
+      )
+    end
   end
 
   private def validate_object(object : AVD::Validatable, property_path : String, groups : Array(String), traversal_strategy : AVD::Metadata::TraversalStrategy, context : AVD::ExecutionContextInterface) : Nil
@@ -194,7 +192,6 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
 
     self.validate_class_node(
       object,
-      "", # Cache thing,
       class_metadata,
       property_path,
       groups,
@@ -205,7 +202,6 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
 
   private def validate_class_node(
     object : AVD::Validatable,
-    cache_key : String,
     class_metadata : AVD::Metadata::ClassMetadata,
     property_path : String,
     groups : Array(String),
@@ -215,11 +211,8 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     context.set_node object, object, class_metadata, property_path
 
     groups.each_with_index do |group, idx|
-      # Cache stuff
-      #
-      #
-      # Cache stuff
-      self.validate_in_group(object, cache_key, class_metadata, group, context)
+      # TODO: Can cache validated groups here if needed in the future
+      self.validate_in_group object, class_metadata, group, context
     end
 
     class_metadata.constrained_properties.each do |property_name|
@@ -229,37 +222,34 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
       self.validate_generic_node(
         property_value,
         object,
-        cache_key,
         property_metadata,
         AVD::PropertyPath.append(property_path, property_name),
         groups,
-        nil, # cascaded groups,
         AVD::Metadata::TraversalStrategy::Implicit,
         context
       )
     end
 
     traversal_strategy = class_metadata.traversal_strategy if traversal_strategy.implicit?
-    return if traversal_strategy.none?
-    # return if traversal_strategy.implicit? && !object.is_a? Iterable
 
-    # self.validate_each_object_in(
-    #   object,
-    #   property_path,
-    #   groups,
-    #   context
-    # )
+    return if traversal_strategy.none?
+    return if traversal_strategy.implicit? && !object.is_a? Iterable
+
+    return unless object.is_a? Iterable
+
+    self.validate_each_object_in(
+      object,
+      property_path,
+      groups,
+      context
+    )
   end
 
-  def validate_in_group(value : _, cache_key : String?, metadata : AVD::Metadata::MetadataInterface, group : String, context : AVD::ExecutionContextInterface) : Nil
+  def validate_in_group(value : _, metadata : AVD::Metadata::MetadataInterface, group : String, context : AVD::ExecutionContextInterface) : Nil
     context.group = group
 
     metadata.find_constraints(group).each do |constraint|
-      # Cache stuff here
-      #
-      #
-      #
-      # Cache stuff here
+      # TODO: Can cache validated groups here if needed in the future
       context.constraint = constraint
 
       validator = @constraint_validator_factory.validator constraint

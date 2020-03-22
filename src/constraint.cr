@@ -6,8 +6,9 @@ abstract struct Athena::Validator::Constraint
   # Defaults to `property` but children can override it.  Possible options include `class`, and `property`.
   TARGETS = ["property"]
 
-  def self.error_name(code : String) : String
-    @@error_names[code]? || raise KeyError.new "The error code '#{code}' does not exist for constraint of type '#{{{@type}}}'."
+  # Returns the name of the provided *error_code*.
+  def self.error_name(error_code : String) : String
+    @@error_names[error_code]? || raise KeyError.new "The error code '#{error_code}' does not exist for constraint of type '#{{{@type}}}'."
   end
 
   getter message : String
@@ -24,6 +25,10 @@ abstract struct Athena::Validator::Constraint
     end
   end
 
+  # Returns the `AVD::ConstraintValidator.class` that should be used to validate `self`.
+  #
+  # Defaults to `self`'s class name suffixed with "Validator", but can
+  # be overridden in order to specify a custom type.
   def validator : AVD::ConstraintValidator.class
     {{"#{@type}Validator".id}}
   end

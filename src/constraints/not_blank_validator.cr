@@ -8,7 +8,7 @@ struct Athena::Validator::Constraints::NotBlankValidator < Athena::Validator::Co
     is_empty = value.responds_to?(:empty?) && value.empty? # Arrays
 
     if value == false || is_blank || is_empty
-      context
+      self.context
         .build(constraint.message)
         .add_parameter("{{ value }}", value.to_s)
         .code(AVD::Constraints::NotBlank::IS_BLANK_ERROR)
