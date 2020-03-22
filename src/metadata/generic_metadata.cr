@@ -1,6 +1,6 @@
 require "./metadata_interface"
 
-class Athena::Validator::Metadata::GenericMetadata
+module Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::MetadataInterface
 
   getter constraints : Array(AVD::Constraint) = [] of AVD::Constraint

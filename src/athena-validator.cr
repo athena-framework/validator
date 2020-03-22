@@ -23,8 +23,8 @@ module Athena::Validator
     macro included
       extend AVD::Validatable
 
-      def validation_metadata : AVD::Metadata::Class
-        class_metadata = AVD::Metadata::Class.new self.class
+      def validation_metadata : AVD::Metadata::ClassMetadata
+        class_metadata = AVD::Metadata::ClassMetadata.new self.class
 
         {% verbatim do %}
           {% begin %}
@@ -49,7 +49,7 @@ module Athena::Validator
                   {% raise "Constraint #{constraint} cannot be applied to #{@type}##{ivar.name}.  This constraint does not support the #{ivar.type} type." unless supported_types.any? { |t| t.is_a?(Underscore) ? true : t.resolve >= ivar.type } %}
 
                   class_metadata.add_property_constraint(
-                    AVD::Metadata::Property({{ivar.type}}).new(->{ @{{ivar.id}} }, {{@type}}, {{ivar.name.stringify}}),
+                    AVD::Metadata::PropertyMetadata({{ivar.type}}).new(->{ @{{ivar.id}} }, {{@type}}, {{ivar.name.stringify}}),
                     {{property_constraint.id}}.new({{property_ann.named_args.double_splat}})
                   )
                 {% end %}

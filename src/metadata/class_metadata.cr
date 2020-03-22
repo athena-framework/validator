@@ -1,7 +1,8 @@
 require "./generic_metadata"
 require "./class_metadata_interface"
 
-class Athena::Validator::Metadata::ClassMetadata < Athena::Validator::Metadata::GenericMetadata
+struct Athena::Validator::Metadata::ClassMetadata
+  include Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::ClassMetadataInterface
 
   getter default_group : String

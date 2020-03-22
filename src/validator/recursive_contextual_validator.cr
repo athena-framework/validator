@@ -26,31 +26,32 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     previous_constraint = @context.is_a?(AVD::ExecutionContext) ? @context.constraint : nil
 
     # Validate the value against explicitly passed constraints
-    unless constraints.nil?
-      metadata = AVD::Metadata::GenericMetadata.new
-      metadata.add_constraint constraints
+    # unless constraints.nil?
+    #   metadata = AVD::Metadata::GenericMetadata.new
+    #   metadata.add_constraint constraints
 
-      self.validate_generic_node(
-        value,
-        previous_object,
-        metadata,
-        @default_property_path,
-        groups,
-        AVD::Metadata::TraversalStrategy::Implicit,
-        @context
-      )
+    #   self.validate_generic_node(
+    #     value,
+    #     previous_object,
+    #     metadata,
+    #     @default_property_path,
+    #     groups,
+    #     AVD::Metadata::TraversalStrategy::Implicit,
+    #     @context
+    #   )
 
-      @context.set_node previous_value, previous_object, previous_metadata, previous_path
-      @context.group = previous_group
+    #   @context.set_node previous_value, previous_object, previous_metadata, previous_path
+    #   @context.group = previous_group
 
-      unless previous_constraint.nil?
-        @context.constraint = previous_constraint
-      end
+    #   unless previous_constraint.nil?
+    #     @context.constraint = previous_constraint
+    #   end
 
-      return self
-    end
+    #   return self
+    # end
 
-    if value.is_a? AVD::Validatable
+    case value
+    when AVD::Validatable
       self.validate_object(
         value,
         @default_property_path,
@@ -63,9 +64,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
       @context.group = previous_group
 
       return self
-    end
-
-    if value.is_a? Iterable
+    when Iterable
       self.validate_each_object_in(
         value,
         @default_property_path,
@@ -77,9 +76,9 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
       @context.group = previous_group
 
       return self
+    else
+      raise "Could not validate #{value}"
     end
-
-    self
   end
 
   def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
@@ -148,8 +147,9 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
   )
     collection.each_with_index do |item, idx|
       case item
-      when Iterable then self.validate_each_object_in(item, "#{property_path}[#{idx}]", groups, context)
-      else               self.validate_object(item, "#{property_path}[#{idx}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
+      when Iterable         then self.validate_each_object_in(item, "#{property_path}[#{idx}]", groups, context)
+      when AVD::Validatable then self.validate_object(item, "#{property_path}[#{idx}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
+      else                       raise "unreachable?"
       end
     end
   end
