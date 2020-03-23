@@ -1,6 +1,6 @@
 module Athena::Validator::ExecutionContextInterface
-  abstract def add(message : String, parameters : Hash(String, String) = {} of String => String) : Nil
-  abstract def build(message : String, parameters : Hash(String, String) = {} of String => String) : AVD::Violation::ConstraintViolationBuilderInterface
+  abstract def add_violation(message : String, parameters : Hash(String, String) = {} of String => String) : Nil
+  abstract def build_violation(message : String, parameters : Hash(String, String) = {} of String => String) : AVD::Violation::ConstraintViolationBuilderInterface
   abstract def validator : AVD::Validator::ValidatorInterface
   abstract def object
   abstract def metadata : AVD::Metadata::MetadataInterface?

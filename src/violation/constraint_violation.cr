@@ -12,20 +12,20 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
   getter root : Root
   getter constraint : AVD::Constraint?
   getter property_path : String
-  getter code : String
+  getter code : String?
   getter cause : String?
 
   def initialize(
     @message : String,
     @message_template : String?,
     @parameters : Hash(String, String),
-    @plural : Int32?,
     @root : Root,
-    @constraint : AVD::Constraint?,
     @property_path : String,
     invalid_value : _,
-    @code : String,
-    @cause : String?
+    @plural : Int32? = nil,
+    @code : String? = nil,
+    @constraint : AVD::Constraint? = nil,
+    @cause : String? = nil
   )
     @invalid_value = AVD::ValueContainer.new invalid_value
   end

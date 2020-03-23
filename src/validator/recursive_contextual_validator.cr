@@ -28,7 +28,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     # Validate the value against explicitly passed constraints
     unless constraints.nil?
       metadata = AVD::Metadata::Metadata.new
-      metadata.add_constraint constraints
+      metadata.add_constraints constraints
 
       self.validate_generic_node(
         value,

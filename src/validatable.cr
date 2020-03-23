@@ -7,6 +7,7 @@ module Athena::Validator::Validatable
 
       {% verbatim do %}
         {% begin %}
+          # Add class constraints
           {% for class_constraint in AVD::Constraint.all_subclasses.select { |c| !c.abstract? && (targets = c.constant("TARGETS")) && targets.includes? "class" } %}
             {% constraint = class_constraint %}
 
@@ -18,6 +19,7 @@ module Athena::Validator::Validatable
             {% end %}
           {% end %}
 
+          # Add property constraints
           {% for ivar in @type.instance_vars %}
             {% for property_constraint in AVD::Constraint.all_subclasses.select { |c| !c.abstract? && (targets = c.constant("TARGETS")) && targets.includes? "property" } %}
               {% constraint = property_constraint %}
@@ -33,6 +35,11 @@ module Athena::Validator::Validatable
                 )
               {% end %}
             {% end %}
+          {% end %}
+
+          # Add callback constraints
+          {% for callback in @type.methods.select &.annotation(Assert::Callback) %}
+            class_metadata.add_constraint AVD::Constraints::Callback.new ->{{callback.name.id}}(AVD::ExecutionContextInterface, Hash(String, String)?)
           {% end %}
         {% end %}
 

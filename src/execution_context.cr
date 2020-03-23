@@ -47,23 +47,21 @@ class Athena::Validator::ExecutionContext(Root)
     @property_path = property_path
   end
 
-  def add(message : String, parameters : Hash(String, String) = {} of String => String) : Nil
+  def add_violation(message : String, parameters : Hash(String, String) = {} of String => String) : Nil
     rendered_message = message.gsub(/(?:{{ \w+ }})+/, parameters)
 
-    @violations << AVD::Violation::ConstraintViolation.new(
+    @violations.add AVD::Violation::ConstraintViolation.new(
       rendered_message,
       message,
       parameters,
       @root,
       @property_path,
       self.value,
-      nil,
-      nil,
-      @constraint.not_nil!, # Is set via the validator
+      constraint: @constraint
     )
   end
 
-  def build(message : String, parameters : Hash(String, String) = {} of String => String) : AVD::Violation::ConstraintViolationBuilderInterface
+  def build_violation(message : String, parameters : Hash(String, String) = {} of String => String) : AVD::Violation::ConstraintViolationBuilderInterface
     AVD::Violation::ConstraintViolationBuilder.new(
       @violations,
       @constraint.not_nil!, # Is set via the validator

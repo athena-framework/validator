@@ -25,7 +25,7 @@ module Athena::Validator::Metadata::GenericMetadata
     self
   end
 
-  def add_constraint(constraints : Array(AVD::Constraint)) : AVD::Metadata::GenericMetadata
+  def add_constraints(constraints : Array(AVD::Constraint)) : AVD::Metadata::GenericMetadata
     constraints.each do |constraint|
       add_constraint constraint
     end

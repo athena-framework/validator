@@ -39,12 +39,10 @@ struct Athena::Validator::Metadata::ClassMetadata
   end
 
   def has_property_metadata(property_name : String) : Bool
+    @properties.has_key? property_name
   end
 
-  def property_metadata(property_name : String)
+  def property_metadata(property_name : String) : AVD::Metadata::PropertyMetadataInterfaceBase
     @properties[property_name]
-  end
-
-  def class_name : String
   end
 end

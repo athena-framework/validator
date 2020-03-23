@@ -1,31 +1,5 @@
 require "./spec_helper"
 
-struct MockConstraint < AVD::Constraint
-  configure
-end
-
-struct MockConstraintValidator < AVD::ConstraintValidator
-end
-
-module Fake
-  struct DefaultConstraint < AVD::Constraint
-    configure
-  end
-
-  struct DefaultConstraintValidator < AVD::ConstraintValidator
-  end
-end
-
-struct CustomConstraint < AVD::Constraint
-  configure annotation: CustomConstraintAnotation, validator: MyValidator, targets: ["foo"]
-
-  FAKE_ERROR = "abc123"
-  BLAH       = "BLAH"
-end
-
-struct MyValidator < AVD::ConstraintValidator
-end
-
 describe AVD::Constraint do
   describe ".configure" do
     describe "defaults" do

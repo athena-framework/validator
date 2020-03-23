@@ -60,12 +60,12 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
       rendered_message,
       @message,
       @parameters,
-      @plural,
       @root,
-      @constraint,
       @property_path,
       @invalid_value.value,
-      @code.not_nil!,
+      @plural,
+      @code,
+      @constraint,
       @cause
     )
   end

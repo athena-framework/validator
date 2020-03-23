@@ -24,9 +24,7 @@ abstract struct Athena::Validator::Constraint
   #
   # Defaults to `self`'s class name suffixed with "Validator", but can
   # be overridden in order to specify a custom type.
-  def validator : AVD::ConstraintValidator.class
-    VALIDATOR
-  end
+  abstract def validator : AVD::ConstraintValidator.class
 
   macro configure(**named_args)
     {% annotation_name = named_args[:annotation] || %(Athena::Validator::Annotations::#{@type.name.split("::").last.id}).id %}

@@ -24,7 +24,7 @@ struct Athena::Validator::Constraints::NotBlankValidator < Athena::Validator::Co
 
     if value.nil? || yield
       self.context
-        .build(constraint.message)
+        .build_violation(constraint.message)
         .add_parameter("{{ value }}", value.to_s)
         .code(AVD::Constraints::NotBlank::IS_BLANK_ERROR)
         .add
