@@ -1,3 +1,5 @@
+require "./constraint_validator_interface"
+
 abstract struct Athena::Validator::ConstraintValidator
   include Athena::Validator::ConstraintValidatorInterface
 

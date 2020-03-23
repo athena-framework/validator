@@ -13,7 +13,7 @@ struct Athena::Validator::Violation::ConstraintViolationList
   end
 
   def find_by_code(error_code : String) : AVD::Violation::ConstraintViolationListInterface
-    new @violations.select &.code.==(error_code)
+    self.class.new @violations.select &.code.==(error_code)
   end
 
   def add(violation : AVD::Violation::ConstraintViolationInterface) : Nil
@@ -24,8 +24,8 @@ struct Athena::Validator::Violation::ConstraintViolationList
     @violations.concat violations
   end
 
-  def has(index : Int) : Bool
-    !@violations.index(index).nil?
+  def has?(index : Int) : Bool
+    !@violations[index]?.nil?
   end
 
   def set(index : Int, violation : AVD::Violation::ConstraintViolationInterface) : Nil

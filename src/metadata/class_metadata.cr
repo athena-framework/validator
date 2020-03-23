@@ -19,7 +19,7 @@ struct Athena::Validator::Metadata::ClassMetadata
 
     super constraint
 
-    return self
+    self
   end
 
   def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterfaceBase, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata

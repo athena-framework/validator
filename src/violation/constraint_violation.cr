@@ -10,7 +10,7 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
   getter parameters : Hash(String, String)
   getter plural : Int32?
   getter root : Root
-  getter constraint : AVD::Constraint
+  getter constraint : AVD::Constraint?
   getter property_path : String
   getter code : String
   getter cause : String?
@@ -21,7 +21,7 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
     @parameters : Hash(String, String),
     @plural : Int32?,
     @root : Root,
-    @constraint : AVD::Constraint,
+    @constraint : AVD::Constraint?,
     @property_path : String,
     invalid_value : _,
     @code : String,
@@ -36,8 +36,8 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
 
   def to_s(io : IO) : Nil
     klass = case @root
-            when Array  then "Array"
-            when Object then "Object(#{@root.class})"
+            when Hash             then "Hash"
+            when AVD::Validatable then "Object(#{@root.class})"
             else
               @root.to_s
             end

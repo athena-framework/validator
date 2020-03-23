@@ -1,7 +1,9 @@
 require "./spec_helper"
 
 describe Athena::Validator do
-  it "works" do
-    false.should eq(true)
+  describe ".validator" do
+    it "returns a validator" do
+      AVD.validator.should be_a AVD::Validator::ValidatorInterface
+    end
   end
 end

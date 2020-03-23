@@ -1,5 +1,5 @@
 require "./validator/validator_interface"
-require "./metadata/metadata_interface"
+require "./execution_context_interface"
 
 class Athena::Validator::ExecutionContext(Root)
   include Athena::Validator::ExecutionContextInterface

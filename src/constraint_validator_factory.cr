@@ -1,3 +1,5 @@
+require "./constraint_validator_factory_interface"
+
 struct Athena::Validator::ConstraintValidatorFactory
   include Athena::Validator::ConstraintValidatorFactoryInterface
 

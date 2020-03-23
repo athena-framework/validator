@@ -20,6 +20,14 @@ abstract struct Athena::Validator::Constraint
     end
   end
 
+  # Returns the `AVD::ConstraintValidator.class` that should be used to validate `self`.
+  #
+  # Defaults to `self`'s class name suffixed with "Validator", but can
+  # be overridden in order to specify a custom type.
+  def validator : AVD::ConstraintValidator.class
+    VALIDATOR
+  end
+
   macro configure(**named_args)
     {% annotation_name = named_args[:annotation] || %(Athena::Validator::Annotations::#{@type.name.split("::").last.id}).id %}
     {% validator = named_args[:validator] || "#{@type}Validator".id %}
@@ -39,6 +47,8 @@ abstract struct Athena::Validator::Constraint
     #
     # Defaults to `self`'s class name suffixed with "Validator", but can be overridden via the `AVD::Constraint.configure` macro.
     VALIDATOR = {{validator}}
+
+    # Annotation related to the `{{@type}}` constraint.
     annotation ::{{annotation_name}}; end
   end
 
@@ -72,6 +82,11 @@ abstract struct Athena::Validator::Constraint
   macro inherited
     macro finished
       {% verbatim do %}
+        # :nodoc:
+        def validator : AVD::ConstraintValidator.class
+          VALIDATOR
+        end
+
         {% begin %}
           {% errors = {} of Nil => Nil %}
           {% for error in @type.constants.select { |error| error =~ /ERROR$/ } %}
@@ -79,14 +94,6 @@ abstract struct Athena::Validator::Constraint
           {% end %}
           @@error_names = {{errors}} of String => String
         {% end %}
-
-        # Returns the `AVD::ConstraintValidator.class` that should be used to validate `self`.
-        #
-        # Defaults to `self`'s class name suffixed with "Validator", but can
-        # be overridden in order to specify a custom type.
-        def validator : AVD::ConstraintValidator.class
-          VALIDATOR
-        end
       {% end %}
     end
   end

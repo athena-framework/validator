@@ -63,7 +63,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
       @context.set_node previous_value, previous_object, previous_metadata, previous_path
       @context.group = previous_group
 
-      return self
+      self
     when Iterable
       self.validate_each_object_in(
         value,
@@ -75,7 +75,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
       @context.set_node previous_value, previous_object, previous_metadata, previous_path
       @context.group = previous_group
 
-      return self
+      self
     else
       raise "Could not validate #{value}"
     end
@@ -174,17 +174,14 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     cascading_strategy = metadata.cascading_strategy
 
     return unless cascading_strategy.cascade?
+    return unless value.is_a? Iterable
 
-    traversal_strategy = metadata.traversal_strategy if traversal_strategy.implicit?
-
-    if value.is_a? Iterable
-      self.validate_each_object_in(
-        value,
-        property_path,
-        groups,
-        context
-      )
-    end
+    self.validate_each_object_in(
+      value,
+      property_path,
+      groups,
+      context
+    )
   end
 
   private def validate_object(object : AVD::Validatable, property_path : String, groups : Array(String), traversal_strategy : AVD::Metadata::TraversalStrategy, context : AVD::ExecutionContextInterface) : Nil
@@ -210,7 +207,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
   ) : Nil
     context.set_node object, object, class_metadata, property_path
 
-    groups.each_with_index do |group, idx|
+    groups.each do |group|
       # TODO: Can cache validated groups here if needed in the future
       self.validate_in_group object, class_metadata, group, context
     end
@@ -234,7 +231,6 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
 
     return if traversal_strategy.none?
     return if traversal_strategy.implicit? && !object.is_a? Iterable
-
     return unless object.is_a? Iterable
 
     self.validate_each_object_in(
