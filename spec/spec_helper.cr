@@ -28,5 +28,5 @@ struct MyValidator < AVD::ConstraintValidator
 end
 
 def get_violation(message : String, *, invalid_value : _ = nil, root : _ = nil, property_path : String = "", code : String = "") : AVD::Violation::ConstraintViolation
-  AVD::Violation::ConstraintViolation.new message, message, Hash(String, String).new, nil, root, nil, property_path, invalid_value, code, nil
+  AVD::Violation::ConstraintViolation.new message, message, Hash(String, String).new, root, property_path, invalid_value, code: code
 end
