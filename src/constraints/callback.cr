@@ -7,16 +7,22 @@ struct Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
 
   record CallbackContainer(T) < Container, value : T, context : AVD::ExecutionContextInterface, payload : Hash(String, String)? do
     getter! value : T
+
+    def expand
+      {@value, @context, @payload}
+    end
   end
 
-  macro with_callback
+  alias CallbackProc = Proc(AVD::Constraints::Callback::Container, Nil)
+
+  macro with_callback(**named_args)
     callback = Proc(AVD::Constraints::Callback::Container, Nil).new do |container|
       {{yield}}
 
       nil
     end
 
-    AVD::Constraints::Callback.new callback
+    AVD::Constraints::Callback.new callback: callback, groups: {{named_args[:groups]}}, payload: {{named_args[:payload]}}
   end
 
   configure targets: ["property", "class"]

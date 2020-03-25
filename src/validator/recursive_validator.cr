@@ -13,12 +13,12 @@ struct Athena::Validator::Validator::RecursiveValidator
     start_context(value).validate(value, constraints, groups).violations
   end
 
-  def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : Array(ConstraintViolationInterface)
-    start_context(value).validate_property(object, property_name, groups).violations
+  def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+    start_context(object).validate_property(object, property_name, groups).violations
   end
 
-  def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : Array(ConstraintViolationInterface)
-    start_context(value).validate_property_value(object, property_name, value, groups).violations
+  def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+    start_context(object).validate_property_value(object, property_name, value, groups).violations
   end
 
   def start_context(root = nil) : AVD::Validator::ContextualValidatorInterface

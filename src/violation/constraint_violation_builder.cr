@@ -9,7 +9,7 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
 
   def initialize(
     @violations : AVD::Violation::ConstraintViolationListInterface,
-    @constraint : AVD::Constraint,
+    @constraint : AVD::Constraint?,
     @message : String,
     @parameters : Hash(String, String),
     @root : Root,
@@ -50,6 +50,10 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
   end
 
   def cause(@cause : String?) : AVD::Violation::ConstraintViolationBuilderInterface
+    self
+  end
+
+  def constraint(@constraint : AVD::Constraint?) : AVD::Violation::ConstraintViolationBuilderInterface
     self
   end
 

@@ -6,12 +6,13 @@ struct Athena::Validator::Metadata::ClassMetadata
   include Athena::Validator::Metadata::ClassMetadataInterface
 
   getter default_group : String
-  @cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
+  getter class_name : AVD::Validatable
 
+  @cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
   @properties : Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase) = Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase).new
 
-  def initialize(@class : Validatable)
-    @default_group = @class.to_s
+  def initialize(@class_name : AVD::Validatable)
+    @default_group = @class_name.to_s
   end
 
   def add_constraint(constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
@@ -44,5 +45,9 @@ struct Athena::Validator::Metadata::ClassMetadata
 
   def property_metadata(property_name : String) : AVD::Metadata::PropertyMetadataInterfaceBase
     @properties[property_name]
+  end
+
+  def name : String?
+    nil
   end
 end

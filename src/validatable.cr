@@ -39,11 +39,11 @@ module Athena::Validator::Validatable
 
           # Add callback constraints
           {% for callback in @type.methods.select &.annotation(Assert::Callback) %}
-            class_metadata.add_constraint AVD::Constraints::Callback.new ->{{callback.name.id}}(AVD::Constraints::Callback::Container), false
+            class_metadata.add_constraint AVD::Constraints::Callback.new(callback: ->{{callback.name.id}}(AVD::Constraints::Callback::Container), static: false, {{callback.annotation(Assert::Callback).named_args.double_splat}})
           {% end %}
 
           {% for callback in @type.class.methods.select &.annotation(Assert::Callback) %}
-            class_metadata.add_constraint AVD::Constraints::Callback.new ->{{@type}}.{{callback.name.id}}(AVD::Constraints::Callback::Container)
+            class_metadata.add_constraint AVD::Constraints::Callback.new(callback: ->{{@type}}.{{callback.name.id}}(AVD::Constraints::Callback::Container), {{callback.annotation(Assert::Callback).named_args.double_splat}})
           {% end %}
         {% end %}
 

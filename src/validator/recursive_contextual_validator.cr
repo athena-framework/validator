@@ -64,7 +64,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
       @context.group = previous_group
 
       self
-    when Iterable
+    when Iterable, Hash
       self.validate_each_object_in(
         value,
         @default_property_path,
@@ -147,8 +147,23 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
   )
     collection.each_with_index do |item, idx|
       case item
-      when Iterable         then self.validate_each_object_in(item, "#{property_path}[#{idx}]", groups, context)
+      when Iterable, Hash   then self.validate_each_object_in(item, "#{property_path}[#{idx}]", groups, context)
       when AVD::Validatable then self.validate_object(item, "#{property_path}[#{idx}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
+      else                       raise "unreachable?"
+      end
+    end
+  end
+
+  private def validate_each_object_in(
+    collection : Hash,
+    property_path : String,
+    groups : Array(String),
+    context : AVD::ExecutionContextInterface
+  )
+    collection.each do |key, value|
+      case value
+      when Iterable, Hash   then self.validate_each_object_in(value, "#{property_path}[#{key}]", groups, context)
+      when AVD::Validatable then self.validate_object(value, "#{property_path}[#{key}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
       else                       raise "unreachable?"
       end
     end

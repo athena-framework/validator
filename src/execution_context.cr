@@ -31,8 +31,12 @@ class Athena::Validator::ExecutionContext(Root)
     @object_container.value
   end
 
+  def class_name
+    @metadata.try &.class_name
+  end
+
   def property_name : String?
-    (m = @metadata).is_a?(AVD::Metadata::PropertyMetadataInterfaceBase) ? m.name : nil
+    @metadata.try &.name
   end
 
   def path(path : String) : String
@@ -64,7 +68,7 @@ class Athena::Validator::ExecutionContext(Root)
   def build_violation(message : String, parameters : Hash(String, String) = {} of String => String) : AVD::Violation::ConstraintViolationBuilderInterface
     AVD::Violation::ConstraintViolationBuilder.new(
       @violations,
-      @constraint.not_nil!, # Is set via the validator
+      @constraint,
       message,
       parameters,
       @root,

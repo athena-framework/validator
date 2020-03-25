@@ -8,8 +8,7 @@ module Athena::Validator::ExecutionContextInterface
   abstract def group : String?
   abstract def root
   abstract def value
-  # abstract def class_name
-  # abstract def property_name : String
+  abstract def class_name
   abstract def property_path : String
   abstract def violations : AVD::Violation::ConstraintViolationListInterface
 
