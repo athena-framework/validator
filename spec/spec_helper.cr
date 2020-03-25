@@ -73,6 +73,86 @@ struct TestPropertyCallback
   def initialize(@name : String, @age : Int32 = 1, *, @group1 : String = "group", @group2 : String = "group"); end
 end
 
+struct MockContextualValidator
+  include Athena::Validator::Validator::ContextualValidatorInterface
+
+  def at_path(path : String) : AVD::Validator::ContextualValidatorInterface
+    self
+  end
+
+  def validate(value : _, constraints : Array(Constraint)? = nil, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+    self
+  end
+
+  def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+    self
+  end
+
+  def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+    self
+  end
+
+  def violations : AVD::Violation::ConstraintViolationListInterface
+    AVD::Violation::ConstraintViolationList.new
+  end
+end
+
+struct MockValidator
+  include Athena::Validator::Validator::ValidatorInterface
+
+  def validate(value : _, constraints : Array(AVD::Constraint)? = nil, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+    AVD::Violation::ConstraintViolationList.new
+  end
+
+  def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+    AVD::Violation::ConstraintViolationList.new
+  end
+
+  def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+    AVD::Violation::ConstraintViolationList.new
+  end
+
+  def start_context(root = nil) : AVD::Validator::ContextualValidatorInterface
+    MockContextualValidator.new
+  end
+
+  def in_context(context : AVD::ExecutionContextInterface) : AVD::Validator::ContextualValidatorInterface
+    MockContextualValidator.new
+  end
+end
+
+# TODO: Create Athena::Validator::Spec module
+
 def get_violation(message : String, *, invalid_value : _ = nil, root : _ = nil, property_path : String = "", code : String = "") : AVD::Violation::ConstraintViolation
   AVD::Violation::ConstraintViolation.new message, message, Hash(String, String).new, root, property_path, invalid_value, code: code
+end
+
+def create_context : AVD::ExecutionContextInterface
+  AVD::ExecutionContext.new MockValidator.new, nil
+end
+
+private def validate(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : AVD::Violation::ConstraintViolationListInterface
+  context = create_context
+
+  validator.context = context
+
+  validator.validate value, constraint
+
+  context.violations
+end
+
+def assert_no_violation(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : Nil
+  validate(validator, constraint, value).should be_empty
+end
+
+def assert_violations(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _, & : AVD::Violation::ConstraintViolationListInterface ->) : Nil
+  violations = validate(validator, constraint, value)
+
+  yield violations
+end
+
+def assert_violations(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : Nil
+  assert_violations(validator, constraint, value) do |violations|
+    violations.should_not be_empty
+  end
 end
