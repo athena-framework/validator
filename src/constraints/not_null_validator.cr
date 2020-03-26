@@ -5,7 +5,7 @@ struct Athena::Validator::Constraints::NotNullValidator < Athena::Validator::Con
 
     self.context
       .build_violation(constraint.message)
-      .add_parameter("{{ value }}", value.to_s)
+      .add_parameter("{{ value }}", value)
       .code(AVD::Constraints::NotNull::IS_NULL_ERROR)
       .add
   end

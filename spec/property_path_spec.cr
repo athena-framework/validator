@@ -10,8 +10,8 @@ private PATHS = [
 
 describe AVD::PropertyPath do
   describe ".append" do
-    it "generates the correct strings" do
-      PATHS.each do |(base, sub, expected)|
+    PATHS.each do |(base, sub, expected)|
+      it "generates the correct strings" do
         AVD::PropertyPath.append(base, sub).should eq expected
       end
     end

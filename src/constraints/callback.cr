@@ -30,5 +30,5 @@ struct Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
   getter callback : Proc(Container, Nil)
   getter? static : Bool
 
-  initializer("", callback : Proc(Container, Nil), static : Bool = true)
+  initializer(callback : Proc(Container, Nil), static : Bool = true)
 end

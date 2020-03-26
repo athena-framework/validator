@@ -28,7 +28,11 @@ module Athena::Validator
   abstract struct Container; end
 
   # :nodoc:
-  record ValueContainer(T) < Container, value : T
+  record ValueContainer(T) < Container, value : T do
+    def value_type : T.class
+      T
+    end
+  end
 
   def self.validator(validator_factory : AVD::ConstraintValidatorFactoryInterface? = nil) : AVD::Validator::ValidatorInterface
     AVD::Validator::RecursiveValidator.new validator_factory

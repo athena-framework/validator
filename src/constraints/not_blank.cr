@@ -6,5 +6,7 @@ struct Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
   getter? allow_nil : Bool
   getter normalizer : Proc(String, String)?
 
-  initializer("This value should not be blank.", allow_nil : Bool = false, normalizer : Proc(String, String)? = nil)
+  DEFAULT_ERROR_MESSAGE = "This value should not be blank."
+
+  initializer(allow_nil : Bool = false, normalizer : Proc(String, String)? = nil)
 end

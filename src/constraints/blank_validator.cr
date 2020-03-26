@@ -5,7 +5,7 @@ struct Athena::Validator::Constraints::BlankValidator < Athena::Validator::Const
 
     self.context
       .build_violation(constraint.message)
-      .add_parameter("{{ value }}", value.to_s)
+      .add_parameter("{{ value }}", value)
       .code(AVD::Constraints::Blank::NOT_BLANK_ERROR)
       .add
   end

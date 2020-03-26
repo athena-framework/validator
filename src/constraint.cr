@@ -1,6 +1,8 @@
 abstract struct Athena::Validator::Constraint
   DEFAULT_GROUP = "default"
 
+  DEFAULT_ERROR_MESSAGE = ""
+
   # Returns the name of the provided *error_code*.
   def self.error_name(error_code : String) : String
     @@error_names[error_code]? || raise KeyError.new "The error code '#{error_code}' does not exist for constraint of type '#{{{@type}}}'."
@@ -21,8 +23,8 @@ abstract struct Athena::Validator::Constraint
   end
 
   macro configure(**named_args)
-    {% annotation_name = named_args[:annotation] || %(Athena::Validator::Annotations::#{@type.name.split("::").last.id}).id %}
-    {% validator = named_args[:validator] || "#{@type}Validator".id %}
+    {% annotation_name = named_args[:annotation] || %(Athena::Validator::Annotations::#{@type.name(generic_args: false).split("::").last.id}).id %}
+    {% validator = named_args[:validator] || "#{@type.name(generic_args: false)}Validator".id %}
     {% targets = named_args[:targets] || ["property"] %}
 
     # The fully qualified name (FQN) of the annotation that should be related to `self`.
@@ -74,12 +76,12 @@ abstract struct Athena::Validator::Constraint
   # #   super message, groups, payload
   # # end
   # ```
-  macro initializer(message, *properties)
+  macro initializer(*properties)
     def initialize(
       {% for property in properties %}
         @{{property}},
       {% end %}
-      message : String = {{message}},
+      message : String = DEFAULT_ERROR_MESSAGE,
       groups : Array(String)? = nil,
       payload : Hash(String, String)? = nil,
     )

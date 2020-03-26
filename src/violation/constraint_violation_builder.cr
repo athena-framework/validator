@@ -25,8 +25,8 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
     self
   end
 
-  def add_parameter(key : String, value : String) : AVD::Violation::ConstraintViolationBuilderInterface
-    @parameters[key] = value
+  def add_parameter(key : String, value : _) : AVD::Violation::ConstraintViolationBuilderInterface
+    @parameters[key] = value.to_s
 
     self
   end

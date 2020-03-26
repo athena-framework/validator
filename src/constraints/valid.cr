@@ -3,5 +3,5 @@ struct Athena::Validator::Constraints::Valid < Athena::Validator::Constraint
 
   getter? traverse : Bool
 
-  initializer("", traverse : Bool = true)
+  initializer(traverse : Bool = true)
 end
