@@ -1,4 +1,5 @@
 struct Athena::Validator::Constraints::ValidValidator < Athena::Validator::ConstraintValidator
+  # :inherit:
   def validate(value : _, constraint : AVD::Constraints::Valid) : Nil
     return if value.nil?
 

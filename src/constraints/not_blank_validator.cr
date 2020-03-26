@@ -1,4 +1,5 @@
 struct Athena::Validator::Constraints::NotBlankValidator < Athena::Validator::ConstraintValidator
+  # :inherit:
   def validate(value : String?, constraint : AVD::Constraints::NotBlank) : Nil
     value = (va = value) && (normalizer = constraint.normalizer) ? normalizer.call(va) : value
 
@@ -7,12 +8,14 @@ struct Athena::Validator::Constraints::NotBlankValidator < Athena::Validator::Co
     end
   end
 
+  # :inherit:
   def validate(value : Bool?, constraint : AVD::Constraints::NotBlank) : Nil
     validate(value, constraint) do |v|
       v == false
     end
   end
 
+  # :inherit:
   def validate(value : Indexable?, constraint : AVD::Constraints::NotBlank) : Nil
     validate(value, constraint) do |v|
       v.empty?

@@ -1,6 +1,6 @@
 require "../spec_helper"
 
-private def create_validator : AVD::Constraints::CallbackValidator
+private def create_validator
   AVD::Constraints::CallbackValidator.new
 end
 
