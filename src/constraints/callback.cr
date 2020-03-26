@@ -22,10 +22,10 @@ struct Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
       nil
     end
 
-    AVD::Constraints::Callback.new callback: callback, groups: {{named_args[:groups]}}, payload: {{named_args[:payload]}}
+    AVD::Constraints::Callback.new(callback: callback, {{named_args.double_splat}})
   end
 
-  configure targets: ["property", "class"]
+  configure targets: ["method"]
 
   getter callback : Proc(Container, Nil)
   getter? static : Bool

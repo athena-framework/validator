@@ -13,7 +13,8 @@ module Athena::Validator::Validatable
 
             {% if (ann_name = class_constraint.constant("ANNOTATION").resolve) && (class_ann = @type.annotation(ann_name)) %}
               {% supported_types = constraint.constant("VALIDATOR").resolve.methods.select { |m| m.name == "validate" }.map { |m| m.args.first.restriction } %}
-              {% if supported_types.any? { |t| !t.is_a?(Nop) || !t.is_a_?(Underscore) } %}
+
+              {% if !supported_types.any? { |t| !t.is_a?(Nop) || !t.is_a_?(Underscore) } %}
                 {% raise "Constraint #{constraint} cannot be applied to #{@type}.  This constraint does not support the #{@type} type." unless supported_types.any? { |t| (t.is_a?(Underscore) || t.is_a?(Nop)) ? false : t.resolve >= @type.resolve } %}
               {% end %}
 
@@ -30,7 +31,7 @@ module Athena::Validator::Validatable
               {% if (ann_name = property_constraint.constant("ANNOTATION").resolve) && (property_ann = ivar.annotation(ann_name)) %}
                 {% supported_types = constraint.constant("VALIDATOR").resolve.methods.select { |m| m.name == "validate" }.map { |m| m.args.first.restriction } %}
 
-                {% if supported_types.any? { |t| !t.is_a?(Nop) || !t.is_a_?(Underscore) } %}
+                {% if !supported_types.any? { |t| !t.is_a?(Nop) || !t.is_a_?(Underscore) } %}
                   {% raise "Constraint #{constraint} cannot be applied to #{@type}##{ivar.name}.  This constraint does not support the #{ivar.type} type." unless supported_types.any? { |t| (t.is_a?(Underscore) || t.is_a?(Nop)) ? false : t.resolve >= ivar.type } %}
                 {% end %}
 

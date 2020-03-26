@@ -7,17 +7,29 @@ describe AVD::Constraint do
         it "defaults to AVD::Annotations namespace" do
           Fake::DefaultConstraint::ANNOTATION.should eq Athena::Validator::Annotations::DefaultConstraint
         end
+
+        it ".annotation" do
+          Fake::DefaultConstraint.annotation.should eq Athena::Validator::Annotations::DefaultConstraint
+        end
       end
 
       describe "VALIDATOR" do
         it "defaults to type name suffixed with Validator" do
           Fake::DefaultConstraint::VALIDATOR.should eq Fake::DefaultConstraintValidator
         end
+
+        it ".validator" do
+          Fake::DefaultConstraint.validator.should eq Fake::DefaultConstraintValidator
+        end
       end
 
       describe "TARGETS" do
         it "defaults to property" do
           Fake::DefaultConstraint::TARGETS.should eq ["property"]
+        end
+
+        it ".targets" do
+          Fake::DefaultConstraint.targets.should eq ["property"]
         end
       end
     end
@@ -27,17 +39,29 @@ describe AVD::Constraint do
         it "uses what is provided" do
           CustomConstraint::ANNOTATION.should eq CustomConstraintAnotation
         end
+
+        it ".targets" do
+          CustomConstraint.annotation.should eq CustomConstraintAnotation
+        end
       end
 
       describe "VALIDATOR" do
         it "uses what is provided" do
           CustomConstraint::VALIDATOR.should eq MyValidator
         end
+
+        it ".targets" do
+          CustomConstraint.validator.should eq MyValidator
+        end
       end
 
       describe "TARGETS" do
         it "uses what is provided" do
           CustomConstraint::TARGETS.should eq ["foo"]
+        end
+
+        it ".targets" do
+          CustomConstraint.targets.should eq ["foo"]
         end
       end
     end
@@ -83,12 +107,6 @@ describe AVD::Constraint do
       constraint.groups.should eq ["custom_group"]
       constraint.add_implicit_group "foo"
       constraint.groups.should eq ["custom_group"]
-    end
-  end
-
-  describe "#validator" do
-    it "returns the type that should validate that constraint" do
-      CustomConstraint.new("").validator.should eq MyValidator
     end
   end
 

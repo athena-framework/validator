@@ -7,7 +7,7 @@ struct Athena::Validator::ConstraintValidatorFactory
 
   # :inherit:
   def validator(constraint : AVD::Constraint) : AVD::ConstraintValidatorInterface
-    validator_class = constraint.validator
+    validator_class = constraint.class.validator
 
     @validators[validator_class] = validator_class.new unless @validators.has_key? validator_class
 
