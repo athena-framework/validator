@@ -1,7 +1,7 @@
 struct Athena::Validator::Constraints::EqualToValidator < Athena::Validator::Constraints::AbstractComparisonValidator
   # :inherit:
-  def compare_values(expected : _, actual : _) : Bool
-    expected == actual
+  def compare_values(actual : _, expected : _) : Bool
+    actual == expected
   end
 
   # :inherit:

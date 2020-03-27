@@ -123,6 +123,30 @@ end
 
 # TODO: Create Athena::Validator::Spec module
 
+record ComparableMock, value : Int32 do
+  include Comparable(ComparableMock)
+
+  def <=>(other : self) : Int32?
+    @value <=> other.value
+  end
+end
+
+macro define_comparison_spec
+  describe "#validate" do
+    VALID_COMPARISONS.each do |(actual, expected, message)|
+      it "valid #{message}" do
+        assert_no_violation create_validator, create_constraint(value: expected), actual
+      end
+    end
+
+    INVALID_COMPARISONS.each do |(actual, expected, message)|
+      it "invalid #{message}" do
+        assert_violations create_validator, create_constraint(value: expected), actual
+      end
+    end
+  end
+end
+
 def get_violation(message : String, *, invalid_value : _ = nil, root : _ = nil, property_path : String = "", code : String = "") : AVD::Violation::ConstraintViolation
   AVD::Violation::ConstraintViolation.new message, message, Hash(String, String).new, root, property_path, invalid_value, code: code
 end

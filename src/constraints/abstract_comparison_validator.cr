@@ -1,5 +1,5 @@
 abstract struct Athena::Validator::Constraints::AbstractComparisonValidator < Athena::Validator::ConstraintValidator
-  protected abstract def compare_values(expected : _, actual : _) : Bool
+  protected abstract def compare_values(actual : _, expected : _) : Bool
   protected abstract def error_code : String
 
   # :inherit:
@@ -8,7 +8,7 @@ abstract struct Athena::Validator::Constraints::AbstractComparisonValidator < At
 
     compared_value = constraint.value
 
-    return if self.compare_values compared_value, value
+    return if self.compare_values value, compared_value
 
     self.context
       .build_violation(constraint.message)
