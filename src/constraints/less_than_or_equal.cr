@@ -1,4 +1,4 @@
-struct Athena::Validator::Constraints::LessThanOrEqual < Athena::Validator::Constraints::AbstractComparison
+struct Athena::Validator::Constraints::LessThanOrEqual(ValueType) < Athena::Validator::Constraints::AbstractComparison
   configure
 
   TOO_HIGH_ERROR        = "515a12ff-82f2-4434-9635-137164d5b467"

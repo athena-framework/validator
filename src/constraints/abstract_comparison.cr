@@ -1,24 +1,11 @@
 abstract struct Athena::Validator::Constraints::AbstractComparison < Athena::Validator::Constraint
-  DEFAULT_ERROR_MESSAGE = ""
+  abstract def value
+  abstract def value_type
 
-  @value_container : AVD::Container
+  macro inherited
+    getter value : ValueType
+    getter value_type : ValueType.class = ValueType
 
-  def initialize(
-    value : _,
-    message : String = DEFAULT_ERROR_MESSAGE,
-    groups : Array(String)? = nil,
-    payload : Hash(String, String)? = nil
-  )
-    @value_container = AVD::ValueContainer.new value
-
-    super message, groups, payload
-  end
-
-  def value
-    @value_container.value
-  end
-
-  def value_type
-    @value_container.value_type
+    initializer(value : ValueType)
   end
 end

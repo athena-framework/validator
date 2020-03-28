@@ -8,11 +8,12 @@ module Athena::Validator::Validatable
       {% verbatim do %}
         {% begin %}
           # Add class constraints
-          {% for class_constraint in AVD::Constraint.all_subclasses.select { |c| !c.abstract? && (targets = c.constant("TARGETS")) && targets.includes? "class" } %}
+          {% for class_constraint in AVD::Constraint.all_subclasses.select { |c| !c.abstract? && (ann = c.annotation(AVD::RegisterConstraint)) && (targets = ann[:targets]) && targets.includes? "class" } %}
             {% constraint = class_constraint %}
+            {% ann = constraint.annotation(AVD::RegisterConstraint) %}
 
-            {% if (ann_name = class_constraint.constant("ANNOTATION").resolve) && (class_ann = @type.annotation(ann_name)) %}
-              {% supported_types = constraint.constant("VALIDATOR").resolve.methods.select { |m| m.name == "validate" }.map { |m| m.args.first.restriction } %}
+            {% if (ann_name = ann[:annotation].resolve) && (class_ann = @type.annotation(ann_name)) %}
+              {% supported_types = ann[:validator].resolve.methods.select { |m| m.name == "validate" }.map { |m| m.args.first.restriction } %}
 
               {% if !supported_types.any? { |t| !t.is_a?(Nop) || !t.is_a_?(Underscore) } %}
                 {% raise "Constraint #{constraint} cannot be applied to #{@type}.  This constraint does not support the #{@type} type." unless supported_types.any? { |t| (t.is_a?(Underscore) || t.is_a?(Nop)) ? false : t.resolve >= @type.resolve } %}
@@ -24,12 +25,14 @@ module Athena::Validator::Validatable
 
           # Add property constraints
           {% for ivar in @type.instance_vars %}
-            {% for property_constraint in AVD::Constraint.all_subclasses.select { |c| !c.abstract? && (targets = c.constant("TARGETS")) && targets.includes? "property" } %}
+            {% for property_constraint in AVD::Constraint.all_subclasses.select { |c| !c.abstract? && (ann = c.annotation(AVD::RegisterConstraint)) && (targets = ann[:targets]) && targets.includes? "property" } %}
               {% constraint = property_constraint %}
+              {% ann = constraint.annotation(AVD::RegisterConstraint) %}
+
               {% ivar = ivar %}
 
-              {% if (ann_name = property_constraint.constant("ANNOTATION").resolve) && (property_ann = ivar.annotation(ann_name)) %}
-                {% supported_types = constraint.constant("VALIDATOR").resolve.methods.select { |m| m.name == "validate" }.map { |m| m.args.first.restriction } %}
+              {% if (ann_name = ann[:annotation].resolve) && (property_ann = ivar.annotation(ann_name)) %}
+                {% supported_types = ann[:validator].resolve.methods.select { |m| m.name == "validate" }.map { |m| m.args.first.restriction } %}
 
                 {% if !supported_types.any? { |t| !t.is_a?(Nop) || !t.is_a_?(Underscore) } %}
                   {% raise "Constraint #{constraint} cannot be applied to #{@type}##{ivar.name}.  This constraint does not support the #{ivar.type} type." unless supported_types.any? { |t| (t.is_a?(Underscore) || t.is_a?(Nop)) ? false : t.resolve >= ivar.type } %}

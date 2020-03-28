@@ -37,4 +37,36 @@ module Athena::Validator
   def self.validator(validator_factory : AVD::ConstraintValidatorFactoryInterface? = nil) : AVD::Validator::ValidatorInterface
     AVD::Validator::RecursiveValidator.new validator_factory
   end
+
+  module Compare
+    def self.gt(value1, value2) : Bool
+      compare(value1, value2) do |cmp|
+        cmp > 0
+      end
+    end
+
+    def self.gte(value1, value2) : Bool
+      compare(value1, value2) do |cmp|
+        cmp >= 0
+      end
+    end
+
+    def self.lt(value1, value2) : Bool
+      compare(value1, value2) do |cmp|
+        cmp < 0
+      end
+    end
+
+    def self.lte(value1, value2) : Bool
+      compare(value1, value2) do |cmp|
+        cmp <= 0
+      end
+    end
+
+    private def self.compare(value1 : _, value2 : _, & : Int32 -> Bool) : Bool
+      return false unless cmp = (value1 <=> value2)
+
+      yield cmp
+    end
+  end
 end

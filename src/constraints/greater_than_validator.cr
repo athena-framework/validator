@@ -2,9 +2,8 @@ struct Athena::Validator::Constraints::GreaterThanValidator < Athena::Validator:
   # :inherit:
   def compare_values(actual : _, expected : _) : Bool
     return true if expected.nil?
-    return false unless cmp = (actual <=> expected)
 
-    cmp > 0
+    AVD::Compare.gt actual, expected
   end
 
   # :inherit:
