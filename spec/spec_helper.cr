@@ -131,17 +131,30 @@ record ComparableMock, value : Int32 do
   end
 end
 
-macro define_comparison_spec
+macro define_comparison_spec(with_value = true)
   describe "#validate" do
     VALID_COMPARISONS.each do |(actual, expected, message)|
       it "valid #{message}" do
-        assert_no_violation create_validator, create_constraint(value: expected), actual
+        assert_constraint_validator create_validator, create_constraint{% if with_value %}(value: expected){% end %} do
+          validate actual
+
+          assert_no_violations
+        end
       end
     end
 
     INVALID_COMPARISONS.each do |(actual, expected, message)|
       it "invalid #{message}" do
-        assert_violations create_validator, create_constraint(value: expected), actual
+        assert_constraint_validator create_validator, create_constraint(message: "message"{% if with_value %}, value: expected{% end %}) do
+          validate actual
+
+          build_violation("message")
+            .add_parameter("\{{ value }}", actual)
+            .add_parameter("\{{ compared_value }}", expected)
+            .add_parameter("\{{ compared_value_type }}", typeof(expected))
+            .code(error_code)
+            .assert_violation
+        end
       end
     end
   end
@@ -151,38 +164,8 @@ def get_violation(message : String, *, invalid_value : _ = nil, root : _ = nil, 
   AVD::Violation::ConstraintViolation.new message, message, Hash(String, String).new, root, property_path, invalid_value, code: code
 end
 
-def create_context : AVD::ExecutionContextInterface
-  AVD::ExecutionContext.new MockValidator.new, nil
-end
-
-# private def validate(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : AVD::Violation::ConstraintViolationListInterface
-#   context = create_context
-
-#   validator.context = context
-
-#   validator.validate value, constraint
-
-#   context.violations
-# end
-
-# def assert_no_violation(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : Nil
-#   validate(validator, constraint, value).should be_empty
-# end
-
-# def assert_violations(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _, & : AVD::Violation::ConstraintViolationListInterface ->) : Nil
-#   violations = validate(validator, constraint, value)
-
-#   yield violations
-# end
-
-# def assert_violations(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : Nil
-#   assert_violations(validator, constraint, value) do |violations|
-#     violations.should_not be_empty
-#   end
-# end
-
 def assert_constraint_validator(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, group : String? = nil, &)
-  context = create_context
+  context = AVD::ExecutionContext.new MockValidator.new, nil
   context.group = group
   context.set_node "invalid_value", nil, nil, "property_path"
   context.constraint = constraint
@@ -202,7 +185,6 @@ record ConstraintViolationAssertion, context : AVD::ExecutionContextInterface, v
   @plural : Int32? = nil
   @code : String? = nil
   @cause : String? = nil
-  @assertions : Array(self) = [] of self
 
   def assert_no_violations : Nil
     @context.violations.should be_empty
@@ -235,13 +217,13 @@ record ConstraintViolationAssertion, context : AVD::ExecutionContextInterface, v
   end
 
   def assert_violation : Nil
-    expected = [get_violation]
+    expected_violations = [self.get_violation] of AVD::Violation::ConstraintViolationInterface
 
     violations = @context.violations
 
     violations.size.should eq 1
 
-    expected.each_with_index do |violation, idx|
+    expected_violations.each_with_index do |violation, idx|
       violation.should eq violations[idx]
     end
   end

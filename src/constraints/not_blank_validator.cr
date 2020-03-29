@@ -1,8 +1,6 @@
 struct Athena::Validator::Constraints::NotBlankValidator < Athena::Validator::ConstraintValidator
   # :inherit:
   def validate(value : String?, constraint : AVD::Constraints::NotBlank) : Nil
-    value = (va = value) && (normalizer = constraint.normalizer) ? normalizer.call(va) : value
-
     validate(value, constraint) do |v|
       v.blank?
     end

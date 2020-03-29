@@ -8,6 +8,10 @@ private def create_constraint(**named_args)
   AVD::Constraints::NotEqualTo.new **named_args
 end
 
+private def error_code : String
+  AVD::Constraints::NotEqualTo::IS_EQUAL_ERROR
+end
+
 private VALID_COMPARISONS = [
   {2, 1, "numbers"},
   {"bar", "foo", "strings"},

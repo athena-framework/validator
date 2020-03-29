@@ -15,7 +15,11 @@ describe AVD::Constraints::CallbackValidator do
         payload.should be_nil
       end
 
-      assert_no_violation(create_validator, constraint, "foo")
+      assert_constraint_validator create_validator, constraint do
+        validate "foo"
+
+        assert_no_violations
+      end
     end
 
     it "the value is nil in non static callbacks" do
@@ -27,7 +31,11 @@ describe AVD::Constraints::CallbackValidator do
         payload.should be_nil
       end
 
-      assert_no_violation(create_validator, constraint, "foo")
+      assert_constraint_validator create_validator, constraint do
+        validate "foo"
+
+        assert_no_violations
+      end
     end
 
     it "does not run the callback if the value is nil" do
@@ -35,7 +43,11 @@ describe AVD::Constraints::CallbackValidator do
         container.context.add_violation "message"
       end
 
-      assert_no_violation(create_validator, constraint, nil)
+      assert_constraint_validator create_validator, constraint do
+        validate nil
+
+        assert_no_violations
+      end
     end
   end
 end

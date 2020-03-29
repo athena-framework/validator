@@ -1,11 +1,15 @@
-abstract struct Athena::Validator::Constraints::AbstractComparison < Athena::Validator::Constraint
-  abstract def value
-  abstract def value_type
+module Athena::Validator::Constraints::AbstractComparison(ValueType)
+  private DEFAULT_ERROR_MESSAGE = ""
 
-  macro inherited
-    getter value : ValueType
-    getter value_type : ValueType.class = ValueType
+  getter value : ValueType
+  getter value_type : ValueType.class = ValueType
 
-    initializer(value : ValueType)
+  def initialize(
+    @value : ValueType,
+    message : String = DEFAULT_ERROR_MESSAGE,
+    groups : Array(String)? = nil,
+    payload : Hash(String, String)? = nil
+  )
+    super message, groups, payload
   end
 end

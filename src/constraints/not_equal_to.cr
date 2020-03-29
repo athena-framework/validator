@@ -1,4 +1,6 @@
-struct Athena::Validator::Constraints::NotEqualTo(ValueType) < Athena::Validator::Constraints::AbstractComparison
+struct Athena::Validator::Constraints::NotEqualTo(ValueType) < Athena::Validator::Constraint
+  include Athena::Validator::Constraints::AbstractComparison(ValueType)
+
   configure
 
   IS_EQUAL_ERROR        = "984a0525-d73e-40c0-81c2-2ecbca7e4c96"

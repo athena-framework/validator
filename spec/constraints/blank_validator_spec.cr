@@ -8,29 +8,43 @@ private def create_constraint(**named_args)
   AVD::Constraints::Blank.new **named_args
 end
 
+private VALID_VALUES = [
+  {"", "string"},
+  {nil, "nil"},
+]
+
+private INVALID_VALUES = [
+  {"foo", "string"},
+  {false, "bool"},
+  {1232, "integer"},
+]
+
 describe AVD::Constraints::BlankValidator do
   describe "#validate" do
     describe "valid values" do
-      it String do
-        assert_no_violation create_validator, create_constraint, ""
-      end
+      VALID_VALUES.each do |(actual, message)|
+        it message do
+          assert_constraint_validator create_validator, create_constraint do
+            validate actual
 
-      it Nil do
-        assert_no_violation create_validator, create_constraint, nil
+            assert_no_violations
+          end
+        end
       end
     end
 
     describe "invalid values" do
-      it String do
-        assert_violations create_validator, create_constraint, "foo"
-      end
+      INVALID_VALUES.each do |(actual, message)|
+        it message do
+          assert_constraint_validator create_validator, create_constraint(message: "message") do
+            validate actual
 
-      it Bool do
-        assert_violations create_validator, create_constraint, false
-      end
-
-      it Int32 do
-        assert_violations create_validator, create_constraint, 123
+            build_violation("message")
+              .add_parameter("{{ value }}", actual)
+              .code(AVD::Constraints::Blank::NOT_BLANK_ERROR)
+              .assert_violation
+          end
+        end
       end
     end
   end

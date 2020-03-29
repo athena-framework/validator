@@ -8,6 +8,10 @@ private def create_constraint(**named_args)
   AVD::Constraints::GreaterThan.new **named_args
 end
 
+private def error_code : String
+  AVD::Constraints::GreaterThan::TOO_LOW_ERROR
+end
+
 private VALID_COMPARISONS = [
   {2, 1, "numbers"},
   {"zzz", "aaa", "strings"},

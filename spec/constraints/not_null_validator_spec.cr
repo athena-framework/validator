@@ -8,30 +8,38 @@ private def create_constraint(**named_args)
   AVD::Constraints::NotNull.new **named_args
 end
 
+private VALID_VALUES = [
+  {"", "string"},
+  {true, "bool"},
+  {false, "bool"},
+  {0, "integer"},
+  {Pointer(Void).null, "null pointer"},
+]
+
 describe AVD::Constraints::NotNullValidator do
   describe "#validate" do
     describe "valid values" do
-      it String do
-        assert_no_violation create_validator, create_constraint, ""
-      end
+      VALID_VALUES.each do |(actual, message)|
+        it message do
+          assert_constraint_validator create_validator, create_constraint do
+            validate actual
 
-      it Bool do
-        assert_no_violation create_validator, create_constraint, false
-        assert_no_violation create_validator, create_constraint, true
-      end
-
-      it Int32 do
-        assert_no_violation create_validator, create_constraint, 0
-      end
-
-      it Pointer do
-        assert_no_violation create_validator, create_constraint, Pointer(Void).null
+            assert_no_violations
+          end
+        end
       end
     end
 
     describe "invalid values" do
       it Nil do
-        assert_violations create_validator, create_constraint, nil
+        assert_constraint_validator create_validator, create_constraint(message: "message") do
+          validate nil
+
+          build_violation("message")
+            .add_parameter("{{ value }}", nil)
+            .code(AVD::Constraints::NotNull::IS_NULL_ERROR)
+            .assert_violation
+        end
       end
     end
   end
