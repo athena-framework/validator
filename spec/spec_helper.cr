@@ -155,28 +155,109 @@ def create_context : AVD::ExecutionContextInterface
   AVD::ExecutionContext.new MockValidator.new, nil
 end
 
-private def validate(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : AVD::Violation::ConstraintViolationListInterface
+# private def validate(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : AVD::Violation::ConstraintViolationListInterface
+#   context = create_context
+
+#   validator.context = context
+
+#   validator.validate value, constraint
+
+#   context.violations
+# end
+
+# def assert_no_violation(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : Nil
+#   validate(validator, constraint, value).should be_empty
+# end
+
+# def assert_violations(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _, & : AVD::Violation::ConstraintViolationListInterface ->) : Nil
+#   violations = validate(validator, constraint, value)
+
+#   yield violations
+# end
+
+# def assert_violations(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : Nil
+#   assert_violations(validator, constraint, value) do |violations|
+#     violations.should_not be_empty
+#   end
+# end
+
+def assert_constraint_validator(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, group : String? = nil, &)
   context = create_context
+  context.group = group
+  context.set_node "invalid_value", nil, nil, "property_path"
+  context.constraint = constraint
 
   validator.context = context
 
-  validator.validate value, constraint
+  assertion = ConstraintViolationAssertion.new context, validator, constraint
 
-  context.violations
+  with assertion yield
 end
 
-def assert_no_violation(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : Nil
-  validate(validator, constraint, value).should be_empty
-end
+record ConstraintViolationAssertion, context : AVD::ExecutionContextInterface, validator : AVD::ConstraintValidator, constraint : AVD::Constraint do
+  @message : String = "message"
+  @parameters : Hash(String, String) = Hash(String, String).new
+  @invalid_value : String = "invalid_value"
+  @property_path : String = "property_path"
+  @plural : Int32? = nil
+  @code : String? = nil
+  @cause : String? = nil
+  @assertions : Array(self) = [] of self
 
-def assert_violations(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _, & : AVD::Violation::ConstraintViolationListInterface ->) : Nil
-  violations = validate(validator, constraint, value)
+  def assert_no_violations : Nil
+    @context.violations.should be_empty
+  end
 
-  yield violations
-end
+  def validate(value : _) : Nil
+    @validator.validate value, @constraint
+  end
 
-def assert_violations(validator : AVD::ConstraintValidator, constraint : AVD::Constraint, value : _) : Nil
-  assert_violations(validator, constraint, value) do |violations|
-    violations.should_not be_empty
+  def add_parameter(key : String, value : _) : self
+    @parameters[key] = value.to_s
+
+    self
+  end
+
+  def build_violation(@message : String) : self
+    self
+  end
+
+  def plural(@plural : Int32) : self
+    self
+  end
+
+  def code(@code : String?) : self
+    self
+  end
+
+  def cause(@cause : String?) : self
+    self
+  end
+
+  def assert_violation : Nil
+    expected = [get_violation]
+
+    violations = @context.violations
+
+    violations.size.should eq 1
+
+    expected.each_with_index do |violation, idx|
+      violation.should eq violations[idx]
+    end
+  end
+
+  private def get_violation
+    AVD::Violation::ConstraintViolation.new(
+      @message,
+      @message,
+      @parameters,
+      @context.root,
+      @property_path,
+      @invalid_value,
+      @plural,
+      @code,
+      @constraint,
+      @cause
+    )
   end
 end

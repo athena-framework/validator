@@ -35,7 +35,7 @@ abstract struct Athena::Validator::Constraint
       # Defaults to `self`'s class name within the `AVD::Annotations` namespace but can be overridden via the `AVD::Constraint.configure` macro.
       ANNOTATION = {{annotation_name}}
 
-      # Denotes that possible targets `self` is allowed to be applied to.  Possible values are `"property"` or `"class"`.
+      # Denotes that possible targets `self` is allowed to be applied to.  Possible values are `"property"`, `"method"`, or `"class"`.
       #
       # Defaults to `"property"`, but can be overridden via the `AVD::Constraint.configure` macro.
       TARGETS = {{targets}}

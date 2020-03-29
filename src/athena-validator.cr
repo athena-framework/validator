@@ -32,6 +32,10 @@ module Athena::Validator
     def value_type : T.class
       T
     end
+
+    def ==(other : self) : Bool
+      @value == other.value
+    end
   end
 
   def self.validator(validator_factory : AVD::ConstraintValidatorFactoryInterface? = nil) : AVD::Validator::ValidatorInterface
@@ -39,25 +43,25 @@ module Athena::Validator
   end
 
   module Compare
-    def self.gt(value1, value2) : Bool
+    def self.gt(value1 : _, value2 : _) : Bool
       compare(value1, value2) do |cmp|
         cmp > 0
       end
     end
 
-    def self.gte(value1, value2) : Bool
+    def self.gte(value1 : _, value2 : _) : Bool
       compare(value1, value2) do |cmp|
         cmp >= 0
       end
     end
 
-    def self.lt(value1, value2) : Bool
+    def self.lt(value1 : _, value2 : _) : Bool
       compare(value1, value2) do |cmp|
         cmp < 0
       end
     end
 
-    def self.lte(value1, value2) : Bool
+    def self.lte(value1 : _, value2 : _) : Bool
       compare(value1, value2) do |cmp|
         cmp <= 0
       end
