@@ -6,5 +6,6 @@ abstract struct Athena::Validator::ConstraintValidator
   property! context : AVD::ExecutionContextInterface
 
   def validate(value : _, constraint : AVD::Constraint) : Nil
+    # Noop if a given validator doesn't support a given type of value
   end
 end

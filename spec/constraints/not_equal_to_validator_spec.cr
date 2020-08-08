@@ -1,32 +1,35 @@
 require "../spec_helper"
 
-private def create_validator
-  AVD::Constraints::NotEqualToValidator.new
-end
+struct NotEqualToValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
+  def valid_comparisons
+    {
+      int:    {1, 2},
+      char:   {'b', 'a'},
+      string: {"b", "a"},
+      time:   {Time.utc(2020, 4, 8), Time.utc(2020, 4, 7)},
+      nil:    {nil, false},
 
-private def create_constraint(**named_args)
-  AVD::Constraints::NotEqualTo.new **named_args
-end
+    }
+  end
 
-private def error_code : String
-  AVD::Constraints::NotEqualTo::IS_EQUAL_ERROR
-end
+  def invalid_comparisons
+    {
+      int:    {3, 3},
+      char:   {'a', 'a'},
+      string: {"a", "a"},
+      time:   {Time.utc(2020, 4, 7), Time.utc(2020, 4, 7)},
+    }
+  end
 
-private VALID_COMPARISONS = [
-  {2, 1, "numbers"},
-  {"bar", "foo", "strings"},
-  {ComparableMock.new(10), ComparableMock.new(5), "comparable types"},
-  {Time.utc(2020, 4, 8), Time.utc(2020, 4, 7), "times"},
-  {nil, 'a', "nil"},
-]
+  def error_code
+    AVD::Constraints::NotEqualTo::IS_EQUAL_ERROR
+  end
 
-private INVALID_COMPARISONS = [
-  {1, 1, "numbers"},
-  {"foo", "foo", "strings"},
-  {ComparableMock.new(5), ComparableMock.new(5), "comparable types"},
-  {Time.utc(2020, 4, 7), Time.utc(2020, 4, 7), "times"},
-]
+  def create_validator : AVD::ConstraintValidatorInterface
+    AVD::Constraints::NotEqualTo::Validator.new
+  end
 
-describe AVD::Constraints::NotEqualToValidator do
-  define_comparison_spec
+  def constraint_class : AVD::Constraint.class
+    AVD::Constraints::NotEqualTo
+  end
 end

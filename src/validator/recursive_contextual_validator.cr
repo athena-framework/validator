@@ -51,19 +51,19 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     end
 
     case value
-    when AVD::Validatable
-      self.validate_object(
-        value,
-        @default_property_path,
-        groups,
-        AVD::Metadata::TraversalStrategy::Implicit,
-        @context
-      )
+    # when AVD::Validatable
+    #   self.validate_object(
+    #     value,
+    #     @default_property_path,
+    #     groups,
+    #     AVD::Metadata::TraversalStrategy::Implicit,
+    #     @context
+    #   )
 
-      @context.set_node previous_value, previous_object, previous_metadata, previous_path
-      @context.group = previous_group
+    #   @context.set_node previous_value, previous_object, previous_metadata, previous_path
+    #   @context.group = previous_group
 
-      self
+    #   self
     when Iterable, Hash
       self.validate_each_object_in(
         value,
@@ -147,9 +147,9 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
   )
     collection.each_with_index do |item, idx|
       case item
-      when Iterable, Hash   then self.validate_each_object_in(item, "#{property_path}[#{idx}]", groups, context)
-      when AVD::Validatable then self.validate_object(item, "#{property_path}[#{idx}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
-      else                       raise "unreachable?"
+      when Iterable, Hash then self.validate_each_object_in(item, "#{property_path}[#{idx}]", groups, context)
+        # when AVD::Validatable then self.validate_object(item, "#{property_path}[#{idx}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
+      else raise "unreachable?"
       end
     end
   end
@@ -162,9 +162,9 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
   )
     collection.each do |key, value|
       case value
-      when Iterable, Hash   then self.validate_each_object_in(value, "#{property_path}[#{key}]", groups, context)
-      when AVD::Validatable then self.validate_object(value, "#{property_path}[#{key}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
-      else                       raise "unreachable?"
+      when Iterable, Hash then self.validate_each_object_in(value, "#{property_path}[#{key}]", groups, context)
+        # when AVD::Validatable then self.validate_object(value, "#{property_path}[#{key}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
+      else raise "unreachable?"
       end
     end
   end
@@ -261,13 +261,12 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
 
     metadata.find_constraints(group).each do |constraint|
       # TODO: Can cache validated groups here if needed in the future
-      context.constraint = constraint.value
+      context.constraint = constraint
 
-      validator = @constraint_validator_factory.validator constraint.value
-      pp typeof(validator)
+      validator = @constraint_validator_factory.validator constraint.validated_by
       validator.context = context
 
-      validator.validate value, constraint.value
+      validator.validate value, constraint
     rescue type_error : AVD::Exceptions::UnexpectedValueError
       context
         .build_violation("This value should be a valid: {{ type }}")

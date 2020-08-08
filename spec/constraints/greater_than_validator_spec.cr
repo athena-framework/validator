@@ -1,33 +1,33 @@
 require "../spec_helper"
 
-private def create_validator
-  AVD::Constraints::GreaterThanValidator.new
-end
+struct GreaterThanValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
+  def valid_comparisons
+    {
+      int:    {3, 2},
+      string: {"333", "22"},
+      time:   {Time.utc(2020, 4, 8), Time.utc(2020, 4, 7)},
+      nil:    {nil, false},
+    }
+  end
 
-private def create_constraint(**named_args)
-  AVD::Constraints::GreaterThan.new **named_args
-end
+  def invalid_comparisons
+    {
+      int:       {2, 3},
+      int_equal: {3, 3},
+      string:    {"a", "b"},
+      time:      {Time.utc(2020, 4, 6), Time.utc(2020, 4, 7)},
+    }
+  end
 
-private def error_code : String
-  AVD::Constraints::GreaterThan::TOO_LOW_ERROR
-end
+  def error_code
+    AVD::Constraints::GreaterThan::TOO_LOW_ERROR
+  end
 
-private VALID_COMPARISONS = [
-  {2, 1, "numbers"},
-  {"zzz", "aaa", "strings"},
-  {ComparableMock.new(10), ComparableMock.new(5), "comparable types"},
-  {Time.utc(2021, 4, 7), Time.utc(2020, 4, 7), "times"},
-  {1, nil, "nil"},
-]
+  def create_validator : AVD::ConstraintValidatorInterface
+    AVD::Constraints::GreaterThan::Validator.new
+  end
 
-private INVALID_COMPARISONS = [
-  {1, 2, "numbers"},
-  {2, 2, "equal numbers"},
-  {"aaa", "zzz", "strings"},
-  {ComparableMock.new(5), ComparableMock.new(10), "comparable types"},
-  {Time.utc(2020, 4, 8), Time.utc(2021, 4, 7), "times"},
-]
-
-describe AVD::Constraints::GreaterThanValidator do
-  define_comparison_spec
+  def constraint_class : AVD::Constraint.class
+    AVD::Constraints::GreaterThan
+  end
 end

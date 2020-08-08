@@ -6,15 +6,15 @@ module Athena::Validator::Metadata::GenericMetadata
   getter constraints : Array(AVD::Constraint) = [] of AVD::Constraint
   getter cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
   getter traversal_strategy : AVD::Metadata::TraversalStrategy = AVD::Metadata::TraversalStrategy::None
-  @constraints_by_group : Hash(String, Array(AVD::Constraint)) = {} of String => Array(AVD::Constraint)
+  @constraints_by_group = {} of String => Array(AVD::Constraint)
 
   def add_constraint(constraint : Constraint) : AVD::Metadata::GenericMetadata
-    if constraint.is_a?(AVD::Constraints::Valid) && constraint.groups.nil?
-      @cascading_strategy = :cascade
-      @traversal_strategy = constraint.traverse? ? AVD::Metadata::TraversalStrategy::Implicit : AVD::Metadata::TraversalStrategy::None
+    # if constraint.is_a?(AVD::Constraints::Valid) && constraint.groups.nil?
+    #   @cascading_strategy = :cascade
+    #   @traversal_strategy = constraint.traverse? ? AVD::Metadata::TraversalStrategy::Implicit : AVD::Metadata::TraversalStrategy::None
 
-      return self
-    end
+    #   return self
+    # end
 
     @constraints << constraint
 
@@ -26,9 +26,7 @@ module Athena::Validator::Metadata::GenericMetadata
   end
 
   def add_constraints(constraints : Array(AVD::Constraint)) : AVD::Metadata::GenericMetadata
-    constraints.each do |constraint|
-      add_constraint constraint
-    end
+    constraints.each &->add_constraint(AVD::Constraint)
 
     self
   end

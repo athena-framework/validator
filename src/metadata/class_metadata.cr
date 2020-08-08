@@ -6,12 +6,12 @@ struct Athena::Validator::Metadata::ClassMetadata
   include Athena::Validator::Metadata::ClassMetadataInterface
 
   getter default_group : String
-  getter class_name : AVD::Validatable
+  # getter class_name : AVD::Validatable
 
   @cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
   @properties : Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase) = Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase).new
 
-  def initialize(@class_name : AVD::Validatable)
+  def initialize(class_name)
     @default_group = @class_name.to_s
   end
 

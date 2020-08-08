@@ -1,9 +1,5 @@
-annotation Athena::Validator::RegisterConstraint; end
-
 abstract struct Athena::Validator::Constraint
   DEFAULT_GROUP = "default"
-
-  DEFAULT_ERROR_MESSAGE = ""
 
   # Returns the name of the provided *error_code*.
   def self.error_name(error_code : String) : String
@@ -18,55 +14,22 @@ abstract struct Athena::Validator::Constraint
     @groups = groups || [DEFAULT_GROUP]
   end
 
+  protected abstract def default_error_message : String
+
   def add_implicit_group(group : String) : Nil
     if @groups.includes?(DEFAULT_GROUP) && !@groups.includes?(group)
       @groups << group
     end
   end
 
-  macro configure(**named_args)
-    {% begin %}
-      {% annotation_name = named_args[:annotation] || %(Athena::Validator::Annotations::#{@type.name(generic_args: false).split("::").last.id}).id %}
-      {% validator = named_args[:validator] || "#{@type.name(generic_args: false)}Validator".id %}
-      {% targets = named_args[:targets] || ["property"] %}
+  macro inherited
+    def validated_by : AVD::ConstraintValidator.class
+      Validator
+    end
 
-      # The fully qualified name (FQN) of the annotation that should be related to `self`.
-      #
-      # Defaults to `self`'s class name within the `AVD::Annotations` namespace but can be overridden via the `AVD::Constraint.configure` macro.
-      ANNOTATION = {{annotation_name}}
-
-      # Denotes that possible targets `self` is allowed to be applied to.  Possible values are `"property"`, `"method"`, or `"class"`.
-      #
-      # Defaults to `"property"`, but can be overridden via the `AVD::Constraint.configure` macro.
-      TARGETS = {{targets}}
-
-      # The `AVD::ConstraintValidator.class` that should be used to validate `self`.
-      #
-      # Defaults to `self`'s class name suffixed with "Validator", but can be overridden via the `AVD::Constraint.configure` macro.
-      VALIDATOR = {{validator}}
-
-      # Annotation related to the `{{@type}}` constraint.
-      annotation ::{{annotation_name}}; end
-
-      @[Athena::Validator::RegisterConstraint(validator: {{validator}}, targets: {{targets}}, annotation: {{annotation_name}})]
-      struct ::{{@type.name.id}}; end
-
-      # Returns the `AVD::ConstraintValidator.class` that should be used to validate instances of `self`.
-      #
-      # Defaults to `self`'s class name suffixed with "Validator", but can
-      # be overridden in order to specify a custom type.
-      def self.validator : AVD::ConstraintValidator.class
-        VALIDATOR
-      end
-
-      def self.targets : Array(String)
-        TARGETS
-      end
-
-      def self.annotation
-        ANNOTATION
-      end
-    {% end %}
+    protected def default_error_message : String
+      DEFAULT_ERROR_MESSAGE
+    end
   end
 
   # Builds the constraint initializer for `self` with the provided *message* and additional *properties*.
@@ -88,25 +51,11 @@ abstract struct Athena::Validator::Constraint
       {% for property in properties %}
         @{{property}},
       {% end %}
-      message : String = DEFAULT_ERROR_MESSAGE,
+      message : String = default_error_message,
       groups : Array(String)? = nil,
       payload : Hash(String, String)? = nil,
     )
       super message, groups, payload
-    end
-  end
-
-  macro inherited
-    macro finished
-      {% verbatim do %}
-        {% begin %}
-          {% errors = {} of Nil => Nil %}
-          {% for error in @type.constants.select { |error| error =~ /ERROR$/ } %}
-            {% errors[error] = error.stringify %}
-          {% end %}
-          @@error_names = {{errors}} of String => String
-        {% end %}
-      {% end %}
     end
   end
 end

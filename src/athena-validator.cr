@@ -8,6 +8,8 @@ require "./execution_context_interface"
 require "./property_path"
 require "./validatable"
 
+require "./constraints/abstract_comparison"
+require "./constraints/abstract_comparison_validator"
 require "./constraints/*"
 require "./exceptions/*"
 require "./metadata/*"
@@ -42,38 +44,6 @@ module Athena::Validator
   def self.validator(validator_factory : AVD::ConstraintValidatorFactoryInterface? = nil) : AVD::Validator::ValidatorInterface
     AVD::Validator::RecursiveValidator.new validator_factory
   end
-
-  module Compare
-    def self.gt(value1 : _, value2 : _) : Bool
-      compare(value1, value2) do |cmp|
-        cmp > 0
-      end
-    end
-
-    def self.gte(value1 : _, value2 : _) : Bool
-      compare(value1, value2) do |cmp|
-        cmp >= 0
-      end
-    end
-
-    def self.lt(value1 : _, value2 : _) : Bool
-      compare(value1, value2) do |cmp|
-        cmp < 0
-      end
-    end
-
-    def self.lte(value1 : _, value2 : _) : Bool
-      compare(value1, value2) do |cmp|
-        cmp <= 0
-      end
-    end
-
-    private def self.compare(value1 : _, value2 : _, & : Int32 -> Bool) : Bool
-      return false unless cmp = (value1 <=> value2)
-
-      yield cmp
-    end
-  end
 end
 
 # private struct Foo
@@ -85,8 +55,23 @@ end
 
 validator = AVD.validator
 
-range_constraint = AVD::Constraints::Range(Int32, Int32).new 0..10
-equal_to_constraint = AVD::Constraints::EqualTo.new "yes"
+# constraint = AVD::Constraints::NotBlank.new
 
-puts validator.validate false, [range_constraint]
-puts validator.validate "no", [equal_to_constraint]
+# # range_constraint = AVD::Constraints::Range(Int32, Int32).new 0..10
+# equal_to_constraint = AVD::Constraints::EqualTo.new "yes"
+
+# puts validator.validate 17, [constraint]
+# puts validator.validate "no", [equal_to_constraint]
+# # puts validator.validate 5, [greater_than_constraint]
+# puts validator.validate 50, [AVD::Constraints::GreaterThan.new 10.0]
+# puts validator.validate 0_u8, [AVD::Constraints::GreaterThan.new 10.0]
+# puts validator.validate "zzz", [AVD::Constraints::GreaterThan.new "foo"]
+# puts validator.validate false, [AVD::Constraints::GreaterThan.new "foo"]
+
+value = 11 || "foo" || nil
+
+pp typeof(value)
+
+constraint = AVD::Constraints::GreaterThan.new 5
+
+puts validator.validate value, [constraint]

@@ -15,9 +15,9 @@ module Athena::Validator::ExecutionContextInterface
   # Internal
 
   # :nodoc:
-  abstract def set_node(value : _, object : _, metadata : AVD::Metadata::MetadataInterface?, property_path : String) : Nil
+  protected abstract def set_node(value : _, object : _, metadata : AVD::Metadata::MetadataInterface?, property_path : String) : Nil
   # :nodoc:
-  abstract def group=(group : String)
+  protected abstract def group=(group : String)
   # :nodoc:
-  abstract def constraint=(constraint : AVD::Constraint)
+  protected abstract def constraint=(constraint : AVD::Constraint)
 end

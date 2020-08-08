@@ -1,4 +1,4 @@
-abstract struct Athena::Validator::Constraints::AbstractComparisonValidator < Athena::Validator::ConstraintValidator
+abstract struct Athena::Validator::Constraints::ComparisonValidator < Athena::Validator::ConstraintValidator
   protected abstract def compare_values(actual : _, expected : _) : Bool
   protected abstract def error_code : String
 
