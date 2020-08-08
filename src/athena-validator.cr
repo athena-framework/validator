@@ -9,6 +9,7 @@ require "./property_path"
 require "./validatable"
 
 require "./constraints/*"
+require "./exceptions/*"
 require "./metadata/*"
 require "./validator/*"
 require "./violation/*"
@@ -74,3 +75,18 @@ module Athena::Validator
     end
   end
 end
+
+# private struct Foo
+#   include AVD::Validatable
+
+#   @[Assert::Range(range: 0..10)]
+#   property value : Bool = false
+# end
+
+validator = AVD.validator
+
+range_constraint = AVD::Constraints::Range(Int32, Int32).new 0..10
+equal_to_constraint = AVD::Constraints::EqualTo.new "yes"
+
+puts validator.validate false, [range_constraint]
+puts validator.validate "no", [equal_to_constraint]

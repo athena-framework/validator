@@ -40,12 +40,4 @@ struct Athena::Validator::Constraints::RangeValidator < Athena::Validator::Const
         .add
     end
   end
-
-  def validate(value : _, constraint : AVD::Constraints::Range) : Nil
-    self.context
-      .build_violation(constraint.invalid_message)
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::Range::INVALID_VALUE_ERROR)
-      .add
-  end
 end

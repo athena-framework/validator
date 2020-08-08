@@ -15,11 +15,9 @@ module Athena::Validator::Validatable
             {% if (ann_name = ann[:annotation].resolve) && (class_ann = @type.annotation(ann_name)) %}
               {% supported_types = ann[:validator].resolve.methods.select { |m| m.name == "validate" }.map { |m| m.args.first.restriction } %}
 
-              {% if !supported_types.any? { |t| !t.is_a?(Nop) || !t.is_a_?(Underscore) } %}
-                {% raise "Constraint #{constraint} cannot be applied to #{@type}.  This constraint does not support the #{@type} type." unless supported_types.any? { |t| (t.is_a?(Underscore) || t.is_a?(Nop)) ? false : t.resolve >= @type.resolve } %}
-              {% end %}
 
-              class_metadata.add_constraint {{class_constraint.id}}.new({{class_ann.named_args.double_splat}})
+
+              class_metadata.add_constraint {{class_constraint.name(generic_args: false)}}.new({{class_ann.named_args.double_splat}})
             {% end %}
           {% end %}
 
@@ -34,13 +32,11 @@ module Athena::Validator::Validatable
               {% if (ann_name = ann[:annotation].resolve) && (property_ann = ivar.annotation(ann_name)) %}
                 {% supported_types = ann[:validator].resolve.methods.select { |m| m.name == "validate" }.map { |m| m.args.first.restriction } %}
 
-                {% if !supported_types.any? { |t| !t.is_a?(Nop) || !t.is_a_?(Underscore) } %}
-                  {% raise "Constraint #{constraint} cannot be applied to #{@type}##{ivar.name}.  This constraint does not support the #{ivar.type} type." unless supported_types.any? { |t| (t.is_a?(Underscore) || t.is_a?(Nop)) ? false : t.resolve >= ivar.type } %}
-                {% end %}
+
 
                 class_metadata.add_property_constraint(
                   AVD::Metadata::PropertyMetadata({{ivar.type}}).new(->{ @{{ivar.id}} }, {{@type}}, {{ivar.name.stringify}}),
-                  {{property_constraint.id}}.new({{property_ann.named_args.double_splat}})
+                  {{property_constraint.name(generic_args: false)}}.new({{property_ann.named_args.double_splat}})
                 )
               {% end %}
             {% end %}

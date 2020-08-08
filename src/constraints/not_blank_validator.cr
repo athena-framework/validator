@@ -1,26 +1,26 @@
 struct Athena::Validator::Constraints::NotBlankValidator < Athena::Validator::ConstraintValidator
   # :inherit:
   def validate(value : String?, constraint : AVD::Constraints::NotBlank) : Nil
-    validate(value, constraint) do |v|
+    validate_value(value, constraint) do |v|
       v.blank?
     end
   end
 
   # :inherit:
   def validate(value : Bool?, constraint : AVD::Constraints::NotBlank) : Nil
-    validate(value, constraint) do |v|
+    validate_value(value, constraint) do |v|
       v == false
     end
   end
 
   # :inherit:
   def validate(value : Indexable?, constraint : AVD::Constraints::NotBlank) : Nil
-    validate(value, constraint) do |v|
+    validate_value(value, constraint) do |v|
       v.empty?
     end
   end
 
-  private def validate(value : _, constraint : AVD::Constraints::NotBlank, & : -> Bool) : Nil
+  private def validate_value(value : _, constraint : AVD::Constraints::NotBlank, & : -> Bool) : Nil
     return if value.nil? && constraint.allow_nil?
 
     if value.nil? || yield value

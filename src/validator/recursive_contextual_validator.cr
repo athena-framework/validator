@@ -261,12 +261,18 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
 
     metadata.find_constraints(group).each do |constraint|
       # TODO: Can cache validated groups here if needed in the future
-      context.constraint = constraint
+      context.constraint = constraint.value
 
-      validator = @constraint_validator_factory.validator constraint
+      validator = @constraint_validator_factory.validator constraint.value
+      pp typeof(validator)
       validator.context = context
 
-      validator.validate value, constraint
+      validator.validate value, constraint.value
+    rescue type_error : AVD::Exceptions::UnexpectedValueError
+      context
+        .build_violation("This value should be a valid: {{ type }}")
+        .add_parameter("{{ type }}", type_error.expected_type)
+        .add
     end
   end
 
