@@ -83,9 +83,9 @@ module Athena::Validator::Spec
       self.validator.validate actual, constraint
 
       self.build_violation("my_message")
-        .add_parameter("{{ value }}", actual.to_s)
-        .add_parameter("{{ compared_value }}", expected.to_s)
-        .add_parameter("{{ compared_value_type }}", T.to_s)
+        .add_parameter("{{ value }}", actual)
+        .add_parameter("{{ compared_value }}", expected)
+        .add_parameter("{{ compared_value_type }}", T)
         .code(self.error_code)
         .assert_violation
     end

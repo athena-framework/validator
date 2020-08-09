@@ -1,7 +1,7 @@
 require "../spec_helper"
 
 struct LessThanValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
-  def valid_comparisons
+  def valid_comparisons : NamedTuple
     {
       int:    {2, 3},
       string: {"a", "b"},
@@ -10,7 +10,7 @@ struct LessThanValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
     }
   end
 
-  def invalid_comparisons
+  def invalid_comparisons : NamedTuple
     {
       int:       {3, 2},
       int_equal: {3, 3},
@@ -19,7 +19,13 @@ struct LessThanValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
     }
   end
 
-  def error_code
+  def test_invalid_type : Nil
+    expect_raises AVD::Exceptions::UnexpectedValueError, "Expected argument of type 'Number | String | Time', 'Bool' given." do
+      self.validator.validate false, new_constraint value: 50
+    end
+  end
+
+  def error_code : String
     AVD::Constraints::LessThan::TOO_HIGH_ERROR
   end
 

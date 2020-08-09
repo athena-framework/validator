@@ -6,10 +6,6 @@ struct Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
 
   initializer(allow_nil : Bool = false)
 
-  protected def default_error_message : String
-    DEFAULT_ERROR_MESSAGE
-  end
-
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:
     def validate(value : String?, constraint : AVD::Constraints::NotBlank) : Nil
@@ -39,7 +35,7 @@ struct Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
         self.context
           .build_violation(constraint.message)
           .add_parameter("{{ value }}", value)
-          .code(AVD::Constraints::NotBlank::IS_BLANK_ERROR)
+          .code(IS_BLANK_ERROR)
           .add
       end
     end

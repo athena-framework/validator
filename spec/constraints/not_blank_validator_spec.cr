@@ -7,7 +7,7 @@ struct NotBlankValidatorTest < AVD::Spec::ConstraintValidatorTestCase
     self.assert_no_violation
   end
 
-  def valid_values
+  def valid_values : NamedTuple
     {
       string: {"foo"},
       array:  {[1, 2, 3]},

@@ -1,7 +1,7 @@
 require "../spec_helper"
 
 struct EqualToValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
-  def valid_comparisons
+  def valid_comparisons : NamedTuple
     {
       int:    {3, 3},
       char:   {'a', 'a'},
@@ -11,7 +11,7 @@ struct EqualToValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
     }
   end
 
-  def invalid_comparisons
+  def invalid_comparisons : NamedTuple
     {
       int:    {1, 3},
       char:   {'b', 'a'},
@@ -20,7 +20,7 @@ struct EqualToValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
     }
   end
 
-  def error_code
+  def error_code : String
     AVD::Constraints::EqualTo::NOT_EQUAL_ERROR
   end
 

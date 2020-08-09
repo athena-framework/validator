@@ -20,12 +20,12 @@ struct Athena::Validator::Constraints::LessThan(ValueType) < Athena::Validator::
     # :inherit:
     def compare_values(actual : _, expected : _) : Bool
       # TODO: Support checking if arbitrarily typed values are actually comparable once `#responds_to?` supports it.
-      false
+      raise AVD::Exceptions::UnexpectedValueError.new actual, "Number | String | Time"
     end
 
     # :inherit:
     def error_code : String
-      AVD::Constraints::LessThan::TOO_HIGH_ERROR
+      TOO_HIGH_ERROR
     end
   end
 end

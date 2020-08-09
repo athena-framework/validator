@@ -12,7 +12,7 @@ struct Athena::Validator::Constraints::NotEqualTo(ValueType) < Athena::Validator
 
     # :inherit:
     def error_code : String
-      AVD::Constraints::NotEqualTo::IS_EQUAL_ERROR
+      IS_EQUAL_ERROR
     end
   end
 end
