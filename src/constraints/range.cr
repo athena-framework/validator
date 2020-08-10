@@ -27,6 +27,8 @@ struct Athena::Validator::Constraints::Range(B, E) < Athena::Validator::Constrai
 
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:
+    #
+    # ameba:disable Metrics/CyclomaticComplexity
     def validate(value : Number | Time | Nil, constraint : AVD::Constraints::Range) : Nil
       return if value.nil?
 
@@ -35,41 +37,50 @@ struct Athena::Validator::Constraints::Range(B, E) < Athena::Validator::Constrai
       min = range.begin
       max = range.end
 
-      if min && max && !range.includes?(value)
-        self.context
-          .build_violation(constraint.not_in_range_message)
-          .add_parameter("{{ value }}", value)
-          .add_parameter("{{ min }}", min)
-          .add_parameter("{{ max }}", max)
-          .code(NOT_IN_RANGE_ERROR)
-          .add
+      case {value, min, max}
+      when {Number, Number::Primitive?, Number::Primitive?}
+        return self.add_not_in_range_violation constraint, value, min, max if min && max && (value < min || value > max)
+        return self.add_too_high_violation constraint, value, max if max && value > max
 
-        return
-      end
+        add_too_low_violation constraint, value, min if min && value < min
+      when {Time, Time?, Time?}
+        return self.add_not_in_range_violation constraint, value, min, max if min && max && (value < min || value > max)
+        return self.add_too_high_violation constraint, value, max if max && value > max
 
-      if max && value > max
-        self.context
-          .build_violation(constraint.max_message)
-          .add_parameter("{{ value }}", value)
-          .add_parameter("{{ limit }}", max)
-          .code(TOO_HIGH_ERROR)
-          .add
-
-        return
-      end
-
-      if min && value < min
-        self.context
-          .build_violation(constraint.min_message)
-          .add_parameter("{{ value }}", value)
-          .add_parameter("{{ limit }}", min)
-          .code(TOO_LOW_ERROR)
-          .add
+        add_too_low_violation constraint, value, min if min && value < min
       end
     end
 
     def validate(value : _, constraint : AVD::Constraints::Range) : Nil
       raise AVD::Exceptions::UnexpectedValueError.new value, "Number | Time"
+    end
+
+    private def add_not_in_range_violation(constraint, value, min, max) : Nil
+      self.context
+        .build_violation(constraint.not_in_range_message)
+        .add_parameter("{{ value }}", value)
+        .add_parameter("{{ min }}", min)
+        .add_parameter("{{ max }}", max)
+        .code(NOT_IN_RANGE_ERROR)
+        .add
+    end
+
+    private def add_too_high_violation(constraint, value, max) : Nil
+      self.context
+        .build_violation(constraint.max_message)
+        .add_parameter("{{ value }}", value)
+        .add_parameter("{{ limit }}", max)
+        .code(TOO_HIGH_ERROR)
+        .add
+    end
+
+    private def add_too_low_violation(constraint, value, min) : Nil
+      self.context
+        .build_violation(constraint.min_message)
+        .add_parameter("{{ value }}", value)
+        .add_parameter("{{ limit }}", min)
+        .code(TOO_LOW_ERROR)
+        .add
     end
   end
 end

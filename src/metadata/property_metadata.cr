@@ -4,9 +4,10 @@ struct Athena::Validator::Metadata::PropertyMetadata(IvarType, EntityType)
   include Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::PropertyMetadataInterface(IvarType)
 
+  getter class_name : AVD::Validatable
   getter name : String
 
-  def initialize(@name : String); end
+  def initialize(@name : String, @class_name : EntityType.class = EntityType); end
 
   def get_value(obj : EntityType)
     {% begin %}

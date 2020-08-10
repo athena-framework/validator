@@ -2,8 +2,8 @@ require "../spec_helper"
 
 describe AVD::Validator::RecursiveValidator do
   describe "#validate" do
-    it "validates", focus: true do
-      constraint = AVD::Constraints::Callback.with_callback(groups: ["group"]) do |value, context, payload|
+    it "validates" do
+      constraint = AVD::Constraints::Callback.with_callback(groups: ["group"]) do |value, context, _payload|
         context.class_name.should be_nil
         context.property_name.should be_nil
         context.property_path.should be_empty
@@ -33,7 +33,7 @@ describe AVD::Validator::RecursiveValidator do
     it "validates class constraints" do
       obj = TestClassCallback.new
 
-      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
         context.class_name.should eq TestClassCallback
         context.property_name.should be_nil
         context.property_path.should be_empty
@@ -63,7 +63,7 @@ describe AVD::Validator::RecursiveValidator do
     it "validates property constraints" do
       obj = TestPropertyCallback.new "Jim"
 
-      obj.callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestPropertyCallback.callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
         context.class_name.should eq TestPropertyCallback
         context.property_name.should eq "name"
         context.property_path.should eq "name"
@@ -94,7 +94,7 @@ describe AVD::Validator::RecursiveValidator do
       obj = TestClassCallback.new
       hash = {"key" => obj}
 
-      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
         context.class_name.should eq TestClassCallback
         context.property_name.should be_nil
         context.property_path.should eq "[key]"
@@ -125,7 +125,7 @@ describe AVD::Validator::RecursiveValidator do
       obj = TestClassCallback.new
       hash = {2 => {"key" => obj}}
 
-      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
         context.class_name.should eq TestClassCallback
         context.property_name.should be_nil
         context.property_path.should eq "[2][key]"
@@ -156,7 +156,7 @@ describe AVD::Validator::RecursiveValidator do
       obj = TestClassCallback.new
       arr = [obj]
 
-      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
         context.class_name.should eq TestClassCallback
         context.property_name.should be_nil
         context.property_path.should eq "[0]"
@@ -187,7 +187,7 @@ describe AVD::Validator::RecursiveValidator do
       obj = TestClassCallback.new
       arr = [[obj]]
 
-      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
         context.class_name.should eq TestClassCallback
         context.property_name.should be_nil
         context.property_path.should eq "[0][0]"
@@ -215,21 +215,22 @@ describe AVD::Validator::RecursiveValidator do
     end
 
     it "validates single group" do
-      obj = TestPropertyCallback.new "Jim", 2, group2: "group2"
+      TestPropertyCallback.group2 = "group2"
 
-      obj.callback = obj.callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestPropertyCallback.callback = TestPropertyCallback.callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
         context.add_violation "message"
       end
 
-      violations = AVD.validator.validate obj, groups: ["group"]
+      violations = AVD.validator.validate TestPropertyCallback.new("Jim", 2), groups: ["group"]
 
       violations.size.should eq 1
     end
 
     it "validates multiple groups" do
-      obj = TestPropertyCallback.new "Jim", 2, group2: "group2"
+      TestPropertyCallback.group2 = "group2"
+      obj = TestPropertyCallback.new "Jim", 2
 
-      obj.callback = obj.callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestPropertyCallback.callback = TestPropertyCallback.callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
         context.add_violation "message"
       end
 
@@ -251,7 +252,7 @@ describe AVD::Validator::RecursiveValidator do
 
       TestClassCallback.group = nil
 
-      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestClassCallback.class_callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
         context.build_violation("message {{ param }}")
           .add_parameter("{{ param }}", "value")
           .plural(2)
@@ -280,7 +281,7 @@ describe AVD::Validator::RecursiveValidator do
     it "validates" do
       obj = TestPropertyCallback.new "Jim", 2
 
-      obj.callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestPropertyCallback.callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
         context.class_name.should eq TestPropertyCallback
         context.property_name.should eq "name"
         context.property_path.should eq "name"
@@ -292,7 +293,7 @@ describe AVD::Validator::RecursiveValidator do
         context.add_violation "message {{ param }}", {"{{ param }}" => "value"}
       end
 
-      obj.callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestPropertyCallback.callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
         context.add_violation "violation"
       end
 
@@ -316,7 +317,7 @@ describe AVD::Validator::RecursiveValidator do
     it "validates" do
       obj = TestPropertyCallback.new "Fred", 2
 
-      obj.callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestPropertyCallback.callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
         context.class_name.should eq TestPropertyCallback
         context.property_name.should eq "name"
         context.property_path.should eq "name"
@@ -328,7 +329,7 @@ describe AVD::Validator::RecursiveValidator do
         context.add_violation "message {{ param }}", {"{{ param }}" => "value"}
       end
 
-      obj.callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context, payload|
+      TestPropertyCallback.callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
         context.add_violation "violation"
       end
 

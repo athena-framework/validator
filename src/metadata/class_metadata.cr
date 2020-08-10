@@ -11,14 +11,10 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
     class_metadata = new T
 
     {% begin %}
-      {% annotation_types = Assert.constants %}
-
       # Add property constraints
       {% for ivar in T.instance_vars %}
         {% for constraint in AVD::Constraint.all_subclasses.reject &.abstract? %}
           {% ann_name = constraint.name(generic_args: false).split("::").last.id %}
-
-          {{pp ann_name, Assert.constant(ann_name)}}
 
           {% if ann = ivar.annotation Assert.constant(ann_name).resolve %}
             class_metadata.add_property_constraint(
@@ -31,14 +27,12 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
 
       # Add callback constraints
       {% for callback in T.methods.select &.annotation(Assert::Callback) %}
-        class_metadata.add_constraint AVD::Constraints::Callback.new(callback_name: {{callback.name.stringify}})
+        class_metadata.add_constraint AVD::Constraints::Callback.new(callback_name: {{callback.name.stringify}}, {{callback.annotation(Assert::Callback).named_args.double_splat}})
       {% end %}
 
       {% for callback in T.class.methods.select &.annotation(Assert::Callback) %}
-        class_metadata.add_constraint AVD::Constraints::Callback.new(callback: ->T.{{callback.name.id}}(AVD::Constraints::Callback::Value, AVD::ExecutionContextInterface, Hash(String, String)?))
+        class_metadata.add_constraint AVD::Constraints::Callback.new(callback: ->T.{{callback.name.id}}(AVD::Constraints::Callback::Value, AVD::ExecutionContextInterface, Hash(String, String)?), {{callback.annotation(Assert::Callback).named_args.double_splat}})
       {% end %}
-
-      {{debug}}
     {% end %}
 
     class_metadata

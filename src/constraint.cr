@@ -25,6 +25,8 @@ abstract struct Athena::Validator::Constraint
   end
 
   macro inherited
+    annotation ::Athena::Validator::Annotations::{{@type.name(generic_args: false).split("::").last.id}}; end
+
     def validated_by : AVD::ConstraintValidator.class
       Validator
     end

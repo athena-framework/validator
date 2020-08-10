@@ -93,7 +93,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     previous_path = @context.property_path
     previous_group = @context.group
 
-    property_value = property_metadata.value
+    property_value = property_metadata.get_value object
 
     self.validate_generic_node(
       property_value,
@@ -112,7 +112,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
   end
 
   def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
-    class_metadata = object.class..validation_class_metadata
+    class_metadata = object.class.validation_class_metadata
     property_metadata = class_metadata.property_metadata(property_name)
     groups = groups || @default_groups
     property_path = AVD::PropertyPath.append @default_property_path, property_name
