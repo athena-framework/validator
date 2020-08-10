@@ -8,6 +8,12 @@ struct Athena::Validator::Constraints::Range(B, E) < Athena::Validator::Constrai
   TOO_HIGH_ERROR     = "5d9aed01-ac49-4d8e-9c16-e4aab74ea774"
   TOO_LOW_ERROR      = "f0316644-882e-4779-a404-ee7ac97ddecc"
 
+  @@error_names = {
+    NOT_IN_RANGE_ERROR => "NOT_IN_RANGE_ERROR",
+    TOO_HIGH_ERROR     => "TOO_HIGH_ERROR",
+    TOO_LOW_ERROR      => "TOO_LOW_ERROR",
+  }
+
   def initialize(
     @range : ::Range(B, E),
     @not_in_range_message : String = "This value should be between {{ min }} and {{ max }}.",

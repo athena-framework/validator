@@ -1,6 +1,8 @@
 abstract struct Athena::Validator::Constraint
   DEFAULT_GROUP = "default"
 
+  @@error_names = Hash(String, String).new
+
   # Returns the name of the provided *error_code*.
   def self.error_name(error_code : String) : String
     @@error_names[error_code]? || raise KeyError.new "The error code '#{error_code}' does not exist for constraint of type '#{{{@type}}}'."

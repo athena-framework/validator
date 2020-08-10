@@ -30,8 +30,8 @@ struct Athena::Validator::Violation::ConstraintViolation(Root, InvalidValueType)
 
   def to_s(io : IO) : Nil
     klass = case @root
-            when Hash then "Hash"
-              # when AVD::Validatable then "Object(#{@root.class})"
+            when Hash             then "Hash"
+            when AVD::Validatable then "Object(#{@root.class})"
             else
               @root.to_s
             end

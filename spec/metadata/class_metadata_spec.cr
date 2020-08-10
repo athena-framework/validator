@@ -19,15 +19,15 @@ describe AVD::Metadata::ClassMetadata do
     metadata.constrained_properties.should eq ["name", "age"]
   end
 
-  it "#has_property_metadata" do
+  it "#has_property_metadata?" do
     metadata = AVD::Metadata::ClassMetadata.new Entity
     metadata.add_property_constraint(
       AVD::Metadata::PropertyMetadata(String).new(->{ "foo" }, Entity, "name"),
       CustomConstraint.new ""
     )
 
-    metadata.has_property_metadata("name").should be_true
-    metadata.has_property_metadata("age").should be_false
+    metadata.has_property_metadata?("name").should be_true
+    metadata.has_property_metadata?("age").should be_false
   end
 
   it "#property_metadata" do

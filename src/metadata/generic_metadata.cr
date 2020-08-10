@@ -34,4 +34,8 @@ module Athena::Validator::Metadata::GenericMetadata
   def find_constraints(group : String) : Array(AVD::Constraint)
     @constraints_by_group[group]? || Array(AVD::Constraint).new
   end
+
+  def get_value(entity : AVD::Validatable)
+    raise "BUG: Invoked default get_value"
+  end
 end

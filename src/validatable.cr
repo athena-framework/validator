@@ -2,8 +2,7 @@ module Athena::Validator::Validatable
   macro included
     extend AVD::Validatable
 
-    def validation_metadata_class : AVD::Metadata::ClassMetadata.class
-      AVD::Metadata::ClassMetadata({{@type}})
-    end
+    # :nodoc:
+    class_getter validation_class_metadata : AVD::Metadata::ClassMetadata({{@type}}) { AVD::Metadata::ClassMetadata({{@type}}).build }
   end
 end

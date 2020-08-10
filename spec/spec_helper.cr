@@ -22,60 +22,62 @@ end
 #   end
 # end
 
-# struct CustomConstraint < AVD::Constraint
+struct CustomConstraint < AVD::Constraint
+  protected def default_error_message : String
+    DEFAULT_ERROR_MESSAGE
+  end
 
-#   protected def default_error_message : String
-#     DEFAULT_ERROR_MESSAGE
-#   end
-# end
+  struct Validator < Athena::Validator::ConstraintValidator
+    def validate(value : _, constraint : AVD::Constraints::NotNull) : Nil
+    end
+  end
+end
 
 # struct MyValidator < AVD::ConstraintValidator
 # end
 
-# struct TestClassCallback
-#   include AVD::Validatable
+struct TestClassCallback
+  include AVD::Validatable
 
-#   class_setter class_callback : Proc(AVD::Constraints::Callback::Container, Nil)? = nil
-#   class_setter group : Array(String)? = ["group"]
+  class_setter class_callback : AVD::Constraints::Callback::CallbackProc? = nil
+  class_setter group : Array(String)? = ["group"]
 
-#   @[Assert::Callback(groups: @@group)]
-#   def self.class_callback(container : AVD::Constraints::Callback::Container) : Nil
-#     @@class_callback.not_nil!.call container
-#   end
-# end
+  @[Assert::Callback(groups: @@group)]
+  def self.validate(object : AVD::Constraints::Callback::Value, context : AVD::ExecutionContextInterface, payload : Hash(String, String)?) : Nil
+    @@class_callback.not_nil!.call object, context, payload
+  end
+end
 
-# Spec.before_each do
-#   TestClassCallback.group = ["group"]
-#   TestClassCallback.class_callback = nil
-# end
+Spec.before_each do
+  TestClassCallback.group = ["group"]
+  TestClassCallback.class_callback = nil
+end
 
-# struct TestPropertyCallback
-#   include AVD::Validatable
+struct TestPropertyCallback
+  include AVD::Validatable
 
-#   def validation_metadata : AVD::Metadata::ClassMetadata
-#     class_metadata = AVD::Metadata::ClassMetadata.new self.class
+  def validation_metadata : AVD::Metadata::ClassMetadata
+    class_metadata = AVD::Metadata::ClassMetadata.new self.class
 
-#     class_metadata.add_property_constraint(
-#       AVD::Metadata::PropertyMetadata(String).new(->{ @name }, TestPropertyCallback, "name"),
-#       Athena::Validator::Constraints::Callback.new @callback.not_nil!, groups: [@group1]
-#     )
+    class_metadata.add_property_constraint(
+      AVD::Metadata::PropertyMetadata(String, TestPropertyCallback).new("name"),
+      AVD::Constraints::Callback.new callback: @callback, groups: [@group1]
+    )
 
-#     if callback2 = @callback2
-#       class_metadata.add_property_constraint(
-#         AVD::Metadata::PropertyMetadata(Int32).new(->{ @age }, TestPropertyCallback, "age"),
-#         Athena::Validator::Constraints::Callback.new callback2, groups: [@group2]
-#       )
-#     end
+    if callback2 = @callback2
+      class_metadata.add_property_constraint(
+        AVD::Metadata::PropertyMetadata(Int32, TestPropertyCallback).new("age"),
+        AVD::Constraints::Callback.new callback: callback2, groups: [@group2]
+      )
+    end
 
-#     class_metadata
-#   end
+    class_metadata
+  end
 
-#   property name : String
-#   property age : Int32
-#   setter callback : AVD::Constraints::Callback::CallbackProc? = nil
-#   setter callback2 : AVD::Constraints::Callback::CallbackProc? = nil
+  property name : String
+  property age : Int32
+  setter callback : AVD::Constraints::Callback::CallbackProc? = nil
+  setter callback2 : AVD::Constraints::Callback::CallbackProc? = nil
 
-#   def initialize(@name : String, @age : Int32 = 1, *, @group1 : String = "group", @group2 : String = "group"); end
-# end
-
-# TODO: Create Athena::Validator::Spec module
+  def initialize(@name : String, @age : Int32 = 1, *, @group1 : String = "group", @group2 : String = "group"); end
+end

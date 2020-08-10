@@ -22,10 +22,14 @@ alias AVD = Athena::Validator
 alias Assert = AVD::Annotations
 
 module Athena::Validator
-  VERSION = "0.1.0"
-
+  # :nodoc:
+  #
   # Default namespace for constaint annotations.
-  module Annotations; end
+  module Annotations
+    {% for constraint in AVD::Constraint.all_subclasses.reject &.abstract? %}
+      annotation {{constraint.name(generic_args: false).split("::").last.id}}; end
+    {% end %}
+  end
 
   # :nodoc:
   abstract struct Container; end
@@ -46,32 +50,66 @@ module Athena::Validator
   end
 end
 
-# private struct Foo
-#   include AVD::Validatable
-
-#   @[Assert::Range(range: 0..10)]
-#   property value : Bool = false
-# end
-
 validator = AVD.validator
+
+struct Foo
+  include AVD::Validatable
+
+  @[Assert::Callback]
+  def self.validate(object : AVD::Constraints::Callback::Value, context : AVD::ExecutionContextInterface, payload : Hash(String, String)?) : Nil
+    context.build_violation("Invalid name").at_path("name").add
+  end
+
+  def initialize(@value : Int32, @name : String); end
+
+  @[Assert::Negative]
+  property value : Int32
+
+  @[Assert::NotBlank]
+  property name : String
+
+  @[Assert::Callback]
+  def validate(context : AVD::ExecutionContextInterface, payload : Hash(String, String)?) : Nil
+    context.build_violation("bad ID").at_path("value").add
+  end
+end
+
+constraint = AVD::Constraints::Callback.with_callback do |value, context, payload|
+  pp value.value == "foo"
+  pp value == "foo"
+end
+
+validator.validate "foo", [constraint]
+
+# obj = Foo.new 50, ""
+
+# puts validator.validate obj
+# Object(Foo).value:
+#   This value should be between 0 and 10. (code: 7e62386d-30ae-4e7c-918f-1b7e571c6d69)
+# Object(Foo).name:
+#   This value should not be blank. (code: 0d0c3254-3642-4cb0-9882-46ee5918e6e3)
 
 # constraint = AVD::Constraints::NotBlank.new
 
-# # range_constraint = AVD::Constraints::Range(Int32, Int32).new 0..10
+# range_constraint = AVD::Constraints::Range(Int32, Int32).new 0..10
 # equal_to_constraint = AVD::Constraints::EqualTo.new "yes"
+
+# puts validator.validate 12, [range_constraint]
+# puts validator.validate 5, [range_constraint]
+# puts validator.validate false, [range_constraint]
 
 # puts validator.validate 17, [constraint]
 # puts validator.validate "no", [equal_to_constraint]
-# # puts validator.validate 5, [greater_than_constraint]
 # puts validator.validate 50, [AVD::Constraints::GreaterThan.new 10.0]
 # puts validator.validate 0_u8, [AVD::Constraints::GreaterThan.new 10.0]
 # puts validator.validate "zzz", [AVD::Constraints::GreaterThan.new "foo"]
 # puts validator.validate false, [AVD::Constraints::GreaterThan.new "foo"]
 
-value = 11 || "foo" || nil
+# value = 11 || "foo" || nil
 
-pp typeof(value)
+# constraint = AVD::Constraints::Positive.new
 
-constraint = AVD::Constraints::GreaterThan.new 5
-
-puts validator.validate value, [constraint]
+# puts validator.validate 10, [constraint]
+# puts validator.validate Int64::MAX - 1, [constraint]
+# puts validator.validate 0, [constraint]
+# puts validator.validate -5, [constraint]

@@ -4,6 +4,10 @@ struct Athena::Validator::Constraints::GreaterThanOrEqual(ValueType) < Athena::V
   DEFAULT_ERROR_MESSAGE = "This value should be greater than or equal to {{ compared_value }}."
   TOO_LOW_ERROR         = "e09e52d0-b549-4ba1-8b4e-420aad76f0de"
 
+  @@error_names = {
+    TOO_LOW_ERROR => "TOO_LOW_ERROR",
+  }
+
   struct Validator < Athena::Validator::Constraints::ComparisonValidator
     def compare_values(actual : Number, expected : Number) : Bool
       actual >= expected

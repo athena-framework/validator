@@ -1,6 +1,10 @@
 struct Athena::Validator::Constraints::NegativeOrZero < Athena::Validator::Constraint
   include Athena::Validator::Constraints::AbstractComparison(Int32)
 
+  @@error_names = {
+    AVD::Constraints::LessThan::TOO_HIGH_ERROR => "TOO_HIGH_ERROR",
+  }
+
   def validated_by : AVD::ConstraintValidator.class
     AVD::Constraints::LessThanOrEqual::Validator
   end
