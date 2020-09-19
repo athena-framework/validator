@@ -47,7 +47,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("more_than_twenty")]
   def test_invalid_values_max(value : Number?) : Nil
-    constraint = new_constraint range: (..20), max_message: "my_message"
+    constraint = self.new_constraint range: (..20), max_message: "my_message"
     self.validator.validate value, constraint
 
     self.build_violation("my_message")
@@ -59,7 +59,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("more_than_twenty")]
   def test_invalid_values_minmax_max(value : Number?) : Nil
-    constraint = new_constraint range: (10..20), not_in_range_message: "my_message"
+    constraint = self.new_constraint range: (10..20), not_in_range_message: "my_message"
     self.validator.validate value, constraint
 
     self.build_violation("my_message")
@@ -72,7 +72,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("less_than_ten")]
   def test_invalid_values_minmax_min(value : Number?) : Nil
-    constraint = new_constraint range: (10..20), not_in_range_message: "my_message"
+    constraint = self.new_constraint range: (10..20), not_in_range_message: "my_message"
     self.validator.validate value, constraint
 
     self.build_violation("my_message")
@@ -84,14 +84,14 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   def test_exclusive_range_included : Nil
-    constraint = new_constraint range: (10...20)
+    constraint = self.new_constraint range: (10...20)
     self.validator.validate 15, constraint
 
     self.assert_no_violation
   end
 
   def ptest_exclusive_range_excluded : Nil
-    constraint = new_constraint range: (10...20), not_in_range_message: "my_message"
+    constraint = self.new_constraint range: (10...20), not_in_range_message: "my_message"
     self.validator.validate 20, constraint
 
     self.build_violation("my_message")
@@ -104,7 +104,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("ten_to_twnentieth_april_2020")]
   def test_valid_datetimes_min(value : Time) : Nil
-    constraint = new_constraint range: (Time.utc(2020, 4, 10)..)
+    constraint = self.new_constraint range: (Time.utc(2020, 4, 10)..)
     self.validator.validate value, constraint
 
     self.assert_no_violation
@@ -112,7 +112,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("ten_to_twnentieth_april_2020")]
   def test_valid_datetimes_min(value : Time) : Nil
-    constraint = new_constraint range: (..Time.utc(2020, 4, 20))
+    constraint = self.new_constraint range: (..Time.utc(2020, 4, 20))
     self.validator.validate value, constraint
 
     self.assert_no_violation
@@ -120,7 +120,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("ten_to_twnentieth_april_2020")]
   def test_valid_datetimes_min(value : Time) : Nil
-    constraint = new_constraint range: (Time.utc(2020, 4, 10)..Time.utc(2020, 4, 20))
+    constraint = self.new_constraint range: (Time.utc(2020, 4, 10)..Time.utc(2020, 4, 20))
     self.validator.validate value, constraint
 
     self.assert_no_violation
@@ -130,7 +130,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_invalid_datetimes_min(value : Time) : Nil
     expected_start_date = Time.utc(2020, 4, 10)
 
-    constraint = new_constraint range: (expected_start_date..), min_message: "my_message"
+    constraint = self.new_constraint range: (expected_start_date..), min_message: "my_message"
     self.validator.validate value, constraint
 
     self.build_violation("my_message")
@@ -144,7 +144,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_invalid_datetimes_max(value : Time) : Nil
     expected_end_date = Time.utc(2020, 4, 20)
 
-    constraint = new_constraint range: (..expected_end_date), max_message: "my_message"
+    constraint = self.new_constraint range: (..expected_end_date), max_message: "my_message"
     self.validator.validate value, constraint
 
     self.build_violation("my_message")
@@ -159,7 +159,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
     expected_begin_date = Time.utc(2020, 4, 10)
     expected_end_date = Time.utc(2020, 4, 20)
 
-    constraint = new_constraint range: (expected_begin_date..expected_end_date), not_in_range_message: "my_message"
+    constraint = self.new_constraint range: (expected_begin_date..expected_end_date), not_in_range_message: "my_message"
     self.validator.validate value, constraint
 
     self.build_violation("my_message")
@@ -175,7 +175,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
     expected_begin_date = Time.utc(2020, 4, 10)
     expected_end_date = Time.utc(2020, 4, 20)
 
-    constraint = new_constraint range: (expected_begin_date..expected_end_date), not_in_range_message: "my_message"
+    constraint = self.new_constraint range: (expected_begin_date..expected_end_date), not_in_range_message: "my_message"
     self.validator.validate value, constraint
 
     self.build_violation("my_message")
@@ -187,7 +187,7 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   def test_invalid_type : Nil
-    constraint = new_constraint range: (10..20)
+    constraint = self.new_constraint range: (10..20)
 
     expect_raises AVD::Exceptions::UnexpectedValueError, "Expected argument of type 'Number | Time', 'Bool' given." do
       self.validator.validate false, constraint

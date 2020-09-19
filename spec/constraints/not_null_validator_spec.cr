@@ -20,7 +20,7 @@ struct NotNullValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_nil_is_invalid
     self.validator.validate nil, self.new_constraint message: "my_message"
 
-    build_violation("my_message")
+    self.build_violation("my_message")
       .add_parameter("{{ value }}", nil)
       .code(AVD::Constraints::NotNull::IS_NULL_ERROR)
       .assert_violation

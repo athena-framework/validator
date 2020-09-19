@@ -58,7 +58,16 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
   end
 
   def add : Nil
-    rendered_message = @message.gsub(/(?:{{ \w+ }})+/, @parameters)
+    # Split and determine the message to use based on plural value
+    translated_message = if !(count = @plural).nil? && @message.includes? '|'
+                           parts = @message.split('|')
+                           # TODO: Support more robust translations
+                           count == 1 ? parts.first : parts[1]
+                         else
+                           @message
+                         end
+
+    rendered_message = translated_message.gsub(/(?:{{ \w+ }})+/, @parameters)
 
     @violations.add AVD::Violation::ConstraintViolation.new(
       rendered_message,

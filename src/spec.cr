@@ -141,7 +141,7 @@ module Athena::Validator::Spec
 
   record ConstraintViolationAssertion, context : AVD::ExecutionContextInterface, message : String, constraint : AVD::Constraint do
     @parameters : Hash(String, String) = Hash(String, String).new
-    @invalid_value : String = "invalid_value"
+    @invalid_value : AVD::Container = AVD::ValueContainer.new("invalid_value")
     @property_path : String = "property.path"
     @plural : Int32? = nil
     @code : String? = nil
@@ -158,6 +158,12 @@ module Athena::Validator::Spec
     end
 
     def build_violation(@message : String) : self
+      self
+    end
+
+    def invalid_value(value : _) : self
+      @invalid_value = AVD::ValueContainer.new value
+
       self
     end
 
@@ -192,7 +198,7 @@ module Athena::Validator::Spec
         @parameters,
         @context.root,
         @property_path,
-        @invalid_value,
+        @invalid_value.value,
         @plural,
         @code,
         @constraint,
