@@ -88,7 +88,10 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
     {% begin %}
       case name
         {% for callback in T.methods.select &.annotation(Assert::Callback) %}
-          when {{callback.name.stringify}} then object.{{callback.name.id}}(context, payload)
+          when {{callback.name.stringify}}
+            if object.responds_to?({{callback.name.id.symbolize}})
+              object.{{callback.name.id}}(context, payload)
+            end
         {% end %}
       else
         raise "BUG: Unknown method #{name} within #{T}"

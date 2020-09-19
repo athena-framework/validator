@@ -1,2 +1,2 @@
-class Athena::Validator::Exceptions::ValidatorError < RuntimeError
+class Athena::Validator::Exceptions::ValidatorError < Exception
 end

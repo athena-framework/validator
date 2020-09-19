@@ -4,6 +4,10 @@ struct Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
   record ValueContainer(T) < Value, value : T do
     forward_missing_to @value
 
+    def get(_t : T.class) : T forall T
+      @value.as?(T).not_nil!
+    end
+
     def ==(other) : Bool
       @value == other
     end
