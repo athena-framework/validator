@@ -26,7 +26,7 @@ class Athena::Validator::Constraints::Range < Athena::Validator::Constraint
     new range.begin, range.end, not_in_range_message, min_message, max_message, groups, payload
   end
 
-  def initialize(
+  private def initialize(
     @min : Int32 | Time | Nil,
     @max : Int32 | Time | Nil,
     @not_in_range_message : String = "This value should be between {{ min }} and {{ max }}.",

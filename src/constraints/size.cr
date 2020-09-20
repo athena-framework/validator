@@ -1,4 +1,4 @@
-class Athena::Validator::Constraints::Size(B, E) < Athena::Validator::Constraint
+class Athena::Validator::Constraints::Size < Athena::Validator::Constraint
   TOO_SHORT_ERROR = "8ba31c71-1b37-4b76-8bc9-66896589b01f"
   TOO_LONG_ERROR  = "a1fa7a63-ea3b-46a0-adcc-5e1bcc26f73a"
 
@@ -7,13 +7,26 @@ class Athena::Validator::Constraints::Size(B, E) < Athena::Validator::Constraint
     TOO_LONG_ERROR  => "TOO_LONG_ERROR",
   }
 
-  getter range : ::Range(B, E)
+  getter min : Int32?
+  getter max : Int32?
   getter min_message : String
   getter max_message : String
   getter exact_message : String
 
-  def initialize(
-    @range : ::Range(B, E),
+  def self.new(
+    range : ::Range,
+    min_message : String = "This value is too short. It should have {{ limit }} {{ type }} or more.|This value is too short. It should have {{ limit }} {{ type }}s or more.",
+    max_message : String = "This value is too long. It should have {{ limit }} {{ type }} or less.|This value is too long. It should have {{ limit }} {{ type }}s or less.",
+    exact_message : String = "This value should have exactly {{ limit }} {{ type }}.|This value should have exactly {{ limit }} {{ type }}s.",
+    groups : Array(String)? = nil,
+    payload : Hash(String, String)? = nil
+  )
+    new range.begin, range.end, min_message, max_message, exact_message, groups, payload
+  end
+
+  private def initialize(
+    @min : Int32?,
+    @max : Int32?,
     @min_message : String = "This value is too short. It should have {{ limit }} {{ type }} or more.|This value is too short. It should have {{ limit }} {{ type }}s or more.",
     @max_message : String = "This value is too long. It should have {{ limit }} {{ type }} or less.|This value is too long. It should have {{ limit }} {{ type }}s or less.",
     @exact_message : String = "This value should have exactly {{ limit }} {{ type }}.|This value should have exactly {{ limit }} {{ type }}s.",
@@ -30,10 +43,8 @@ class Athena::Validator::Constraints::Size(B, E) < Athena::Validator::Constraint
 
       size = value.size
 
-      range = constraint.range
-
-      min = range.begin
-      max = range.end
+      min = constraint.min
+      max = constraint.max
 
       if max && size > max
         self.context
