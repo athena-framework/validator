@@ -1,4 +1,4 @@
-struct Athena::Validator::Constraints::LessThanOrEqual(ValueType) < Athena::Validator::Constraint
+class Athena::Validator::Constraints::LessThanOrEqual(ValueType) < Athena::Validator::Constraint
   include Athena::Validator::Constraints::AbstractComparison(ValueType)
 
   DEFAULT_ERROR_MESSAGE = "This value should be less than or equal to {{ compared_value }}."

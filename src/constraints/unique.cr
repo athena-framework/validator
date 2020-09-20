@@ -1,4 +1,4 @@
-struct Athena::Validator::Constraints::Unique < Athena::Validator::Constraint
+class Athena::Validator::Constraints::Unique < Athena::Validator::Constraint
   DEFAULT_ERROR_MESSAGE = "This collection should contain only unique elements."
   IS_NOT_UNIQUE         = "fd1f83d6-94b5-44bc-b39d-b1ff367ebfb8"
 

@@ -1,4 +1,4 @@
-struct Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
+class Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
   abstract struct Value; end
 
   record ValueContainer(T) < Value, value : T do

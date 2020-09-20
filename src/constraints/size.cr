@@ -1,4 +1,4 @@
-struct Athena::Validator::Constraints::Size(B, E) < Athena::Validator::Constraint
+class Athena::Validator::Constraints::Size(B, E) < Athena::Validator::Constraint
   TOO_SHORT_ERROR = "8ba31c71-1b37-4b76-8bc9-66896589b01f"
   TOO_LONG_ERROR  = "a1fa7a63-ea3b-46a0-adcc-5e1bcc26f73a"
 

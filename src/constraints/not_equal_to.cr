@@ -1,4 +1,4 @@
-struct Athena::Validator::Constraints::NotEqualTo(ValueType) < Athena::Validator::Constraint
+class Athena::Validator::Constraints::NotEqualTo(ValueType) < Athena::Validator::Constraint
   include Athena::Validator::Constraints::AbstractComparison(ValueType)
 
   DEFAULT_ERROR_MESSAGE = "This value should not be equal to {{ compared_value }}."

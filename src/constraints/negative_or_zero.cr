@@ -1,4 +1,4 @@
-struct Athena::Validator::Constraints::NegativeOrZero < Athena::Validator::Constraint
+class Athena::Validator::Constraints::NegativeOrZero < Athena::Validator::Constraint
   include Athena::Validator::Constraints::AbstractComparison(Int32)
 
   @@error_names = {

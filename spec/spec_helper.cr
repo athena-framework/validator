@@ -4,7 +4,7 @@ require "../src/spec"
 
 ASPEC.run_all
 
-struct MockConstraint < AVD::Constraint
+class MockConstraint < AVD::Constraint
   def validated_by
     MockConstraintValidator
   end
@@ -13,7 +13,7 @@ end
 struct MockConstraintValidator < AVD::ConstraintValidator
 end
 
-struct CustomConstraint < AVD::Constraint
+class CustomConstraint < AVD::Constraint
   @@error_names = {
     "abc123" => "FAKE_ERROR",
   }

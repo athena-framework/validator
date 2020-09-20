@@ -1,4 +1,4 @@
-abstract struct Athena::Validator::Constraint
+abstract class Athena::Validator::Constraint
   DEFAULT_GROUP = "default"
 
   @@error_names = Hash(String, String).new
@@ -9,7 +9,7 @@ abstract struct Athena::Validator::Constraint
   end
 
   getter message : String
-  getter groups : Array(String)
+  property groups : Array(String)
   getter payload : Hash(String, String)?
 
   def initialize(@message : String, groups : Array(String)? = nil, @payload : Hash(String, String)? = nil)
@@ -25,15 +25,17 @@ abstract struct Athena::Validator::Constraint
   end
 
   macro inherited
-    annotation ::Athena::Validator::Annotations::{{@type.name(generic_args: false).split("::").last.id}}; end
+    {% unless @type.abstract? %}
+      annotation ::Athena::Validator::Annotations::{{@type.name(generic_args: false).split("::").last.id}}; end
 
-    def validated_by : AVD::ConstraintValidator.class
-      Validator
-    end
+      def validated_by : AVD::ConstraintValidator.class
+        Validator
+      end
 
-    protected def default_error_message : String
-      DEFAULT_ERROR_MESSAGE
-    end
+      protected def default_error_message : String
+        DEFAULT_ERROR_MESSAGE
+      end
+    {% end %}
   end
 
   # Builds the constraint initializer for `self` with the provided *message* and additional *properties*.
