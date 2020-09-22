@@ -17,9 +17,30 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
           {% ann_name = constraint.name(generic_args: false).split("::").last.id %}
 
           {% if ann = ivar.annotation Assert.constant(ann_name).resolve %}
+            {% default_arg = ann.args.empty? ? nil : ann.args.first %}
+
+
+            {% if default_arg.is_a? ArrayLiteral %}
+              {% default_arg = default_arg.map do |arg|
+                   if arg.is_a? Annotation
+                     arg_name = arg.stringify.gsub(/@\[/, "").gsub(/\(.*/, "").split("::").last
+
+                     inner_default_arg = arg.args.empty? ? nil : arg.args.first
+
+                     # Resolve constraints from the annotations
+                     %(AVD::Constraints::#{arg_name.id}.new(#{inner_default_arg ? "#{inner_default_arg},".id : "".id}#{arg.named_args.double_splat})).id
+                   else
+                     arg
+                   end
+                 end %}
+            {% end %}
+
             class_metadata.add_property_constraint(
               AVD::Metadata::PropertyMetadata({{ivar.type}}, T).new({{ivar.name.stringify}}),
-              {{constraint.name(generic_args: false).id}}.new({{ann.named_args.double_splat}})
+              {{constraint.name(generic_args: false).id}}.new(
+                {{ default_arg ? "#{default_arg},".id : "".id }} # Default argument
+                {{ ann.named_args.double_splat }}
+              )
             )
           {% end %}
         {% end %}

@@ -9,13 +9,11 @@ class Athena::Validator::Constraints::AtLeastOneOf < Athena::Validator::Constrai
   }
 
   getter include_internal_messages : Bool
-  getter collection_message : String
 
   def initialize(
     constraints : Array(AVD::Constraint) | AVD::Constraint,
     @include_internal_messages : Bool = true,
-    @collection_message : String = "Each element of this collection should satisfy its own set of constraints.",
-    message : String = default_error_message,
+    message : String = "This value should satisfy at least one of the following constraints:",
     groups : Array(String)? = nil,
     payload : Hash(String, String)? = nil
   )
@@ -35,11 +33,8 @@ class Athena::Validator::Constraints::AtLeastOneOf < Athena::Validator::Constrai
         return if violations.empty?
 
         if constraint.include_internal_messages
-          message = "\n\t  [#{idx + 1}] "
-
           # TODO: Handle `All` and `Collection` constraints
-          message += "#{violations[0].message}"
-          messages << message
+          messages << " [#{idx + 1}] #{violations[0].message}"
         end
       end
 
