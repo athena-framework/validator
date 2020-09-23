@@ -15,8 +15,8 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     self
   end
 
-  def validate(value : _, constraints : Array(AVD::Constraint)? = nil, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
-    groups = groups || @default_groups
+  def validate(value : _, constraints : Array(AVD::Constraint) | AVD::Constraint | Nil = nil, groups : Array(String) | String | Nil = nil) : AVD::Validator::ContextualValidatorInterface
+    groups = self.normalize_groups groups
 
     previous_value = @context.value
     previous_object = @context.object
@@ -27,6 +27,8 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
 
     # Validate the value against explicitly passed constraints
     unless constraints.nil?
+      constraints = constraints.is_a?(Array) ? constraints : [constraints]
+
       metadata = AVD::Metadata::Metadata.new
       metadata.add_constraints constraints
 
@@ -81,10 +83,11 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     end
   end
 
-  def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+  def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String) | String | Nil = nil) : AVD::Validator::ContextualValidatorInterface
+    groups = self.normalize_groups groups
+
     class_metadata = object.class.validation_class_metadata
     property_metadata = class_metadata.property_metadata(property_name)
-    groups = groups || @default_groups
     property_path = AVD::PropertyPath.append @default_property_path, property_name
 
     previous_value = @context.value
@@ -111,10 +114,11 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     self
   end
 
-  def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+  def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String) | String | Nil = nil) : AVD::Validator::ContextualValidatorInterface
+    groups = self.normalize_groups groups
+
     class_metadata = object.class.validation_class_metadata
     property_metadata = class_metadata.property_metadata(property_name)
-    groups = groups || @default_groups
     property_path = AVD::PropertyPath.append @default_property_path, property_name
 
     previous_value = @context.value
@@ -137,6 +141,10 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     @context.group = previous_group
 
     self
+  end
+
+  def violations : AVD::Violation::ConstraintViolationListInterface
+    @context.violations
   end
 
   private def validate_each_object_in(
@@ -256,7 +264,7 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     )
   end
 
-  def validate_in_group(value : _, metadata : AVD::Metadata::MetadataInterface, group : String, context : AVD::ExecutionContextInterface) : Nil
+  private def validate_in_group(value : _, metadata : AVD::Metadata::MetadataInterface, group : String, context : AVD::ExecutionContextInterface) : Nil
     context.group = group
 
     metadata.find_constraints(group).each do |constraint|
@@ -275,7 +283,13 @@ struct Athena::Validator::Validator::RecursiveContextualValidator
     end
   end
 
-  def violations : AVD::Violation::ConstraintViolationListInterface
-    @context.violations
+  private def normalize_groups(groups : Array(String) | String | Nil) : Array(String)
+    return @default_groups if groups.nil?
+
+    if groups.is_a?(String)
+      return [groups]
+    end
+
+    groups
   end
 end

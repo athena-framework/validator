@@ -9,15 +9,15 @@ struct Athena::Validator::Validator::RecursiveValidator
     @validator_factory = validator_factory || AVD::ConstraintValidatorFactory.new
   end
 
-  def validate(value : _, constraints : Array(AVD::Constraint)? = nil, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+  def validate(value : _, constraints : Array(AVD::Constraint) | AVD::Constraint | Nil = nil, groups : Array(String) | String | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
     start_context(value).validate(value, constraints, groups).violations
   end
 
-  def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+  def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String) | String | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
     start_context(object).validate_property(object, property_name, groups).violations
   end
 
-  def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+  def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String) | String | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
     start_context(object).validate_property_value(object, property_name, value, groups).violations
   end
 

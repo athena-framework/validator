@@ -98,7 +98,7 @@ module Athena::Validator::Spec
       self
     end
 
-    def validate(value : _, constraints : Array(Constraint)? = nil, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+    def validate(value : _, constraints : Array(AVD::Constraint) | AVD::Constraint | Nil = nil, groups : Array(String) | String | Nil = nil) : AVD::Validator::ContextualValidatorInterface
       self
     end
 
@@ -118,7 +118,7 @@ module Athena::Validator::Spec
   struct MockValidator
     include Athena::Validator::Validator::ValidatorInterface
 
-    def validate(value : _, constraints : Array(AVD::Constraint)? = nil, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+    def validate(value : _, constraints : Array(AVD::Constraint) | AVD::Constraint | Nil = nil, groups : Array(String) | String | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
       AVD::Violation::ConstraintViolationList.new
     end
 
