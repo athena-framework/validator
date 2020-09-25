@@ -45,3 +45,42 @@ module Athena::Validator
     AVD::Validator::RecursiveValidator.new validator_factory
   end
 end
+
+class Address
+  include AVD::Validatable
+
+  def initialize(@street : String, @zip_code : String); end
+
+  @[Assert::NotBlank]
+  @street : String
+
+  @[Assert::NotBlank]
+  @[Assert::Size(..5)]
+  @zip_code : String
+end
+
+class Author
+  include AVD::Validatable
+
+  def initialize(@first_name : String, @last_name : String, @address : Address); end
+
+  @[Assert::NotBlank]
+  @first_name : String
+
+  @[Assert::NotBlank]
+  @[Assert::Size(4..)]
+  @last_name : String
+
+  @[Assert::Valid]
+  @address : Address
+end
+
+address = Address.new "", "15061"
+author = Author.new "Jim", "Bobb", address
+
+validator = AVD.validator
+
+pp validator.validate author
+# Object(Author).address.street:
+#   This value should not be blank. (code: 0d0c3254-3642-4cb0-9882-46ee5918e6e3)
+

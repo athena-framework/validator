@@ -36,7 +36,7 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
             {% end %}
 
             class_metadata.add_property_constraint(
-              AVD::Metadata::PropertyMetadata({{ivar.type}}, T).new({{ivar.name.stringify}}),
+              AVD::Metadata::PropertyMetadata(T).new({{ivar.name.stringify}}),
               {{constraint.name(generic_args: false).id}}.new(
                 {{ default_arg ? "#{default_arg},".id : "".id }} # Default argument
                 {{ ann.named_args.double_splat }}
@@ -84,17 +84,7 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
 
   # Helper method to aid in adding constraints to properties via `.load_metadata`.
   def add_property_constraint(property_name : String, constraint : AVD::Constraint) : Nil forall IvarType
-    {% begin %}
-      property_metadata = case property_name
-                            {% for ivar in T.instance_vars %}
-                              when {{ivar.name.stringify}} then AVD::Metadata::PropertyMetadata({{ivar.type.id}}, T).new(property_name)
-                            {% end %}
-                          else
-                            raise ArgumentError.new "Property '#{property_name}' does not exist in type '#{T}'."
-                          end
-
-    self.add_property_constraint property_metadata, constraint
-    {% end %}
+    self.add_property_constraint AVD::Metadata::PropertyMetadata(T).new(property_name), constraint
   end
 
   def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterfaceBase, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadataBase

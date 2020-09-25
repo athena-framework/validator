@@ -1,8 +1,8 @@
 require "./property_metadata_interface"
 
-struct Athena::Validator::Metadata::PropertyMetadata(IvarType, EntityType)
+struct Athena::Validator::Metadata::PropertyMetadata(EntityType)
   include Athena::Validator::Metadata::GenericMetadata
-  include Athena::Validator::Metadata::PropertyMetadataInterface(IvarType)
+  include Athena::Validator::Metadata::PropertyMetadataInterfaceBase
 
   getter class_name : AVD::Validatable
   getter name : String

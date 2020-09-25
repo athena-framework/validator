@@ -1,11 +1,5 @@
-module Athena::Validator::Metadata
-  module PropertyMetadataInterfaceBase
-    include Athena::Validator::Metadata::MetadataInterface
+module Athena::Validator::Metadata::PropertyMetadataInterfaceBase
+  include Athena::Validator::Metadata::MetadataInterface
 
-    abstract def name : String
-  end
-
-  module PropertyMetadataInterface(T)
-    include Athena::Validator::Metadata::PropertyMetadataInterfaceBase
-  end
+  abstract def name : String
 end
