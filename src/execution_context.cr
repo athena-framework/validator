@@ -60,7 +60,7 @@ class Athena::Validator::ExecutionContext(Root)
       parameters,
       @root,
       @property_path,
-      self.value,
+      @value_container,
       constraint: @constraint
     )
   end
@@ -73,7 +73,7 @@ class Athena::Validator::ExecutionContext(Root)
       parameters,
       @root,
       @property_path,
-      self.value
+      @value_container,
     )
   end
 end

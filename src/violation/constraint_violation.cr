@@ -1,9 +1,10 @@
 require "./constraint_violation_interface"
 
-struct Athena::Validator::Violation::ConstraintViolation(Root, InvalidValueType)
+struct Athena::Validator::Violation::ConstraintViolation(Root)
   include Athena::Validator::Violation::ConstraintViolationInterface
 
-  getter invalid_value : InvalidValueType
+  protected getter invalid_value_container : AVD::Container
+
   getter message : String
   getter message_template : String?
   getter parameters : Hash(String, String)
@@ -20,12 +21,16 @@ struct Athena::Validator::Violation::ConstraintViolation(Root, InvalidValueType)
     @parameters : Hash(String, String),
     @root : Root,
     @property_path : String,
-    @invalid_value : InvalidValueType,
+    @invalid_value_container : AVD::Container,
     @plural : Int32? = nil,
     @code : String? = nil,
     @constraint : AVD::Constraint? = nil,
     @cause : String? = nil
   )
+  end
+
+  def invalid_value
+    @invalid_value_container.value
   end
 
   def to_s(io : IO) : Nil
@@ -45,13 +50,13 @@ struct Athena::Validator::Violation::ConstraintViolation(Root, InvalidValueType)
     io.puts "#{klass}#{@property_path}:\n\t#{@message}#{code}"
   end
 
-  def ==(other) : Bool
+  def ==(other : self) : Bool
     @message == other.message &&
       @message_template == other.message_template &&
       @parameters == other.parameters &&
       @root == other.root &&
       @property_path == other.property_path &&
-      @invalid_value == other.invalid_value &&
+      @invalid_value_container == other.invalid_value_container &&
       @plural == other.plural &&
       @code == other.code &&
       @constraint == other.constraint &&

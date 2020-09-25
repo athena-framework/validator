@@ -88,5 +88,5 @@ struct TestPropertyCallback
 end
 
 def get_violation(message : String, *, invalid_value : _ = nil, root : _ = nil, property_path : String = "", code : String = "") : AVD::Violation::ConstraintViolation
-  AVD::Violation::ConstraintViolation.new message, message, Hash(String, String).new, root, property_path, invalid_value, code: code
+  AVD::Violation::ConstraintViolation.new message, message, Hash(String, String).new, root, property_path, AVD::ValueContainer.new(invalid_value), code: code
 end

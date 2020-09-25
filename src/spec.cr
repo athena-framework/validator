@@ -198,7 +198,7 @@ module Athena::Validator::Spec
         @parameters,
         @context.root,
         @property_path,
-        @invalid_value.value,
+        @invalid_value,
         @plural,
         @code,
         @constraint,

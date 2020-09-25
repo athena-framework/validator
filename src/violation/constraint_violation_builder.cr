@@ -5,7 +5,6 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
 
   @plural : Int32?
   @cause : String?
-  @invalid_value : AVD::Container
 
   def initialize(
     @violations : AVD::Violation::ConstraintViolationListInterface,
@@ -14,9 +13,8 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
     @parameters : Hash(String, String),
     @root : Root,
     @property_path : String,
-    invalid_value : _
+    @invalid_value : AVD::Container
   )
-    @invalid_value = AVD::ValueContainer.new invalid_value
   end
 
   def at_path(path : String) : AVD::Violation::ConstraintViolationBuilderInterface
@@ -69,13 +67,13 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
 
     rendered_message = translated_message.gsub(/(?:{{ \w+ }})+/, @parameters)
 
-    @violations.add AVD::Violation::ConstraintViolation.new(
+    @violations.add AVD::Violation::ConstraintViolation(Root).new(
       rendered_message,
       @message,
       @parameters,
       @root,
       @property_path,
-      @invalid_value.value,
+      @invalid_value,
       @plural,
       @code,
       @constraint,
