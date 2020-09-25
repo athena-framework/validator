@@ -41,9 +41,9 @@ module Athena::Validator::Spec
       self.constraint_class.new **args
     end
 
-    def assert_no_violation : Nil
+    def assert_no_violation(*, file : String = __FILE__, line : Int32 = __LINE__) : Nil
       unless (violation_count = self.context.violations.size).zero?
-        fail "0 violations expected but got #{violation_count}."
+        fail "0 violations expected but got #{violation_count}.", file, line
       end
     end
 
@@ -179,7 +179,7 @@ module Athena::Validator::Spec
       self
     end
 
-    def assert_violation : Nil
+    def assert_violation(*, file : String = __FILE__, line : Int32 = __LINE__) : Nil
       expected_violations = [self.get_violation] of AVD::Violation::ConstraintViolationInterface
 
       violations = @context.violations
@@ -187,7 +187,7 @@ module Athena::Validator::Spec
       violations.size.should eq 1
 
       expected_violations.each_with_index do |violation, idx|
-        violation.should eq violations[idx]
+        violation.should eq(violations[idx]), file: file, line: line
       end
     end
 

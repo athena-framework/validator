@@ -46,41 +46,48 @@ module Athena::Validator
   end
 end
 
-class Address
-  include AVD::Validatable
+# class Address
+#   include AVD::Validatable
 
-  def initialize(@street : String, @zip_code : String); end
+#   def initialize(@street : String, @zip_code : String); end
 
-  @[Assert::NotBlank]
-  @street : String
+#   @[Assert::NotBlank(message: "You cannot have an empty street")]
+#   @street : String
 
-  @[Assert::NotBlank]
-  @[Assert::Size(..5)]
-  @zip_code : String
-end
+#   @[Assert::NotBlank]
+#   @[Assert::Size(..5)]
+#   @zip_code : String
+# end
 
-class Author
-  include AVD::Validatable
+# class Author
+#   include AVD::Validatable
 
-  def initialize(@first_name : String, @last_name : String, @address : Address); end
+#   def initialize(@first_name : String, @last_name : String, @address : Address); end
 
-  @[Assert::NotBlank]
-  @first_name : String
+#   @[Assert::Callback]
+#   def validate(context : AVD::ExecutionContextInterface, payload : Hash(String, String)?) : Nil
+#     # Do stuff here
+#   end
 
-  @[Assert::NotBlank]
-  @[Assert::Size(4..)]
-  @last_name : String
+#   def self.load_metadata(class_metadata : AVD::Metadata::ClassMetadataBase) : Nil
+#     class_metadata.add_property_constraint "first_name", AVD::Constraints::NotBlank.new
+#   end
 
-  @[Assert::Valid]
-  @address : Address
-end
+#   @first_name : String
 
-address = Address.new "", "15061"
-author = Author.new "Jim", "Bobb", address
+#   @[Assert::NotBlank]
+#   @[Assert::Size((4..))]
+#   @last_name : String
 
-validator = AVD.validator
+#   @[Assert::Valid]
+#   @address : Address
+# end
 
-pp validator.validate author
+# address = Address.new "", "15061"
+# author = Author.new "", "Bobb", address
+
+# validator = AVD.validator
+
+# puts validator.validate author
 # Object(Author).address.street:
-#   This value should not be blank. (code: 0d0c3254-3642-4cb0-9882-46ee5918e6e3)
-
+#   You cannot have an empty street (code: 0d0c3254-3642-4cb0-9882-46ee5918e6e3)
