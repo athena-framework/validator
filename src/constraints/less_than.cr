@@ -25,9 +25,9 @@ class Athena::Validator::Constraints::LessThan(ValueType) < Athena::Validator::C
     end
 
     # :inherit:
-    def compare_values(actual : _, expected : _) : Bool
+    def compare_values(actual : _, expected : _) : NoReturn
       # TODO: Support checking if arbitrarily typed values are actually comparable once `#responds_to?` supports it.
-      raise AVD::Exceptions::UnexpectedValueError.new actual, "Number | String | Time"
+      self.raise_invalid_type actual, "Number | String | Time"
     end
 
     # :inherit:

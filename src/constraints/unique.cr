@@ -30,9 +30,9 @@ class Athena::Validator::Constraints::Unique < Athena::Validator::Constraint
     end
 
     # :inherit:
-    def compare_values(actual : _, expected : _) : Bool
+    def compare_values(actual : _, expected : _) : NoReturn
       # TODO: Support checking if arbitrarily typed values are actually comparable once `#responds_to?` supports it.
-      raise AVD::Exceptions::UnexpectedValueError.new actual, "Indexable"
+      self.raise_invalid_type actual, "Indexable"
     end
   end
 end
