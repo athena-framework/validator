@@ -1,6 +1,5 @@
 class Athena::Validator::Constraints::Regex < Athena::Validator::Constraint
-  DEFAULT_ERROR_MESSAGE = "This value is not valid."
-  REGEX_FAILED_ERROR    = "108987a0-2d81-44a0-b8d4-1c7ab8815343"
+  REGEX_FAILED_ERROR = "108987a0-2d81-44a0-b8d4-1c7ab8815343"
 
   @@error_names = {
     REGEX_FAILED_ERROR => "REGEX_FAILED_ERROR",
@@ -9,7 +8,15 @@ class Athena::Validator::Constraints::Regex < Athena::Validator::Constraint
   getter pattern : ::Regex
   getter? match : Bool
 
-  initializer(pattern : ::Regex, match : Bool = true)
+  def initialize(
+    @pattern : ::Regex,
+    @match : Bool = true,
+    message : String = "This value is not valid.",
+    groups : Array(String)? = nil,
+    payload : Hash(String, String)? = nil
+  )
+    super message, groups, payload
+  end
 
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:

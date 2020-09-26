@@ -1,12 +1,17 @@
 class Athena::Validator::Constraints::IsNull < Athena::Validator::Constraint
-  DEFAULT_ERROR_MESSAGE = "This value should be null."
-  NOT_NULL_ERROR        = "2c88e3c7-9275-4b9b-81b4-48c6c44b1804"
+  NOT_NULL_ERROR = "2c88e3c7-9275-4b9b-81b4-48c6c44b1804"
 
   @@error_names = {
     NOT_NULL_ERROR => "NOT_NULL_ERROR",
   }
 
-  initializer
+  def initialize(
+    message : String = "This value should be null.",
+    groups : Array(String)? = nil,
+    payload : Hash(String, String)? = nil
+  )
+    super message, groups, payload
+  end
 
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:

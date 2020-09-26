@@ -1,6 +1,5 @@
 class Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
-  DEFAULT_ERROR_MESSAGE = "This value should not be blank."
-  IS_BLANK_ERROR        = "0d0c3254-3642-4cb0-9882-46ee5918e6e3"
+  IS_BLANK_ERROR = "0d0c3254-3642-4cb0-9882-46ee5918e6e3"
 
   @@error_names = {
     IS_BLANK_ERROR => "IS_BLANK_ERROR",
@@ -8,7 +7,14 @@ class Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
 
   getter? allow_nil : Bool
 
-  initializer(allow_nil : Bool = false)
+  def initialize(
+    @allow_nil : Bool = false,
+    message : String = "This value should not be blank.",
+    groups : Array(String)? = nil,
+    payload : Hash(String, String)? = nil
+  )
+    super message, groups, payload
+  end
 
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:

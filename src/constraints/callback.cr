@@ -22,13 +22,13 @@ class Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
   getter callback_name : String?
   getter callback : CallbackProc?
 
-  initializer(
-    callback_name : String? = nil,
-    callback : CallbackProc? = nil
+  def initialize(
+    @callback_name : String? = nil,
+    @callback : CallbackProc? = nil,
+    groups : Array(String)? = nil,
+    payload : Hash(String, String)? = nil
   )
-
-  protected def default_error_message : String
-    ""
+    super "", groups, payload
   end
 
   struct Validator < Athena::Validator::ConstraintValidator

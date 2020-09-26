@@ -1,12 +1,17 @@
 class Athena::Validator::Constraints::IsFalse < Athena::Validator::Constraint
-  DEFAULT_ERROR_MESSAGE = "This value should be false."
-  NOT_FALSE_ERROR       = "55c076a0-dbaf-453c-90cf-b94664276dbc"
+  NOT_FALSE_ERROR = "55c076a0-dbaf-453c-90cf-b94664276dbc"
 
   @@error_names = {
     NOT_FALSE_ERROR => "NOT_FALSE_ERROR",
   }
 
-  initializer
+  def initialize(
+    message : String = "This value should be false.",
+    groups : Array(String)? = nil,
+    payload : Hash(String, String)? = nil
+  )
+    super message, groups, payload
+  end
 
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:

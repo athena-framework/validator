@@ -1,8 +1,9 @@
 class Athena::Validator::Constraints::Valid < Athena::Validator::Constraint
-  initializer
-
-  protected def default_error_message : String
-    ""
+  def initialize(
+    groups : Array(String)? = nil,
+    payload : Hash(String, String)? = nil
+  )
+    super "", groups, payload
   end
 
   struct Validator < Athena::Validator::ConstraintValidator

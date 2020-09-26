@@ -1,12 +1,17 @@
 class Athena::Validator::Constraints::Unique < Athena::Validator::Constraint
-  DEFAULT_ERROR_MESSAGE = "This collection should contain only unique elements."
-  IS_NOT_UNIQUE         = "fd1f83d6-94b5-44bc-b39d-b1ff367ebfb8"
+  IS_NOT_UNIQUE = "fd1f83d6-94b5-44bc-b39d-b1ff367ebfb8"
 
   @@error_names = {
     IS_NOT_UNIQUE => "IS_NOT_UNIQUE",
   }
 
-  initializer
+  def initialize(
+    message : String = "This collection should contain only unique elements.",
+    groups : Array(String)? = nil,
+    payload : Hash(String, String)? = nil
+  )
+    super message, groups, payload
+  end
 
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:

@@ -10,4 +10,6 @@ module Athena::Validator::Constraints::AbstractComparison(ValueType)
   )
     super message, groups, payload
   end
+
+  protected abstract def default_error_message : String
 end

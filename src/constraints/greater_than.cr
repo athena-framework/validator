@@ -1,12 +1,15 @@
 class Athena::Validator::Constraints::GreaterThan(ValueType) < Athena::Validator::Constraint
   include Athena::Validator::Constraints::AbstractComparison(ValueType)
 
-  DEFAULT_ERROR_MESSAGE = "This value should be greater than {{ compared_value }}."
-  TOO_LOW_ERROR         = "a221096d-d125-44e8-a865-4270379ac11a"
+  TOO_LOW_ERROR = "a221096d-d125-44e8-a865-4270379ac11a"
 
   @@error_names = {
     TOO_LOW_ERROR => "TOO_LOW_ERROR",
   }
+
+  def default_error_message : String
+    "This value should be greater than {{ compared_value }}."
+  end
 
   struct Validator < Athena::Validator::Constraints::ComparisonValidator
     def compare_values(actual : Number, expected : Number) : Bool
