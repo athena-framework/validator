@@ -1,7 +1,5 @@
 class Athena::Validator::Constraints::Valid < Athena::Validator::Constraint
-  getter? traverse : Bool
-
-  initializer(traverse : Bool = true)
+  initializer
 
   protected def default_error_message : String
     ""

@@ -102,11 +102,11 @@ module Athena::Validator::Spec
       self
     end
 
-    def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+    def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String) | String | Nil = nil) : AVD::Validator::ContextualValidatorInterface
       self
     end
 
-    def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : AVD::Validator::ContextualValidatorInterface
+    def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String) | String | Nil = nil) : AVD::Validator::ContextualValidatorInterface
       self
     end
 
@@ -122,11 +122,11 @@ module Athena::Validator::Spec
       AVD::Violation::ConstraintViolationList.new
     end
 
-    def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+    def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String) | String | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
       AVD::Violation::ConstraintViolationList.new
     end
 
-    def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String)? = nil) : AVD::Violation::ConstraintViolationListInterface
+    def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String) | String | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
       AVD::Violation::ConstraintViolationList.new
     end
 

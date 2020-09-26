@@ -9,13 +9,6 @@ module Athena::Validator::Metadata::GenericMetadata
   @constraints_by_group = {} of String => Array(AVD::Constraint)
 
   def add_constraint(constraint : Constraint) : AVD::Metadata::GenericMetadata
-    if constraint.is_a?(AVD::Constraints::Valid) && constraint.groups.nil?
-      @cascading_strategy = :cascade
-      @traversal_strategy = constraint.traverse? ? AVD::Metadata::TraversalStrategy::Implicit : AVD::Metadata::TraversalStrategy::None
-
-      return self
-    end
-
     @constraints << constraint
 
     constraint.groups.each do |group|

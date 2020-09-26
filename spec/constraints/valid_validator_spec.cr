@@ -18,7 +18,7 @@ class Foo
   include AVD::Validatable
 
   @[Assert::Valid(groups: ["nested"])]
-  @foo_bar : FooBar = FooBar.new
+  setter foo_bar : FooBar? = FooBar.new
 end
 
 describe AVD::Constraints::Valid::Validator do
@@ -29,5 +29,15 @@ describe AVD::Constraints::Valid::Validator do
 
     violations.size.should eq 1
     violations[0].property_path.should eq "foo_bar.foo_bar_baz.foo"
+  end
+
+  it "should pass with null value" do
+    validator = AVD.validator
+    foo = Foo.new
+    foo.foo_bar = nil
+
+    violations = validator.validate foo, groups: "nested"
+
+    violations.should be_empty
   end
 end
