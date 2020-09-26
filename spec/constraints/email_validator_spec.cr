@@ -16,14 +16,14 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
     self.validator.validate "", self.new_constraint
   end
 
-  def test_object_empty_string_is_valid : Nil
+  def test_empty_string_from_object_is_valid : Nil
     self.validator.validate EmtpyEmailObject.new, self.new_constraint
     self.assert_no_violation
   end
 
   @[DataProvider("valid_emails")]
-  def test_valid_emails(email : String) : Nil
-    self.validator.validate email, self.new_constraint
+  def test_valid_emails(value : String) : Nil
+    self.validator.validate value, self.new_constraint
     self.assert_no_violation
   end
 
@@ -41,8 +41,8 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   @[DataProvider("valid_emails_html5")]
-  def test_valid_emails_html5(email : String) : Nil
-    self.validator.validate email, self.new_constraint mode: AVD::Constraints::Email::Mode::HTML5
+  def test_valid_emails_html5(value : String) : Nil
+    self.validator.validate value, self.new_constraint mode: AVD::Constraints::Email::Mode::HTML5
     self.assert_no_violation
   end
 
@@ -56,11 +56,11 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   @[DataProvider("invalid_emails")]
-  def test_invalid_emails(email : String) : Nil
-    self.validator.validate email, self.new_constraint message: "my_message"
+  def test_invalid_emails(value : String) : Nil
+    self.validator.validate value, self.new_constraint message: "my_message"
 
     self.build_violation("my_message")
-      .add_parameter("{{ value }}", email)
+      .add_parameter("{{ value }}", value)
       .code(AVD::Constraints::Email::INVALID_FORMAT_ERROR)
       .assert_violation
   end
@@ -75,11 +75,11 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   @[DataProvider("invalid_emails_html5")]
-  def test_invalid_emails_html5(email : String) : Nil
-    self.validator.validate email, self.new_constraint mode: AVD::Constraints::Email::Mode::HTML5, message: "my_message"
+  def test_invalid_emails_html5(value : String) : Nil
+    self.validator.validate value, self.new_constraint mode: AVD::Constraints::Email::Mode::HTML5, message: "my_message"
 
     self.build_violation("my_message")
-      .add_parameter("{{ value }}", email)
+      .add_parameter("{{ value }}", value)
       .code(AVD::Constraints::Email::INVALID_FORMAT_ERROR)
       .assert_violation
   end
