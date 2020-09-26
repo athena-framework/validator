@@ -18,12 +18,8 @@ class CustomConstraint < AVD::Constraint
     "abc123" => "FAKE_ERROR",
   }
 
-  protected def default_error_message : String
-    DEFAULT_ERROR_MESSAGE
-  end
-
   struct Validator < Athena::Validator::ConstraintValidator
-    def validate(value : _, constraint : AVD::Constraints::NotNull) : Nil
+    def validate(value : _, constraint : CustomConstraint) : Nil
     end
   end
 end
