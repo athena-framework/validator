@@ -1,3 +1,5 @@
+require "json"
+
 require "./constraint"
 require "./constraint_validator"
 require "./constraint_validator_factory"

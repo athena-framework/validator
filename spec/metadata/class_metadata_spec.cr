@@ -6,7 +6,7 @@ end
 
 describe AVD::Metadata::ClassMetadata do
   it "#add_property_constraint" do
-    metadata = AVD::Metadata::ClassMetadata(Entity).new Entity
+    metadata = AVD::Metadata::ClassMetadata(Entity).new
     metadata.add_property_constraint(
       AVD::Metadata::PropertyMetadata(Entity).new("name"),
       CustomConstraint.new ""
@@ -20,7 +20,7 @@ describe AVD::Metadata::ClassMetadata do
   end
 
   it "#has_property_metadata?" do
-    metadata = AVD::Metadata::ClassMetadata(Entity).new Entity
+    metadata = AVD::Metadata::ClassMetadata(Entity).new
     metadata.add_property_constraint(
       AVD::Metadata::PropertyMetadata(Entity).new("name"),
       CustomConstraint.new ""
@@ -31,7 +31,7 @@ describe AVD::Metadata::ClassMetadata do
   end
 
   it "#property_metadata" do
-    metadata = AVD::Metadata::ClassMetadata(Entity).new Entity
+    metadata = AVD::Metadata::ClassMetadata(Entity).new
 
     name_metadata = AVD::Metadata::PropertyMetadata(Entity).new("name")
 

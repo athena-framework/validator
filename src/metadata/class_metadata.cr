@@ -8,7 +8,7 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
   include Athena::Validator::Metadata::ClassMetadataInterface
 
   def self.build : self
-    class_metadata = new T
+    class_metadata = new
 
     {% begin %}
       # Add property constraints
@@ -65,13 +65,16 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
   end
 
   getter default_group : String
-  getter class_name : AVD::Validatable
 
   @cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
   @properties : Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase) = Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase).new
 
-  def initialize(@class_name : AVD::Validatable)
-    @default_group = @class_name.to_s
+  def initialize
+    @default_group = T.to_s
+  end
+
+  def class_name : T.class
+    T
   end
 
   def add_constraint(constraint : AVD::Constraint) : AVD::Metadata::ClassMetadataBase

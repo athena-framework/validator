@@ -50,4 +50,12 @@ struct Athena::Validator::Violation::ConstraintViolationList
       violation.to_s io
     end
   end
+
+  def to_json(builder : JSON::Builder) : Nil
+    builder.array do
+      @violations.each do |violation|
+        violation.to_json builder
+      end
+    end
+  end
 end

@@ -26,7 +26,17 @@ describe AVD::Violation::ConstraintViolation do
     end
 
     it AVD::Validatable do
-      get_violation("Some message", root: TestObj.new).to_s.should eq "Object(TestObj):\n\tSome message\n"
+      get_violation("Some message", root: TestObj.new, property_path: "").to_s.should eq "Object(TestObj):\n\tSome message\n"
+    end
+  end
+
+  describe "#to_json" do
+    it "without a code" do
+      get_violation("Message", invalid_value: 12.8).to_json.should eq %({"property":"property_path","message":"Message"})
+    end
+
+    it "with a code" do
+      get_violation("Message", invalid_value: 12.8, code: "CODE").to_json.should eq %({"property":"property_path","message":"Message","code":"CODE"})
     end
   end
 end

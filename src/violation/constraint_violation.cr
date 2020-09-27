@@ -50,6 +50,17 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
     io.puts "#{klass}#{@property_path}:\n\t#{@message}#{code}"
   end
 
+  def to_json(builder : JSON::Builder) : Nil
+    builder.object do
+      builder.field "property", @property_path
+      builder.field "message", @message
+
+      if (code = @code)
+        builder.field "code", code
+      end
+    end
+  end
+
   def ==(other : self) : Bool
     @message == other.message &&
       @message_template == other.message_template &&

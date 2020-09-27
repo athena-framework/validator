@@ -5,7 +5,7 @@ struct Athena::Validator::ConstraintValidatorFactory
 
   @validators : Hash(AVD::ConstraintValidator.class, AVD::ConstraintValidator) = Hash(AVD::ConstraintValidator.class, AVD::ConstraintValidator).new
 
-  def validator(validator_class : T.class) : AVD::ConstraintValidator forall T
+  def validator(validator_class : AVD::ConstraintValidator.class) : AVD::ConstraintValidator
     # TODO: Handle injecting service based validators
     if validator = @validators[validator_class]?
       return validator

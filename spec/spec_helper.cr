@@ -31,7 +31,7 @@ struct TestClassCallback
   class_setter group : Array(String)? = ["group"]
 
   def self.validation_class_metadata : AVD::Metadata::ClassMetadata
-    class_metadata = AVD::Metadata::ClassMetadata(TestPropertyCallback).new self
+    class_metadata = AVD::Metadata::ClassMetadata(TestClassCallback).new
 
     class_metadata.add_constraint AVD::Constraints::Callback.new callback: @@class_callback, groups: @@group
 
@@ -60,7 +60,7 @@ struct TestPropertyCallback
   class_setter callback2 : AVD::Constraints::Callback::CallbackProc? = nil
 
   def self.validation_class_metadata : AVD::Metadata::ClassMetadata
-    class_metadata = AVD::Metadata::ClassMetadata(TestPropertyCallback).new self
+    class_metadata = AVD::Metadata::ClassMetadata(TestPropertyCallback).new
 
     class_metadata.add_property_constraint(
       AVD::Metadata::PropertyMetadata(TestPropertyCallback).new("name"),
@@ -83,6 +83,6 @@ struct TestPropertyCallback
   def initialize(@name : String, @age : Int32 = 1); end
 end
 
-def get_violation(message : String, *, invalid_value : _ = nil, root : _ = nil, property_path : String = "", code : String = "") : AVD::Violation::ConstraintViolation
+def get_violation(message : String, *, invalid_value : _ = nil, root : _ = nil, property_path : String = "property_path", code : String? = nil) : AVD::Violation::ConstraintViolation
   AVD::Violation::ConstraintViolation.new message, message, Hash(String, String).new, root, property_path, AVD::ValueContainer.new(invalid_value), code: code
 end

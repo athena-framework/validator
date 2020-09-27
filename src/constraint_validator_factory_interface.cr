@@ -1,4 +1,4 @@
 module Athena::Validator::ConstraintValidatorFactoryInterface
-  # Returns the `AVD::ConstraintValidatorInterface` that should be used to validate the provided *constraint*.
-  # abstract def validator(constraint : AVD::Constraint)
+  # Returns an `AVD::ConstraintValidatorInterface` instance based on the provided *validator_class*.
+  abstract def validator(validator : AVD::ConstraintValidator.class) : AVD::ConstraintValidator
 end
