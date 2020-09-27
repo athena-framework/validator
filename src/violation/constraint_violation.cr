@@ -34,25 +34,16 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
   end
 
   def to_s(io : IO) : Nil
-    klass = case @root
-            when Hash             then "Hash"
-            when AVD::Validatable then "Object(#{@root.class})"
-            else
-              @root.to_s
-            end
-
-    klass += '.' if !@property_path.blank? && !@property_path.starts_with?('[') && !klass.blank?
-
     if (c = code) && !c.blank?
       code = " (code: #{c})"
     end
 
-    io.puts "#{klass}#{@property_path}:\n\t#{@message}#{code}"
+    io.puts "#{self.root_class}#{@property_path}:\n\t#{@message}#{code}"
   end
 
   def to_json(builder : JSON::Builder) : Nil
     builder.object do
-      builder.field "property", @property_path
+      builder.field "property", "#{self.root_class}#{@property_path}"
       builder.field "message", @message
 
       if (code = @code)
@@ -72,5 +63,18 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
       @code == other.code &&
       @constraint == other.constraint &&
       @cause == other.cause
+  end
+
+  private def root_class : String
+    klass = case @root
+            when Hash             then "Hash"
+            when AVD::Validatable then "Object(#{@root.class})"
+            else
+              @root.to_s
+            end
+
+    klass += '.' if !@property_path.blank? && !@property_path.starts_with?('[') && !klass.blank?
+
+    klass
   end
 end

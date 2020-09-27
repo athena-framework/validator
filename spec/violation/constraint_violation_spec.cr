@@ -38,5 +38,9 @@ describe AVD::Violation::ConstraintViolation do
     it "with a code" do
       get_violation("Message", invalid_value: 12.8, code: "CODE").to_json.should eq %({"property":"property_path","message":"Message","code":"CODE"})
     end
+
+    it "with a root value" do
+      get_violation("Message", invalid_value: 12.8, code: "CODE", root: "Root").to_json.should eq %({"property":"Root.property_path","message":"Message","code":"CODE"})
+    end
   end
 end

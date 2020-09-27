@@ -87,7 +87,7 @@ describe AVD::Violation::ConstraintViolationList do
   describe "#to_json" do
     it "serializes to an array of objects" do
       violations = AVD::Violation::ConstraintViolationList.new([get_violation("Error 1", root: "Root"), get_violation("Error 2", root: "Root")])
-      violations.to_json.should eq %([{"property":"property_path","message":"Error 1"},{"property":"property_path","message":"Error 2"}])
+      violations.to_json.should eq %([{"property":"Root.property_path","message":"Error 1"},{"property":"Root.property_path","message":"Error 2"}])
     end
   end
 end
