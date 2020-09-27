@@ -17,6 +17,8 @@ class Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
+    include Basic
+
     # :inherit:
     def validate(value : String?, constraint : AVD::Constraints::NotBlank) : Nil
       validate_value(value, constraint) do |v|

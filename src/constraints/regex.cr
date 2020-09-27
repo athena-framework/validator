@@ -19,6 +19,8 @@ class Athena::Validator::Constraints::Regex < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
+    include Basic
+
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::Regex) : Nil
       value = value.to_s

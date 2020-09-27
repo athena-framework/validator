@@ -21,6 +21,8 @@ class Athena::Validator::Constraints::AtLeastOneOf < Athena::Validator::Constrai
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
+    include Basic
+
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::AtLeastOneOf) : Nil
       messages = [constraint.message]

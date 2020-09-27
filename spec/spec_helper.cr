@@ -11,6 +11,7 @@ class MockConstraint < AVD::Constraint
 end
 
 struct MockConstraintValidator < AVD::ConstraintValidator
+  include Basic
 end
 
 class CustomConstraint < AVD::Constraint
@@ -19,6 +20,8 @@ class CustomConstraint < AVD::Constraint
   }
 
   struct Validator < Athena::Validator::ConstraintValidator
+    include Basic
+
     def validate(value : _, constraint : CustomConstraint) : Nil
     end
   end

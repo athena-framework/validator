@@ -32,6 +32,8 @@ class Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
+    include Basic
+
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::Callback) : Nil
       return if value.nil?
