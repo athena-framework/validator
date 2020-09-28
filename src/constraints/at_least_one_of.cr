@@ -40,9 +40,9 @@ class Athena::Validator::Constraints::AtLeastOneOf < Athena::Validator::Constrai
         end
       end
 
-      self.context
-        .build_violation(messages.join)
-        .code(AT_LEAST_ONE_OF_ERROR)
+      self
+        .context
+        .build_violation(messages.join, AT_LEAST_ONE_OF_ERROR)
         .add
     end
   end

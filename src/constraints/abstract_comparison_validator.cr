@@ -10,12 +10,11 @@ abstract struct Athena::Validator::Constraints::ComparisonValidator < Athena::Va
 
     return if self.compare_values value, compared_value
 
-    self.context
-      .build_violation(constraint.message)
-      .add_parameter("{{ value }}", value)
+    self
+      .context
+      .build_violation(constraint.message, self.error_code, value)
       .add_parameter("{{ compared_value }}", compared_value)
       .add_parameter("{{ compared_value_type }}", constraint.value_type)
-      .code(self.error_code)
       .add
   end
 end

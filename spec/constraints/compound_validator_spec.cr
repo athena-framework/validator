@@ -12,7 +12,6 @@ end
 struct CompoundValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_valid_value : Nil
     self.validator.validate "foo", DummyCompoundConstraint.new
-
     self.assert_no_violation
   end
 

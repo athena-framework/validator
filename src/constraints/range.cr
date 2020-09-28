@@ -69,30 +69,27 @@ class Athena::Validator::Constraints::Range < Athena::Validator::Constraint
     end
 
     private def add_not_in_range_violation(constraint, value, min, max) : Nil
-      self.context
-        .build_violation(constraint.not_in_range_message)
-        .add_parameter("{{ value }}", value)
+      self
+        .context
+        .build_violation(constraint.not_in_range_message, NOT_IN_RANGE_ERROR, value)
         .add_parameter("{{ min }}", min)
         .add_parameter("{{ max }}", max)
-        .code(NOT_IN_RANGE_ERROR)
         .add
     end
 
     private def add_too_high_violation(constraint, value, max) : Nil
-      self.context
-        .build_violation(constraint.max_message)
-        .add_parameter("{{ value }}", value)
+      self
+        .context
+        .build_violation(constraint.max_message, TOO_HIGH_ERROR, value)
         .add_parameter("{{ limit }}", max)
-        .code(TOO_HIGH_ERROR)
         .add
     end
 
     private def add_too_low_violation(constraint, value, min) : Nil
-      self.context
-        .build_violation(constraint.min_message)
-        .add_parameter("{{ value }}", value)
+      self
+        .context
+        .build_violation(constraint.min_message, TOO_LOW_ERROR, value)
         .add_parameter("{{ limit }}", min)
-        .code(TOO_LOW_ERROR)
         .add
     end
   end

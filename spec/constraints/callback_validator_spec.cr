@@ -1,8 +1,10 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::Callback
+
 struct CallbackValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_callback : Nil
-    constraint = AVD::Constraints::Callback.with_callback(payload: {"foo" => "bar"}) do |value, context, payload|
+    constraint = CONSTRAINT.with_callback(payload: {"foo" => "bar"}) do |value, context, payload|
       value.should eq 123
       payload.should eq({"foo" => "bar"})
 
@@ -15,10 +17,10 @@ struct CallbackValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::Callback::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::Callback
+    CONSTRAINT
   end
 end

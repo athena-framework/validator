@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::Luhn
+
 struct LuhnValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_nil_is_valid : Nil
     self.validator.validate nil, self.new_constraint
@@ -43,27 +45,26 @@ struct LuhnValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_invalid_numbers(value : String, code : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(code)
+    self
+      .build_violation("my_message", code, value)
       .assert_violation
   end
 
   def invalid_numbers : Tuple
     {
-      {"1234567812345678", AVD::Constraints::Luhn::CHECKSUM_FAILED_ERROR},
-      {"4222222222222222", AVD::Constraints::Luhn::CHECKSUM_FAILED_ERROR},
-      {"0000000000000000", AVD::Constraints::Luhn::CHECKSUM_FAILED_ERROR},
-      {"000000!000000000", AVD::Constraints::Luhn::INVALID_CHARACTERS_ERROR},
-      {"42-22222222222222", AVD::Constraints::Luhn::INVALID_CHARACTERS_ERROR},
+      {"1234567812345678", CONSTRAINT::CHECKSUM_FAILED_ERROR},
+      {"4222222222222222", CONSTRAINT::CHECKSUM_FAILED_ERROR},
+      {"0000000000000000", CONSTRAINT::CHECKSUM_FAILED_ERROR},
+      {"000000!000000000", CONSTRAINT::INVALID_CHARACTERS_ERROR},
+      {"42-22222222222222", CONSTRAINT::INVALID_CHARACTERS_ERROR},
     }
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::Luhn::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::Luhn
+    CONSTRAINT
   end
 end

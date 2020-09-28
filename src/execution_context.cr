@@ -65,6 +65,14 @@ class Athena::Validator::ExecutionContext(Root)
     )
   end
 
+  def build_violation(message : String, code : String) : AVD::Violation::ConstraintViolationBuilderInterface
+    self.build_violation(message).code(code)
+  end
+
+  def build_violation(message : String, code : String, value : _) : AVD::Violation::ConstraintViolationBuilderInterface
+    self.build_violation(message).code(code).add_parameter("{{ value }}", value)
+  end
+
   def build_violation(message : String, parameters : Hash(String, String) = {} of String => String) : AVD::Violation::ConstraintViolationBuilderInterface
     AVD::Violation::ConstraintViolationBuilder.new(
       @violations,

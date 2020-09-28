@@ -77,10 +77,9 @@ class Athena::Validator::Constraints::ISBN < Athena::Validator::Constraint
 
       return if code.nil?
 
-      self.context
-        .build_violation(constraint.message)
-        .add_parameter("{{ value }}", value)
-        .code(code)
+      self
+        .context
+        .build_violation(constraint.message, code, value)
         .add
     end
 

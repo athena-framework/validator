@@ -1,49 +1,39 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::IsFalse
+
 struct IsFalseValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_nil_is_valid : Nil
-    constraint = self.new_constraint
-
-    self.validator.validate nil, constraint
-
+    self.validator.validate nil, self.new_constraint
     self.assert_no_violation
   end
 
   def test_false_is_valid : Nil
-    constraint = self.new_constraint
-
-    self.validator.validate false, constraint
-
+    self.validator.validate false, self.new_constraint
     self.assert_no_violation
   end
 
   def test_true_is_invalid : Nil
-    constraint = self.new_constraint message: "my_message"
+    self.validator.validate true, self.new_constraint message: "my_message"
 
-    self.validator.validate true, constraint
-
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", true)
-      .code(AVD::Constraints::IsFalse::NOT_FALSE_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::NOT_FALSE_ERROR, true)
       .assert_violation
   end
 
   def test_zero_is_invalid : Nil
-    constraint = self.new_constraint message: "my_message"
+    self.validator.validate 0, self.new_constraint message: "my_message"
 
-    self.validator.validate 0, constraint
-
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", 0)
-      .code(AVD::Constraints::IsFalse::NOT_FALSE_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::NOT_FALSE_ERROR, 0)
       .assert_violation
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::IsFalse::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::IsFalse
+    CONSTRAINT
   end
 end

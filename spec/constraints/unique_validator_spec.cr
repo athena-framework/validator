@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::Unique
+
 private record Foo
 
 struct UniqueValidatorTest < AVD::Spec::ConstraintValidatorTestCase
@@ -13,9 +15,8 @@ struct UniqueValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_invalid_values(value : _) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::Unique::IS_NOT_UNIQUE)
+    self
+      .build_violation("my_message", CONSTRAINT::IS_NOT_UNIQUE, value)
       .assert_violation
   end
 
@@ -57,10 +58,10 @@ struct UniqueValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::Unique::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::Unique
+    CONSTRAINT
   end
 end

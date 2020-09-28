@@ -44,10 +44,9 @@ class Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
       return if value.nil? && constraint.allow_nil?
 
       if value.nil? || yield value
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(IS_BLANK_ERROR)
+        return self
+          .context
+          .build_violation(constraint.message, IS_BLANK_ERROR, value)
           .add
       end
     end

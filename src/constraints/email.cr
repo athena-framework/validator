@@ -42,10 +42,9 @@ class Athena::Validator::Constraints::Email < Athena::Validator::Constraint
       return if value.nil? || value.empty?
       return if value.matches? constraint.mode.pattern
 
-      self.context
-        .build_violation(constraint.message)
-        .add_parameter("{{ value }}", value)
-        .code(INVALID_FORMAT_ERROR)
+      self
+        .context
+        .build_violation(constraint.message, INVALID_FORMAT_ERROR, value)
         .add
     end
   end

@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::NotEqualTo
+
 struct NotEqualToValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
   def valid_comparisons : NamedTuple
     {
@@ -22,14 +24,14 @@ struct NotEqualToValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
   end
 
   def error_code : String
-    AVD::Constraints::NotEqualTo::IS_EQUAL_ERROR
+    CONSTRAINT::IS_EQUAL_ERROR
   end
 
   def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::NotEqualTo::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   def constraint_class : AVD::Constraint.class
-    AVD::Constraints::NotEqualTo
+    CONSTRAINT
   end
 end

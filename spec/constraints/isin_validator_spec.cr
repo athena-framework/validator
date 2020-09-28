@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::ISIN
+
 struct ISINValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_nil_is_valid : Nil
     self.validator.validate nil, self.new_constraint
@@ -33,7 +35,7 @@ struct ISINValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("invalid_length_isins")]
   def test_invalid_length_isins(value : String) : Nil
-    self.assert_violation value, AVD::Constraints::ISIN::INVALID_LENGTH_ERROR
+    self.assert_violation value, CONSTRAINT::INVALID_LENGTH_ERROR
   end
 
   def invalid_length_isins : Tuple
@@ -54,7 +56,7 @@ struct ISINValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("invalid_pattern_isins")]
   def test_invalid_pattern_isins(value : String) : Nil
-    self.assert_violation value, AVD::Constraints::ISIN::INVALID_PATTERN_ERROR
+    self.assert_violation value, CONSTRAINT::INVALID_PATTERN_ERROR
   end
 
   def invalid_pattern_isins : Tuple
@@ -68,7 +70,7 @@ struct ISINValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("invalid_checksum_isins")]
   def test_invalid_checksum_isins(value : String) : Nil
-    self.assert_violation value, AVD::Constraints::ISIN::INVALID_CHECKSUM_ERROR
+    self.assert_violation value, CONSTRAINT::INVALID_CHECKSUM_ERROR
   end
 
   def invalid_checksum_isins : Tuple
@@ -86,17 +88,16 @@ struct ISINValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   private def assert_violation(isin : String, code : String) : Nil
     self.validator.validate isin, self.new_constraint message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", isin)
-      .code(code)
+    self
+      .build_violation("my_message", code, isin)
       .assert_violation
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::ISIN::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::ISIN
+    CONSTRAINT
   end
 end

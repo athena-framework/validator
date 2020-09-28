@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::GreaterThanOrEqual
+
 struct GreaterThanValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
   def valid_comparisons : NamedTuple
     {
@@ -27,14 +29,14 @@ struct GreaterThanValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
   end
 
   def error_code : String
-    AVD::Constraints::GreaterThanOrEqual::TOO_LOW_ERROR
+    CONSTRAINT::TOO_LOW_ERROR
   end
 
   def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::GreaterThanOrEqual::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   def constraint_class : AVD::Constraint.class
-    AVD::Constraints::GreaterThanOrEqual
+    CONSTRAINT
   end
 end

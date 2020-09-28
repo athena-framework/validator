@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::URL
+
 private class EmptyURLObject
   def to_s(io : IO) : Nil
     io << ""
@@ -118,9 +120,8 @@ struct URLValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_invalid_urls(value : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::URL::INVALID_URL_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::INVALID_URL_ERROR, value)
       .assert_violation
   end
 
@@ -129,9 +130,8 @@ struct URLValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_invalid_relative_urls(value : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message", relative_protocol: true
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::URL::INVALID_URL_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::INVALID_URL_ERROR, value)
       .assert_violation
   end
 
@@ -195,10 +195,10 @@ struct URLValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::URL::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::URL
+    CONSTRAINT
   end
 end

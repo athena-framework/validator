@@ -49,26 +49,24 @@ class Athena::Validator::Constraints::Size < Athena::Validator::Constraint
       max = constraint.max
 
       if max && size > max
-        self.context
-          .build_violation(min == max ? constraint.exact_message : constraint.max_message)
-          .add_parameter("{{ value }}", value)
+        self
+          .context
+          .build_violation(min == max ? constraint.exact_message : constraint.max_message, TOO_LONG_ERROR, value)
           .add_parameter("{{ limit }}", max)
           .add_parameter("{{ type }}", value.is_a?(String) ? "character" : "item")
           .invalid_value(value)
           .plural(max)
-          .code(TOO_LONG_ERROR)
           .add
       end
 
       if min && size < min
-        self.context
-          .build_violation(min == max ? constraint.exact_message : constraint.min_message)
-          .add_parameter("{{ value }}", value)
+        self
+          .context
+          .build_violation(min == max ? constraint.exact_message : constraint.min_message, TOO_SHORT_ERROR, value)
           .add_parameter("{{ limit }}", min)
           .add_parameter("{{ type }}", value.is_a?(String) ? "character" : "item")
           .invalid_value(value)
           .plural(min)
-          .code(TOO_SHORT_ERROR)
           .add
       end
     end

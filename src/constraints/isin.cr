@@ -36,31 +36,24 @@ class Athena::Validator::Constraints::ISIN < Athena::Validator::Constraint
       value = value.upcase
 
       if VALIDATION_LENGTH != value.size
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(INVALID_LENGTH_ERROR)
+        return self
+          .context
+          .build_violation(constraint.message, INVALID_LENGTH_ERROR, value)
           .add
-
-        return
       end
 
       unless value.matches? VALIDATION_PATTERN
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(INVALID_PATTERN_ERROR)
+        return self
+          .context
+          .build_violation(constraint.message, INVALID_PATTERN_ERROR, value)
           .add
-
-        return
       end
 
       return if self.is_correct_checksum value
 
-      self.context
-        .build_violation(constraint.message)
-        .add_parameter("{{ value }}", value)
-        .code(INVALID_CHECKSUM_ERROR)
+      self
+        .context
+        .build_violation(constraint.message, INVALID_CHECKSUM_ERROR, value)
         .add
     end
 

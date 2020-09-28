@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::NotNull
+
 struct NotNullValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("valid_values")]
   def test_valid_values(value : _) : Nil
@@ -20,17 +22,16 @@ struct NotNullValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_nil_is_invalid
     self.validator.validate nil, self.new_constraint message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", nil)
-      .code(AVD::Constraints::NotNull::IS_NULL_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::IS_NULL_ERROR, nil)
       .assert_violation
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::NotNull::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::NotNull
+    CONSTRAINT
   end
 end

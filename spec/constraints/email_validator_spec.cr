@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::Email
+
 private class EmtpyEmailObject
   def to_s(io : IO) : Nil
     io << ""
@@ -42,7 +44,7 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("valid_emails_html5")]
   def test_valid_emails_html5(value : String) : Nil
-    self.validator.validate value, self.new_constraint mode: AVD::Constraints::Email::Mode::HTML5
+    self.validator.validate value, self.new_constraint mode: CONSTRAINT::Mode::HTML5
     self.assert_no_violation
   end
 
@@ -59,9 +61,8 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_invalid_emails(value : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::Email::INVALID_FORMAT_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::INVALID_FORMAT_ERROR, value)
       .assert_violation
   end
 
@@ -76,11 +77,10 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("invalid_emails_html5")]
   def test_invalid_emails_html5(value : String) : Nil
-    self.validator.validate value, self.new_constraint mode: AVD::Constraints::Email::Mode::HTML5, message: "my_message"
+    self.validator.validate value, self.new_constraint mode: CONSTRAINT::Mode::HTML5, message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::Email::INVALID_FORMAT_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::INVALID_FORMAT_ERROR, value)
       .assert_violation
   end
 
@@ -106,10 +106,10 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::Email::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::Email
+    CONSTRAINT
   end
 end

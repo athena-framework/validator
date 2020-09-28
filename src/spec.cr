@@ -51,6 +51,14 @@ module Athena::Validator::Spec
       ConstraintViolationAssertion.new self.context, message, @constraint
     end
 
+    def build_violation(message : String, code : String) : ConstraintViolationAssertion
+      self.build_violation(message).code(code)
+    end
+
+    def build_violation(message : String, code : String, value : _) : ConstraintViolationAssertion
+      self.build_violation(message).code(code).add_parameter("{{ value }}", value)
+    end
+
     private def create_context : AVD::ExecutionContext
       validator = MockValidator.new
 

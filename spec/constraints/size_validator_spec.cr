@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::Size
+
 struct SizeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_nil_is_valid : Nil
     self.validator.validate nil, self.new_constraint(range: (1..1), exact_message: "my_message")
@@ -10,11 +12,10 @@ struct SizeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_empty_string_is_invalid : Nil
     self.validator.validate "", self.new_constraint(range: (1..1), exact_message: "my_message")
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", "")
+    self
+      .build_violation("my_message", CONSTRAINT::TOO_SHORT_ERROR, "")
       .add_parameter("{{ limit }}", 1)
       .add_parameter("{{ type }}", "character")
-      .code(AVD::Constraints::Size::TOO_SHORT_ERROR)
       .plural(1)
       .invalid_value("")
       .assert_violation
@@ -52,39 +53,30 @@ struct SizeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("five_or_more")]
   def test_valid_values_min(value : String | Indexable, type : String) : Nil
-    constraint = self.new_constraint range: (5..)
-    self.validator.validate value, constraint
-
+    self.validator.validate value, self.new_constraint range: (5..)
     self.assert_no_violation
   end
 
   @[DataProvider("three_or_less")]
   def test_valid_values_max(value : String | Indexable, type : String) : Nil
-    constraint = self.new_constraint range: (..3)
-    self.validator.validate value, constraint
-
+    self.validator.validate value, self.new_constraint range: (..3)
     self.assert_no_violation
   end
 
   @[DataProvider("four")]
   def test_values_exact(value : String | Indexable, type : String) : Nil
-    constraint = self.new_constraint range: (4..4)
-    self.validator.validate value, constraint
-
+    self.validator.validate value, self.new_constraint range: (4..4)
     self.assert_no_violation
   end
 
   @[DataProvider("three_or_less")]
   def test_invalid_values_min(value : String | Indexable, type : String) : Nil
-    constraint = self.new_constraint range: (4..), min_message: "my_message"
+    self.validator.validate value, self.new_constraint range: (4..), min_message: "my_message"
 
-    self.validator.validate value, constraint
-
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
+    self
+      .build_violation("my_message", CONSTRAINT::TOO_SHORT_ERROR, value)
       .add_parameter("{{ limit }}", 4)
       .add_parameter("{{ type }}", type)
-      .code(AVD::Constraints::Size::TOO_SHORT_ERROR)
       .plural(4)
       .invalid_value(value)
       .assert_violation
@@ -92,14 +84,12 @@ struct SizeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("five_or_more")]
   def test_invalid_values_max(value : String | Indexable, type : String) : Nil
-    constraint = self.new_constraint range: (..4), max_message: "my_message"
-    self.validator.validate value, constraint
+    self.validator.validate value, self.new_constraint range: (..4), max_message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
+    self
+      .build_violation("my_message", CONSTRAINT::TOO_LONG_ERROR, value)
       .add_parameter("{{ limit }}", 4)
       .add_parameter("{{ type }}", type)
-      .code(AVD::Constraints::Size::TOO_LONG_ERROR)
       .plural(4)
       .invalid_value(value)
       .assert_violation
@@ -107,15 +97,12 @@ struct SizeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("three_or_less")]
   def test_invalid_values_exact_less_than_four(value : String | Indexable, type : String) : Nil
-    constraint = self.new_constraint range: (4..4), exact_message: "my_message"
+    self.validator.validate value, self.new_constraint range: (4..4), exact_message: "my_message"
 
-    self.validator.validate value, constraint
-
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
+    self
+      .build_violation("my_message", CONSTRAINT::TOO_SHORT_ERROR, value)
       .add_parameter("{{ limit }}", 4)
       .add_parameter("{{ type }}", type)
-      .code(AVD::Constraints::Size::TOO_SHORT_ERROR)
       .plural(4)
       .invalid_value(value)
       .assert_violation
@@ -123,24 +110,22 @@ struct SizeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("five_or_more")]
   def test_invalid_values_exact_more_than_four(value : String | Indexable, type : String) : Nil
-    constraint = self.new_constraint range: (4..4), exact_message: "my_message"
-    self.validator.validate value, constraint
+    self.validator.validate value, self.new_constraint range: (4..4), exact_message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
+    self
+      .build_violation("my_message", CONSTRAINT::TOO_LONG_ERROR, value)
       .add_parameter("{{ limit }}", 4)
       .add_parameter("{{ type }}", type)
-      .code(AVD::Constraints::Size::TOO_LONG_ERROR)
       .plural(4)
       .invalid_value(value)
       .assert_violation
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::Size::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::Size
+    CONSTRAINT
   end
 end

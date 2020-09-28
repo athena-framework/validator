@@ -23,10 +23,9 @@ class Athena::Validator::Constraints::Unique < Athena::Validator::Constraint
       set = Set(typeof(value[0])).new value.size
 
       unless value.all? { |x| set.add?(x) }
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(IS_NOT_UNIQUE)
+        self
+          .context
+          .build_violation(constraint.message, IS_NOT_UNIQUE, value)
           .add
       end
     end

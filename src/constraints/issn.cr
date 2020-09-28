@@ -42,80 +42,61 @@ class Athena::Validator::Constraints::ISSN < Athena::Validator::Constraint
       if canonical[4]? == '-'
         canonical = canonical.delete '-'
       elsif constraint.require_hypen?
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(MISSING_HYPHEN_ERROR)
+        return self
+          .context
+          .build_violation(constraint.message, MISSING_HYPHEN_ERROR, value)
           .add
-
-        return
       end
 
-      size = canonical.size
-
-      case size
-      when .< 8
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(TOO_SHORT_ERROR)
+      self.validate_size canonical do |code|
+        return self
+          .context
+          .build_violation(constraint.message, code, value)
           .add
-
-        return
-      when .> 8
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(TOO_LONG_ERROR)
-          .add
-
-        return
       end
 
-      unless canonical[...7].each_char.all? &.number?
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(INVALID_CHARACTERS_ERROR)
+      char = self.validate_characters canonical do
+        return self
+          .context
+          .build_violation(constraint.message, INVALID_CHARACTERS_ERROR, value)
           .add
-
-        return
-      end
-
-      if (char = canonical[7]) && !char.number? && !char.in? 'x', 'X'
-        pp char
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(INVALID_CHARACTERS_ERROR)
-          .add
-
-        return
       end
 
       if constraint.case_sensitive? && char == 'x'
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(INVALID_CASE_ERROR)
+        return self
+          .context
+          .build_violation(constraint.message, INVALID_CASE_ERROR, value)
           .add
-
-        return
       end
 
+      self.validate_checksum char, canonical do
+        self
+          .context
+          .build_violation(constraint.message, CHECKSUM_FAILED_ERROR, value)
+          .add
+      end
+    end
+
+    private def validate_size(issn : String, & : String ->) : Nil
+      yield TOO_SHORT_ERROR if issn.size < 8
+      yield TOO_LONG_ERROR if issn.size > 8
+    end
+
+    private def validate_characters(issn : String, &) : Char
+      yield unless issn[...7].each_char.all? &.number?
+      yield if (char = issn[7]) && !char.number? && !char.in? 'x', 'X'
+
+      char
+    end
+
+    private def validate_checksum(char : Char, issn : String, &) : Nil
       checksum = char.in?('x', 'X') ? 10 : char.to_i
 
       7.times do |idx|
-        checksum += (8 - idx) * canonical[idx].to_i
+        checksum += (8 - idx) * issn[idx].to_i
       end
 
-      return if checksum.divisible_by? 11
-
-      self.context
-        .build_violation(constraint.message)
-        .add_parameter("{{ value }}", value)
-        .code(CHECKSUM_FAILED_ERROR)
-        .add
+      yield unless checksum.divisible_by? 11
     end
   end
 end

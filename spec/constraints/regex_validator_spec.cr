@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::Regex
+
 private class Stringifiable
   def initialize(@value : String); end
 
@@ -37,13 +39,10 @@ struct RegexValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("invalid_values")]
   def test_invalid_values(value : _) : Nil
-    constraint = self.new_constraint pattern: /^[0-9]+$/, message: "my_message"
+    self.validator.validate value, self.new_constraint pattern: /^[0-9]+$/, message: "my_message"
 
-    self.validator.validate value, constraint
-
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::Regex::REGEX_FAILED_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::REGEX_FAILED_ERROR, value)
       .assert_violation
   end
 
@@ -56,10 +55,10 @@ struct RegexValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::Regex::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::Regex
+    CONSTRAINT
   end
 end

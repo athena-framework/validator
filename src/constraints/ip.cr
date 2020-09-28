@@ -48,10 +48,9 @@ class Athena::Validator::Constraints::IP < Athena::Validator::Constraint
       return if value.nil? || value.empty?
       return if value.matches? constraint.version.pattern
 
-      self.context
-        .build_violation(constraint.message)
-        .add_parameter("{{ value }}", value)
-        .code(INVALID_IP_ERROR)
+      self
+        .context
+        .build_violation(constraint.message, INVALID_IP_ERROR, value)
         .add
     end
   end

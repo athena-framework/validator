@@ -20,10 +20,9 @@ class Athena::Validator::Constraints::NotNull < Athena::Validator::Constraint
     def validate(value : _, constraint : AVD::Constraints::NotNull) : Nil
       return unless value.nil?
 
-      self.context
-        .build_violation(constraint.message)
-        .add_parameter("{{ value }}", value)
-        .code(IS_NULL_ERROR)
+      self
+        .context
+        .build_violation(constraint.message, IS_NULL_ERROR, value)
         .add
     end
   end

@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::IP
+
 struct IPValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_nil_is_valid : Nil
     self.validator.validate nil, self.new_constraint
@@ -31,7 +33,7 @@ struct IPValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("valid_v6s")]
   def test_valid_v6s(value : String) : Nil
-    self.validator.validate value, self.new_constraint version: AVD::Constraints::IP::Version::V6
+    self.validator.validate value, self.new_constraint version: CONSTRAINT::Version::V6
     self.assert_no_violation
   end
 
@@ -60,7 +62,7 @@ struct IPValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("valid_v4s_v6s")]
   def test_valid_v4s_v6s(value : String) : Nil
-    self.validator.validate value, self.new_constraint version: AVD::Constraints::IP::Version::V4_V6
+    self.validator.validate value, self.new_constraint version: CONSTRAINT::Version::V4_V6
     self.assert_no_violation
   end
 
@@ -72,9 +74,8 @@ struct IPValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def test_invalid_v4s(value : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::IP::INVALID_IP_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::INVALID_IP_ERROR, value)
       .assert_violation
   end
 
@@ -94,11 +95,10 @@ struct IPValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("invalid_v6s")]
   def test_invalid_v6s(value : String) : Nil
-    self.validator.validate value, self.new_constraint message: "my_message", version: AVD::Constraints::IP::Version::V6
+    self.validator.validate value, self.new_constraint message: "my_message", version: CONSTRAINT::Version::V6
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::IP::INVALID_IP_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::INVALID_IP_ERROR, value)
       .assert_violation
   end
 
@@ -121,11 +121,10 @@ struct IPValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   @[DataProvider("invalid_v4s_v6s")]
   def test_invalid_v4s_v6s(value : String) : Nil
-    self.validator.validate value, self.new_constraint message: "my_message", version: AVD::Constraints::IP::Version::V4_V6
+    self.validator.validate value, self.new_constraint message: "my_message", version: CONSTRAINT::Version::V4_V6
 
-    self.build_violation("my_message")
-      .add_parameter("{{ value }}", value)
-      .code(AVD::Constraints::IP::INVALID_IP_ERROR)
+    self
+      .build_violation("my_message", CONSTRAINT::INVALID_IP_ERROR, value)
       .assert_violation
   end
 
@@ -134,10 +133,10 @@ struct IPValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::IP::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   private def constraint_class : AVD::Constraint.class
-    AVD::Constraints::IP
+    CONSTRAINT
   end
 end

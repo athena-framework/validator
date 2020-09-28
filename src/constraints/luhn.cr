@@ -27,13 +27,10 @@ class Athena::Validator::Constraints::Luhn < Athena::Validator::Constraint
       characters = value.chars
 
       unless characters.all? &.number?
-        self.context
-          .build_violation(constraint.message)
-          .add_parameter("{{ value }}", value)
-          .code(INVALID_CHARACTERS_ERROR)
+        return self
+          .context
+          .build_violation(constraint.message, INVALID_CHARACTERS_ERROR, value)
           .add
-
-        return
       end
 
       last_dig : Int32 = characters.pop.to_i
@@ -41,10 +38,9 @@ class Athena::Validator::Constraints::Luhn < Athena::Validator::Constraint
 
       return if !checksum.zero? && checksum.divisible_by?(10)
 
-      self.context
-        .build_violation(constraint.message)
-        .add_parameter("{{ value }}", value)
-        .code(CHECKSUM_FAILED_ERROR)
+      self
+        .context
+        .build_violation(constraint.message, CHECKSUM_FAILED_ERROR, value)
         .add
     end
   end

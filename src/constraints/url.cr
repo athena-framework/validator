@@ -28,10 +28,9 @@ class Athena::Validator::Constraints::URL < Athena::Validator::Constraint
       return if value.nil? || value.empty?
       return if value.matches? self.pattern(constraint)
 
-      self.context
-        .build_violation(constraint.message)
-        .add_parameter("{{ value }}", value)
-        .code(INVALID_URL_ERROR)
+      self
+        .context
+        .build_violation(constraint.message, INVALID_URL_ERROR, value)
         .add
     end
 

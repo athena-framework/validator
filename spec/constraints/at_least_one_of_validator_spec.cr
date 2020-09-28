@@ -1,5 +1,7 @@
 require "../spec_helper"
 
+private alias CONSTRAINT = AVD::Constraints::AtLeastOneOf
+
 struct AtLeastOneOfValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   def valid_combinations : Tuple
     {
@@ -12,7 +14,6 @@ struct AtLeastOneOfValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("valid_combinations")]
   def test_valid_combinations(value : _, constraints : Array(AVD::Constraint)) : Nil
     self.validator.validate value, self.new_constraint(constraints: constraints)
-
     self.assert_no_violation
   end
 
@@ -34,10 +35,10 @@ struct AtLeastOneOfValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   def create_validator : AVD::ConstraintValidatorInterface
-    AVD::Constraints::AtLeastOneOf::Validator.new
+    CONSTRAINT::Validator.new
   end
 
   def constraint_class : AVD::Constraint.class
-    AVD::Constraints::AtLeastOneOf
+    CONSTRAINT
   end
 end
