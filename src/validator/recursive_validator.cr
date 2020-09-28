@@ -1,6 +1,6 @@
 require "../constraint_validator_factory_interface"
 
-struct Athena::Validator::Validator::RecursiveValidator
+class Athena::Validator::Validator::RecursiveValidator
   include Athena::Validator::Validator::ValidatorInterface
 
   @validator_factory : AVD::ConstraintValidatorFactoryInterface

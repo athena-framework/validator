@@ -4,18 +4,28 @@ require "./execution_context_interface"
 class Athena::Validator::ExecutionContext(Root)
   include Athena::Validator::ExecutionContextInterface
 
-  property constraint : AVD::Constraint?
-  property group : String?
+  # :inherit:
+  getter constraint : AVD::Constraint?
 
+  # :inherit:
+  getter group : String?
+
+  # :inherit:
   getter validator : AVD::Validator::ValidatorInterface
+
+  # :inherit:
   getter violations : AVD::Violation::ConstraintViolationList = AVD::Violation::ConstraintViolationList.new
+
+  # :inherit:
   getter property_path : String = ""
+
+  # :inherit:
   getter metadata : AVD::Metadata::MetadataInterface? = nil
 
   # The value that is currently being validated.
   @value_container : AVD::Container = AVD::ValueContainer.new(nil)
 
-  # The object initially passed to `#validate`.
+  # :inherit:
   getter root : Root
 
   # The object that is currently being validated.
@@ -23,22 +33,33 @@ class Athena::Validator::ExecutionContext(Root)
 
   def initialize(@validator : AVD::Validator::ValidatorInterface, @root : Root); end
 
+  # :nodoc:
+  def constraint=(@constraint : AVD::Constraint?); end
+
+  # :nodoc:
+  def group=(@group : String?); end
+
+  # :inherit:
   def value
     @value_container.value
   end
 
+  # :inherit:
   def object
     @object_container.value
   end
 
+  # :inherit:
   def class_name
     @metadata.try &.class_name
   end
 
+  # :inherit:
   def property_name : String?
     @metadata.try &.name
   end
 
+  # :inherit:
   def path(path : String) : String
     AVD::PropertyPath.append @property_path, path
   end
@@ -51,28 +72,27 @@ class Athena::Validator::ExecutionContext(Root)
     @property_path = property_path
   end
 
-  def add_violation(message : String, parameters : Hash(String, String) = {} of String => String) : Nil
-    rendered_message = message.gsub(/(?:{{ \w+ }})+/, parameters)
-
-    @violations.add AVD::Violation::ConstraintViolation.new(
-      rendered_message,
-      message,
-      parameters,
-      @root,
-      @property_path,
-      @value_container,
-      constraint: @constraint
-    )
+  # :inherit:
+  def add_violation(message : String, code : String) : Nil
+    self.build_violation(message, code).add
   end
 
+  # :inherit:
+  def add_violation(message : String, parameters : Hash(String, String) = {} of String => String) : Nil
+    self.build_violation(message, parameters).add
+  end
+
+  # :inherit:
   def build_violation(message : String, code : String) : AVD::Violation::ConstraintViolationBuilderInterface
     self.build_violation(message).code(code)
   end
 
+  # :inherit:
   def build_violation(message : String, code : String, value : _) : AVD::Violation::ConstraintViolationBuilderInterface
     self.build_violation(message).code(code).add_parameter("{{ value }}", value)
   end
 
+  # :inherit:
   def build_violation(message : String, parameters : Hash(String, String) = {} of String => String) : AVD::Violation::ConstraintViolationBuilderInterface
     AVD::Violation::ConstraintViolationBuilder.new(
       @violations,

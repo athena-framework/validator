@@ -24,6 +24,7 @@ abstract class Athena::Validator::Constraint
 
   macro inherited
     {% unless @type.abstract? %}
+      # See `{{@type.id}}`.
       annotation ::Athena::Validator::Annotations::{{@type.name(generic_args: false).split("::").last.id}}; end
 
       def validated_by : AVD::ConstraintValidator.class

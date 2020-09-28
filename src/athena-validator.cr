@@ -21,12 +21,21 @@ require "./violation/*"
 # Convenience alias to make referencing `Athena::Validator` types easier.
 alias AVD = Athena::Validator
 
+# Used to apply constraints to instance variables and types via annotations.
+#
+# ```
+# @[Assert::NotBlank]
+# property name : String
+# ```
 alias Assert = AVD::Annotations
 
+# Athena's Validation component, `AVD` for short, adds an object/value validation framework to your project.
 module Athena::Validator
   # :nodoc:
   #
-  # Default namespace for constaint annotations.
+  # Default namespace for constraint annotations.
+  #
+  # NOTE: Constraints are automatically added to this namespace.
   module Annotations; end
 
   # :nodoc:

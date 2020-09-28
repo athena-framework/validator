@@ -1,4 +1,4 @@
-struct Athena::Validator::Validator::RecursiveContextualValidator
+class Athena::Validator::Validator::RecursiveContextualValidator
   include Athena::Validator::Validator::ContextualValidatorInterface
 
   @default_groups : Array(String)
