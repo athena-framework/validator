@@ -64,10 +64,16 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
       T.load_metadata class_metadata
     {% end %}
 
+    # Check for group sequences
+    {% if group_sequence = T.annotation Assert::GroupSequence %}
+      class_metadata.group_sequence = [{{group_sequence.args.splat}}]
+    {% end %}
+
     class_metadata
   end
 
   getter default_group : String
+  getter group_sequence : AVD::Constraints::GroupSequence? = nil
 
   @cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
   @properties : Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase) = Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase).new
@@ -129,6 +135,32 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
 
   def constrained_properties : Array(String)
     @properties.keys
+  end
+
+  def group_sequence=(sequence : Array(String) | AVD::Constraints::GroupSequence) : self
+    raise ArgumentError.new "Defining a static group sequence is not allowed with a group sequence provider." if @group_sequence_provider
+
+    if sequence.is_a? Array
+      sequence = AVD::Constraints::GroupSequence.new sequence
+    end
+
+    if sequence.groups.includes? AVD::Constraint::DEFAULT_GROUP
+      raise ArgumentError.new "The group '#{AVD::Constraint::DEFAULT_GROUP}' is not allowed in group sequences."
+    end
+
+    unless sequence.groups.includes? @default_group
+      raise ArgumentError.new "The group '#{@default_group}' is missing from the group sequence."
+    end
+
+    @group_sequence = sequence
+
+    self
+  end
+
+  def group_sequence_provider=(active : Bool) : Nil
+    raise ArgumentError.new "Defining a group sequence provider is not allowed with a static group sequence." unless @group_sequence.nil?
+    # TODO: ensure `T` implements the module interface
+    @group_sequence_provider = active
   end
 
   def has_property_metadata?(property_name : String) : Bool

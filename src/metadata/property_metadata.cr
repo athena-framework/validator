@@ -12,7 +12,7 @@ struct Athena::Validator::Metadata::PropertyMetadata(EntityType)
     EntityType
   end
 
-  def get_value(obj : EntityType)
+  protected def get_value(obj : EntityType)
     {% begin %}
       case @name
         {% for column in EntityType.instance_vars %}
