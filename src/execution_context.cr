@@ -78,6 +78,11 @@ class Athena::Validator::ExecutionContext(Root)
   end
 
   # :inherit:
+  def add_violation(message : String, code : String, value : _) : Nil
+    self.build_violation(message, code, value).add
+  end
+
+  # :inherit:
   def add_violation(message : String, parameters : Hash(String, String) = {} of String => String) : Nil
     self.build_violation(message, parameters).add
   end

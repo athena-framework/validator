@@ -104,7 +104,7 @@ alias Assert = AVD::Annotations
 # Most commonly this includes the invalid value itself, but some constraints have additional placeholders.
 # * The `payload` argument can be used to attach any domain specific data to the constraint; such as attaching a severity with each constraint
 # to have more serious violations be handled differently.
-# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validator Groups](./Validator.html#validation-groups) section.
+# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validation Groups](./Validator.html#validation-groups) section.
 #
 # ```
 # validator = AVD.validator
@@ -130,20 +130,25 @@ alias Assert = AVD::Annotations
 # class User
 #   include AVD::Validatable
 #
-#   def initialize(@name : String); end
+#   def initialize(@name : String, @age : Int32? = nil); end
 #
 #   # Specify that we want to assert that the user's name is not blank.
 #   # Multiple constraints can be defined on a single property.
 #   @[Assert::NotBlank]
 #   getter name : String
+#
+#   # Arguments to the constraint can be used normally as well.
+#   # The constraint's default argument can also be supplied positionally: `@[Assert::GreaterThan(0)]`.
+#   @[Assert::NotNull(message: "A user's age cannot be null")]
+#   getter age : Int32?
 # end
 #
 # # Obtain a validator instance.
 # validator = AVD.validator
 #
 # # Validate a user instance, notice we're not passing in any constraints.
-# validator.validate(User.new("Jim")).empty? # => true
-# validator.validate User.new ""             # =>
+# validator.validate(User.new("Jim", 10)).empty? # => true
+# validator.validate User.new "", 10             # =>
 # # Object(User).name:
 # #   This value should not be blank. (code: 0d0c3254-3642-4cb0-9882-46ee5918e6e3)
 # ```
@@ -189,6 +194,118 @@ alias Assert = AVD::Annotations
 #
 # The metadata for each type is lazily loaded when an instance of that type is validated, and is only built once.
 # See `AVD::Metadata::ClassMetadata` for some additional ways to register property constraints.
+#
+# ### Custom Constraints
+#
+# If the built in `AVD::Constraints` are not sufficient to handle validating a given value/object; custom ones can be defined.
+# Let's make a new constraint that asserts a string contains only alphanumeric characters.
+#
+# This is accomplished by first defining a new class within the `AVD::Constraints` namespace that inherits from `AVD::Constraint`.
+# Then define a `Validator` struct within our constraint that inherits from `AVD::ConstraintValidator` that actually implements the validation logic.
+#
+# ```
+# class AVD::Constraints::AlphaNumeric < AVD::Constraint
+#   # (Optional) A unique error code can also be defined to provide a machine readable identifier for a specific error.
+#   NOT_ALPHANUMERIC_ERROR = "1a83a8bd-ff79-4d5c-96e7-86d0b25b8a09"
+#
+#   # (Optional) Allows using the `.error_message(code : String) : String` method with this type.
+#   @@error_names = {
+#     NOT_ALPHANUMERIC_ERROR => "NOT_ALPHANUMERIC_ERROR",
+#   }
+#
+#   # Define an initializer with our default message, and any additional arguments specific to this constraint.
+#   def initialize(
+#     message : String = "This value should contain only alphanumeric characters.",
+#     groups : Array(String)? = nil,
+#     payload : Hash(String, String)? = nil
+#   )
+#     super message, groups, payload
+#   end
+#
+#   # Define the validator within our constraint that'll contain our validation logic.
+#   struct Validator < AVD::ConstraintValidator
+#     # Define our validate method that accepts the value to be validated, and the constraint.
+#     #
+#     # Overloads can be used to filter values of specific types.
+#     def validate(value : _, constraint : AVD::Constraints::AlphaNumeric) : Nil
+#       # custom constraints should ignore null and empty values to allow
+#       # other constraints (NotBlank, NotNull, etc.) take care of that
+#       return if value.nil? || value == ""
+#
+#       # We'll cast the value to a string,
+#       # alternatively we could just ignore non `String?` values.
+#       value = value.to_s
+#
+#       # If all the characters of this string are alphanumeric, then it is valid
+#       return if value.each_char.all? &.alphanumeric?
+#
+#       # Otherwise, it is invalid and we need to add a violation,
+#       # see `AVD::ExecutionContextInterface` for additional information.
+#       self.context.add_violation(constraint.message, NOT_ALPHANUMERIC_ERROR, value)
+#     end
+#   end
+# end
+#
+# puts AVD.validator.validate "$", AVD::Constraints::AlphaNumeric.new # =>
+# # $:
+# #   This value should contain only alphanumeric characters. (code: 1a83a8bd-ff79-4d5c-96e7-86d0b25b8a09)
+# ```
+#
+# NOTE: The constraint _MUST_ be defined within the `AVD::Constraints` namespace for implementation reasons.  This may change in the future.
+#
+# We are now able to use this constraint as we would one of the built in ones;
+# either by manually instantiating it, or applying an `@[Assert::AlphaNumeric]` annotation to a property.
+#
+# See `AVD::ConstraintValidatorInterface` for more information on custom validators.
+#
+# ### Validation Groups
+#
+# By default when validating an object, all constraints defined on that type will be checked.
+# However, in some cases you may only want to validate the object against _some_ of those constraints.
+# This can be accomplished via assigning each constraint to a validation group, then apply validation against one group of constraints.
+#
+# For example, using our `User` class from earlier, say we only want to only validate certain properties when the user is first created.
+# To do this we can utilize the `groups` argument that all constraints have.
+#
+# ```
+# class User
+#   include AVD::Validatable
+#
+#   def initialize(@email : String, @password : String, @city : String); end
+#
+#   @[Assert::Email(groups: ["create"])]
+#   getter email : String
+#
+#   @[Assert::NotBlank(groups: ["create"])]
+#   @[Assert::Size(7.., groups: ["create"])]
+#   getter password : String
+#
+#   @[Assert::Size(2..)]
+#   getter city : String
+# end
+#
+# user = User.new "george@dietrich.app", "monkey123", ""
+#
+# # Validate the user object, but only for those in the "create" group,
+# # if no groups are supplied, then all constraints in the "default" group will be used.
+# violations = AVD.validator.validate user, groups: "create"
+#
+# # There are no violations since the city's size is not validated since it's not in the "create" group
+# violations.empty? # => true
+# ```
+#
+# Using this configuration, there are three groups at play within the `User` class:
+# 1. `default` - Contains constraints in the current type, and subtypes, that belong to no other group.  I.e. `city`.
+# 1. `User` - Equivalent to all constraints in the `default` group.  See the [Sequential Validation](./Validator.html#sequential-validation) section.
+# 1. `create` - A custom group that only contains the constraints explicitly associated with it.  I.e. `email`, and `password`.
+#
+# NOTE: When validating _just_ the `User` object, the `default` group is equivalent to the `User` group.
+# However, if the `User` object has other embedded types using the `AVD::Constraints::Valid` constraint, then validating the `User` object with the `User`
+# group would only validate constraints that are explicitly in the `User` group within the embedded types.
+#
+# ### Sequential Validation
+#
+#
 module Athena::Validator
   # :nodoc:
   #
@@ -215,22 +332,3 @@ module Athena::Validator
     AVD::Validator::RecursiveValidator.new
   end
 end
-
-# Define a class that can be validated.
-class User
-  include AVD::Validatable
-
-  def initialize(@name : String); end
-
-  # Specify that we want to assert that the user's name is not blank.
-  # Multiple constraints can be defined on a single property.
-  @[Assert::NotBlank]
-  getter name : String
-end
-
-# Obtain a validator instance.
-validator = AVD.validator
-
-# Validate a user instance, notice we're not passing in any constraints.
-validator.validate(User.new("Jim")).empty? # => true
-puts validator.validate User.new("")       # => false

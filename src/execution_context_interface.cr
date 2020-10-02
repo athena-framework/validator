@@ -8,6 +8,9 @@ module Athena::Validator::ExecutionContextInterface
   # Adds a violation with the provided *message* and *code*
   abstract def add_violation(message : String, code : String) : Nil
 
+  # Adds a violation with the provided *message*, and *code*, *value* parameter.
+  abstract def add_violation(message : String, code : String, value : _) : Nil
+
   # Returns an `AVD::Violation::ConstraintViolationBuilderInterface` with the provided *message*.
   #
   # Can be used to add additional information to the `AVD::Violation::ConstraintViolationInterface` being adding it to `self`.
