@@ -7,6 +7,8 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
   include Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::ClassMetadataInterface
 
+  # Builds `self`, auto registering any annotation based annotations on `T`,
+  # as well as those registered via `T.load_metadata`.
   def self.build : self
     class_metadata = new
 
@@ -27,7 +29,8 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
 
                      inner_default_arg = arg.args.empty? ? nil : arg.args.first
 
-                     # Resolve constraints from the annotations
+                     # Resolve constraints from the annotations,
+                     # TODO: Figure out a better way to do this.
                      %(AVD::Constraints::#{arg_name.id}.new(#{inner_default_arg ? "#{inner_default_arg},".id : "".id}#{arg.named_args.double_splat})).id
                    else
                      arg
@@ -77,6 +80,14 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
     T
   end
 
+  def add_constraint(constraints : Array(AVD::Constraint)) : AVD::Metadata::ClassMetadataBase
+    constraints.each do |constraint|
+      self.add_constraint constraint
+    end
+
+    self
+  end
+
   def add_constraint(constraint : AVD::Constraint) : AVD::Metadata::ClassMetadataBase
     constraint.add_implicit_group @default_group
 
@@ -86,7 +97,21 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
   end
 
   # Helper method to aid in adding constraints to properties via `.load_metadata`.
-  def add_property_constraint(property_name : String, constraint : AVD::Constraint) : Nil forall IvarType
+  def add_property_constraints(property_hash : Hash(String, AVD::Constraint | Array(AVD::Constraint))) : Nil
+    property_hash.each do |property_name, constraints|
+      self.add_property_constraint property_name, constraints
+    end
+  end
+
+  # :ditto:
+  def add_property_constraint(property_name : String, constraints : Array(AVD::Constraint)) : Nil
+    constraints.each do |constraint|
+      self.add_property_constraint property_name, constraint
+    end
+  end
+
+  # :ditto:
+  def add_property_constraint(property_name : String, constraint : AVD::Constraint) : Nil
     self.add_property_constraint AVD::Metadata::PropertyMetadata(T).new(property_name), constraint
   end
 

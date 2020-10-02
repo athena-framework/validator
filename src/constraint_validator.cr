@@ -8,7 +8,14 @@ abstract struct Athena::Validator::ConstraintValidator
   # Denotes a built in validator that can be instantiated directly via `.new`.
   module Basic; end
 
-  property! context : AVD::ExecutionContextInterface
+  @context : AVD::ExecutionContextInterface?
+
+  def context : AVD::ExecutionContextInterface
+    @context.not_nil!
+  end
+
+  # :nodoc:
+  def context=(@context : AVD::ExecutionContextInterface); end
 
   def validate(value : _, constraint : AVD::Constraint) : Nil
     # Noop if a given validator doesn't support a given type of value

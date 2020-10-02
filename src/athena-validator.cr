@@ -27,15 +27,174 @@ alias AVD = Athena::Validator
 # @[Assert::NotBlank]
 # property name : String
 # ```
+# NOTE: Constraints, including custom ones, are automatically added to this namespace.
 alias Assert = AVD::Annotations
 
 # Athena's Validation component, `AVD` for short, adds an object/value validation framework to your project.
+# The framework consists of `AVD::Constraint`s that describe some assertion; such as a string should be `AVD::Constraints::NotBlank`
+# or that a value is `AVD::Constraints::GreaterThanOrEqual` another value.
+# Constraints, along with a value, are then passed to an `AVD::ConstraintValidatorInterface` that actually performs the validation, using the data defined in the constraint.
+# If the validator determines that the value is invalid in some way, it creates and adds an `AVD::Violation::ConstraintViolationInterface` to this runs' `AVD::ExecutionContextInterface`.
+# The `AVD::Validator::ValidatorInterface` then returns an `AVD::Violation::ConstraintViolationListInterface` that contains all the violations.  The value can be considered valid if that list is empty.
+#
+# NOTE: See each type individually for more detailed information.
+#
+# ## Getting Started
+#
+# `Athena::Validator` comes with a set of common `AVD::Constraints` built in that any project could find useful.
+# When used on its own, the `Athena::Validator.validator` method can be used to obtain an `AVD::Validator::ValidatorInterface` instance
+# to validate a given value/object.
+#
+# ### Basics
+#
+# A validator accepts a value, and one or more `AVD::Constraint` to validate the value against.
+# The validator then returns an `AVD::Violation::ConstraintViolationListInterface` that includes all the violations, if any.
+#
+# ```
+# # Obtain a validator instance.
+# validator = AVD.validator
+#
+# # Use the validator to validate a value.
+# violations = validator.validate "foo", AVD::Constraints::NotBlank.new
+#
+# # The validator returns an empty list of violations, indicating the value is valid.
+# violations.inspect # => Athena::Validator::Violation::ConstraintViolationList(@violations=[])
+# ```
+#
+# In this case it returns an empty list of violations, meaning the value is valid.
+#
+# ```
+# # Using the validator instance from the previous example
+# violations = validator.validate "", AVD::Constraints::NotBlank.new
+#
+# violations.inspect # =>
+# # Athena::Validator::Violation::ConstraintViolationList(
+# #   @violations=
+# #     [Athena::Validator::Violation::ConstraintViolation(String)(
+# #     @cause=nil,
+# #     @code="0d0c3254-3642-4cb0-9882-46ee5918e6e3",
+# #     @constraint=
+# #       #<Athena::Validator::Constraints::NotBlank:0x7f97da08ced0
+# #       @allow_nil=false,
+# #       @groups=["default"],
+# #       @message="This value should not be blank.",
+# #       @payload=nil>,
+# #     @invalid_value_container=
+# #       Athena::Validator::ValueContainer(String)(@value=""),
+# #     @message="This value should not be blank.",
+# #     @message_template="This value should not be blank.",
+# #     @parameters={"{{ value }}" => ""},
+# #     @plural=nil,
+# #     @property_path="",
+# #     @root="")])
+#
+# # Both the ConstraintViolationList and ConstraintViolation implement a `#to_s` method.
+# puts violations # =>
+# # :
+# #   This value should not be blank. (code: 0d0c3254-3642-4cb0-9882-46ee5918e6e3)
+# ```
+#
+# However in the case of the value _NOT_ being valid, the list includes all of the `AVD::Violation::ConstraintViolationInterface`s produced during this run.
+# Each violation includes some metadata; such as the related constraint that failed, a machine readable code, a human readable message, any parameters
+# that should be used to render that message, etc.  The extra context allows for a lot of flexibility; both in terms of how the error could be rendered or handled.
+#
+# By default, in addition to any constraint specific arguments, the majority of the constraints have three optional arguments: `message`, `groups`, and `payload`.
+# * The `message` argument represents that message that should be used if the value is found to not be valid.
+# The message can also include placeholders that will be replaced when the message is rendered.
+# Most commonly this includes the invalid value itself, but some constraints have additional placeholders.
+# * The `payload` argument can be used to attach any domain specific data to the constraint; such as attaching a severity with each constraint
+# to have more serious violations be handled differently.
+# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validator Groups](./Validator.html#validation-groups) section.
+#
+# ```
+# validator = AVD.validator
+#
+# # Instantiate a constraint with a custom message, using a placeholder.
+# violations = validator.validate -4, AVD::Constraints::PositiveOrZero.new message: "{{ value }} is not a valid age.  A user cannot have a negative age."
+#
+# puts violations # =>
+# # -4:
+# #   -4 is not a valid age.  A user cannot have a negative age. (code: e09e52d0-b549-4ba1-8b4e-420aad76f0de)
+# ```
+# Customizing the message can be a good way for those consuming the errors to determine _WHY_ a given value is not valid.
+#
+# ### Validating Objects
+#
+# Validating arbitrary values against a set of arbitrary constraints can be useful in smaller applications and/or for one off use cases.
+# However to keep in line with our Object Oriented Programming (OOP) principles, we can also validate objects.  The object could be either a struct or a class.
+# The only requirements are that the object includes a specific module, `AVD::Validatable`, and specifies which properties should be validated and against what constraints.
+# The easiest/most common way to do this is via annotations and the `Assert` alias.
+#
+# ```
+# # Define a class that can be validated.
+# class User
+#   include AVD::Validatable
+#
+#   def initialize(@name : String); end
+#
+#   # Specify that we want to assert that the user's name is not blank.
+#   # Multiple constraints can be defined on a single property.
+#   @[Assert::NotBlank]
+#   getter name : String
+# end
+#
+# # Obtain a validator instance.
+# validator = AVD.validator
+#
+# # Validate a user instance, notice we're not passing in any constraints.
+# validator.validate(User.new("Jim")).empty? # => true
+# validator.validate User.new ""             # =>
+# # Object(User).name:
+# #   This value should not be blank. (code: 0d0c3254-3642-4cb0-9882-46ee5918e6e3)
+# ```
+#
+# Notice that in this case we do not need to supply the constraints to the `#validate` method.
+# This is because the validator is able to extract them from the annotations on the properties.
+# An array of constraints can still be supplied, and will take precedence over the constraints defined within the type.
+#
+# NOTE: By default if a property's value is another object, the sub object will not be validated.
+# use the `AVD::Constraints::Valid` constraint if you wish to also validate the sub object.
+# This also applies to arrays of objects.
+#
+# Another important thing to point out is that no custom DSL is required to define these constraints.
+# `Athena::Validator` is intended to be a generic validation solution that could be used outside of the [Athena](https://github.com/athena-framework) ecosystem.
+# However, in order to be able to use the annotation based approach, you need to be able to apply the annotations to the underlying properties.
+# If this is not possible due to how a specific type is implemented, or if you just don't like the annotation syntax, the type can also be configured via code.
+#
+# ```
+# # Define a class that can be validated.
+# class User
+#   include AVD::Validatable
+#
+#   # This class method is invoked when building the metadata associated with a type,
+#   # and can be used to manually wire up the constraints.
+#   def self.load_metadata(metadata : AVD::Metadata::ClassMetadataBase) : Nil
+#     metadata.add_property_constraint "name", AVD::Constraints::NotBlank.new
+#   end
+#
+#   def initialize(@name : String); end
+#
+#   getter name : String
+# end
+#
+# # Obtain a validator instance.
+# validator = AVD.validator
+#
+# # Validate a user instance, notice we're not passing in any constraints.
+# validator.validate(User.new("Jim")).empty? # => true
+# validator.validate User.new ""             # =>
+# # Object(User).name:
+# #   This value should not be blank. (code: 0d0c3254-3642-4cb0-9882-46ee5918e6e3)
+# ```
+#
+# The metadata for each type is lazily loaded when an instance of that type is validated, and is only built once.
+# See `AVD::Metadata::ClassMetadata` for some additional ways to register property constraints.
 module Athena::Validator
   # :nodoc:
   #
   # Default namespace for constraint annotations.
   #
-  # NOTE: Constraints are automatically added to this namespace.
+  # NOTE: Constraints, including custom ones, are automatically added to this namespace.
   module Annotations; end
 
   # :nodoc:
@@ -52,7 +211,26 @@ module Athena::Validator
     end
   end
 
-  def self.validator(validator_factory : AVD::ConstraintValidatorFactoryInterface? = nil) : AVD::Validator::ValidatorInterface
-    AVD::Validator::RecursiveValidator.new validator_factory
+  def self.validator : AVD::Validator::ValidatorInterface
+    AVD::Validator::RecursiveValidator.new
   end
 end
+
+# Define a class that can be validated.
+class User
+  include AVD::Validatable
+
+  def initialize(@name : String); end
+
+  # Specify that we want to assert that the user's name is not blank.
+  # Multiple constraints can be defined on a single property.
+  @[Assert::NotBlank]
+  getter name : String
+end
+
+# Obtain a validator instance.
+validator = AVD.validator
+
+# Validate a user instance, notice we're not passing in any constraints.
+validator.validate(User.new("Jim")).empty? # => true
+puts validator.validate User.new("")       # => false

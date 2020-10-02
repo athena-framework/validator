@@ -1,5 +1,14 @@
 require "athena-spec"
 
+# A set of testing utilities/types to aid in testing `AVD` related types.
+# The main things to note include:
+#
+# * `AVD::Spec::ConstraintValidatorTestCase` - An [ASPEC::Test](https://athena-framework.github.io/spec/Athena/Spec/TestCase.html) extension
+# for testing `AVD::ConstraintValidatorInterface`s.
+# * `AVD::Spec::AbstractComparisonValidatorTestCase` - An `AVD::Spec::ConstraintValidatorTestCase` extension for testing
+# `AVD::Constraints::AbstractComparison` based constraints.
+# * `AVD::Spec::ConstraintViolationAssertion` - Similar to `AVD::Violation::ConstraintViolationBuilder` but
+# for asserting the violation added to the context was built as expected.
 module Athena::Validator::Spec
   # Test case designed to make testing `AVD::ConstraintViolationInterface` easier.
   abstract struct ConstraintValidatorTestCase < ASPEC::TestCase
@@ -12,10 +21,8 @@ module Athena::Validator::Spec
 
     @constraint : AVD::Constraint
 
-    # :nodoc:
     getter! context : AVD::ExecutionContext(String)
 
-    # :nodoc:
     getter! validator : AVD::ConstraintValidatorInterface
 
     def initialize
@@ -34,10 +41,14 @@ module Athena::Validator::Spec
       @validator = validator
     end
 
+    # Responsible for returning a new validator instance for the constraint being tested.
     abstract def create_validator : AVD::ConstraintValidatorInterface
+
+    # Returns the class of the constraint being tested.
     abstract def constraint_class : AVD::Constraint.class
 
-    def new_constraint(**args)
+    # Returns a new constraint instance based on `#constraint_class` and the provided *args*.
+    def new_constraint(**args) : AVD::Constraint
       self.constraint_class.new **args
     end
 
@@ -78,27 +89,23 @@ module Athena::Validator::Spec
 
     @[DataProvider("valid_comparisons")]
     def test_valid_comparisons(actual, expected) : Nil
-      constraint = new_constraint value: expected
-
-      self.validator.validate actual, constraint
+      self.validator.validate actual, self.new_constraint value: expected
       self.assert_no_violation
     end
 
     @[DataProvider("invalid_comparisons")]
     def test_invalid_comparisons(actual, expected : T) : Nil forall T
-      constraint = new_constraint value: expected, message: "my_message"
+      self.validator.validate actual, self.new_constraint value: expected, message: "my_message"
 
-      self.validator.validate actual, constraint
-
-      self.build_violation("my_message")
-        .add_parameter("{{ value }}", actual)
+      self
+        .build_violation("my_message", self.error_code, actual)
         .add_parameter("{{ compared_value }}", expected)
         .add_parameter("{{ compared_value_type }}", T)
-        .code(self.error_code)
         .assert_violation
     end
   end
 
+  # A spec implementation of `Validator::ContextualValidatorInterface`.
   struct MockContextualValidator
     include Athena::Validator::Validator::ContextualValidatorInterface
 
@@ -123,6 +130,7 @@ module Athena::Validator::Spec
     end
   end
 
+  # A spec implementation of `Validator::ValidatorInterface`.
   struct MockValidator
     include Athena::Validator::Validator::ValidatorInterface
 
@@ -147,6 +155,9 @@ module Athena::Validator::Spec
     end
   end
 
+  # An `AVD::Violation::ConstraintViolation` used to assert that a violation added via an `AVD::ConstraintValidatorInterface` was built as expected.
+  #
+  # This type should not be used directly, use `AVD::Spec::ConstraintValidatorTestCase#build_violation` instead.
   record ConstraintViolationAssertion, context : AVD::ExecutionContextInterface, message : String, constraint : AVD::Constraint do
     @parameters : Hash(String, String) = Hash(String, String).new
     @invalid_value : AVD::Container = AVD::ValueContainer.new("invalid_value")
