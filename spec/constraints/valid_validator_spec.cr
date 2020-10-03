@@ -23,20 +23,17 @@ end
 
 describe AVD::Constraints::Valid::Validator do
   it "should pass property paths to nested contexts" do
-    validator = AVD.validator
-
-    violations = validator.validate Foo.new, groups: "nested"
+    violations = AVD.validator.validate Foo.new, groups: "nested"
 
     violations.size.should eq 1
     violations[0].property_path.should eq "foo_bar.foo_bar_baz.foo"
   end
 
   it "should pass with null value" do
-    validator = AVD.validator
     foo = Foo.new
     foo.foo_bar = nil
 
-    violations = validator.validate foo, groups: "nested"
+    violations = AVD.validator.validate foo, groups: "nested"
 
     violations.should be_empty
   end

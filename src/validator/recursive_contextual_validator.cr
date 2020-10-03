@@ -223,29 +223,36 @@ class Athena::Validator::Validator::RecursiveContextualValidator
       self.validate_in_group value, metadata, group, context
     end
 
+    return if groups.empty?
     return if value.nil?
 
-    cascading_strategy = metadata.cascading_strategy
-
-    return unless cascading_strategy.cascade?
-    return unless value.is_a? Iterable
+    return unless metadata.cascading_strategy.cascade?
 
     cascaded_groups = !cascaded_groups.nil? && cascaded_groups.size > 0 ? cascaded_groups : groups
 
-    self.validate_each_object_in(
-      value,
-      property_path,
-      cascaded_groups,
-      context
-    )
+    case value
+    when Iterable
+      self.validate_each_object_in(
+        value,
+        property_path,
+        cascaded_groups,
+        context
+      )
+    when AVD::Validatable
+      self.validate_object(
+        value,
+        property_path,
+        cascaded_groups,
+        traversal_strategy,
+        context
+      )
+    end
   end
 
   private def validate_object(object : AVD::Validatable, property_path : String, groups : GROUPS_TYPE, traversal_strategy : AVD::Metadata::TraversalStrategy, context : AVD::ExecutionContextInterface) : Nil
-    class_metadata = @metadata_factory.metadata object
-
     self.validate_class_node(
       object,
-      class_metadata,
+      @metadata_factory.metadata(object),
       property_path,
       groups,
       nil,
@@ -305,7 +312,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
       self.validate_in_group object, class_metadata, group, context
     end
 
-    # TODO: Something about no more groups needing validated?
+    return if groups.empty?
 
     class_metadata.constrained_properties.each do |property_name|
       property_metadata = class_metadata.property_metadata(property_name)
@@ -403,7 +410,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     end
   end
 
-  private def normalize_groups(groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil) : GROUPS_TYPE
+  private def normalize_groups(groups) : GROUPS_TYPE
     case groups
     in Nil                                     then @default_groups
     in String, AVD::Constraints::GroupSequence then [groups] of String | AVD::Constraints::GroupSequence
