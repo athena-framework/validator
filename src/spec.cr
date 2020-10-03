@@ -1,4 +1,6 @@
 require "athena-spec"
+require "./spec/abstract_validator_test_case"
+require "./spec/validator_test_case"
 
 # A set of testing utilities/types to aid in testing `AVD` related types.
 # The main things to note include:
@@ -105,7 +107,7 @@ module Athena::Validator::Spec
     end
   end
 
-  # A spec implementation of `Validator::ContextualValidatorInterface`.
+  # A spec implementation of `AVD::Validator::ContextualValidatorInterface`.
   struct MockContextualValidator
     include Athena::Validator::Validator::ContextualValidatorInterface
 
@@ -130,7 +132,7 @@ module Athena::Validator::Spec
     end
   end
 
-  # A spec implementation of `Validator::ValidatorInterface`.
+  # A spec implementation of `AVD::Validator::ValidatorInterface`.
   struct MockValidator
     include Athena::Validator::Validator::ValidatorInterface
 
@@ -152,6 +154,25 @@ module Athena::Validator::Spec
 
     def in_context(context : AVD::ExecutionContextInterface) : AVD::Validator::ContextualValidatorInterface
       MockContextualValidator.new
+    end
+  end
+
+  # A spec implementation of `AVD::Metadata::MetadataFactoryInterface`.
+  struct MockMetadataFactory
+    include AVD::Metadata::MetadataFactoryInterface
+
+    @metadatas = Hash(AVD::Validatable::Class, AVD::Metadata::ClassMetadataBase).new
+
+    def metadata(object : AVD::Validatable) : AVD::Metadata::ClassMetadataBase
+      if metadata = @metadatas[object.class]?
+        return metadata
+      end
+
+      object.class.validation_class_metadata
+    end
+
+    def add_metadata(klass : AVD::Validatable::Class, metadata : AVD::Metadata::ClassMetadataBase) : Nil
+      @metadatas[klass] = metadata
     end
   end
 

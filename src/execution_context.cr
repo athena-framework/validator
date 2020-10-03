@@ -17,7 +17,7 @@ class Athena::Validator::ExecutionContext(Root)
   getter violations : AVD::Violation::ConstraintViolationList = AVD::Violation::ConstraintViolationList.new
 
   # :inherit:
-  getter property_path : String = ""
+  @property_path : String = ""
 
   # :inherit:
   getter metadata : AVD::Metadata::MetadataInterface? = nil
@@ -60,7 +60,7 @@ class Athena::Validator::ExecutionContext(Root)
   end
 
   # :inherit:
-  def path(path : String) : String
+  def property_path(path : String = "") : String
     AVD::PropertyPath.append @property_path, path
   end
 

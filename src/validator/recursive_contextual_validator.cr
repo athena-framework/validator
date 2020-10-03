@@ -6,7 +6,11 @@ class Athena::Validator::Validator::RecursiveContextualValidator
   @default_groups : Array(String)
   @default_property_path : String
 
-  def initialize(@context : AVD::ExecutionContextInterface, @constraint_validator_factory : AVD::ConstraintValidatorFactoryInterface)
+  def initialize(
+    @context : AVD::ExecutionContextInterface,
+    @constraint_validator_factory : AVD::ConstraintValidatorFactoryInterface,
+    @metadata_factory : AVD::Metadata::MetadataFactoryInterface
+  )
     @default_groups = [(g = @context.group) ? g : Constraint::DEFAULT_GROUP]
     @default_property_path = @context.property_path
   end
@@ -89,7 +93,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
   def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Validator::ContextualValidatorInterface
     groups = self.normalize_groups groups
 
-    class_metadata = object.class.validation_class_metadata
+    class_metadata = @metadata_factory.metadata object
     property_metadata = class_metadata.property_metadata(property_name)
     property_path = AVD::PropertyPath.append @default_property_path, property_name
 
@@ -121,7 +125,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
   def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Validator::ContextualValidatorInterface
     groups = self.normalize_groups groups
 
-    class_metadata = object.class.validation_class_metadata
+    class_metadata = @metadata_factory.metadata object
     property_metadata = class_metadata.property_metadata(property_name)
     property_path = AVD::PropertyPath.append @default_property_path, property_name
 
@@ -233,7 +237,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
   end
 
   private def validate_object(object : AVD::Validatable, property_path : String, groups : GROUPS_TYPE, traversal_strategy : AVD::Metadata::TraversalStrategy, context : AVD::ExecutionContextInterface) : Nil
-    class_metadata = object.class.validation_class_metadata
+    class_metadata = @metadata_factory.metadata object
 
     self.validate_class_node(
       object,

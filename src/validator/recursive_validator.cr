@@ -4,9 +4,11 @@ class Athena::Validator::Validator::RecursiveValidator
   include Athena::Validator::Validator::ValidatorInterface
 
   @validator_factory : AVD::ConstraintValidatorFactoryInterface
+  @metadata_factory : AVD::Metadata::MetadataFactoryInterface
 
-  def initialize(validator_factory : AVD::ConstraintValidatorFactoryInterface? = nil)
+  def initialize(validator_factory : AVD::ConstraintValidatorFactoryInterface? = nil, metadata_factory : AVD::Metadata::MetadataFactoryInterface? = nil)
     @validator_factory = validator_factory || AVD::ConstraintValidatorFactory.new
+    @metadata_factory = metadata_factory || AVD::Metadata::MetadataFactory.new
   end
 
   def validate(value : _, constraints : Array(AVD::Constraint) | AVD::Constraint | Nil = nil, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
@@ -22,11 +24,11 @@ class Athena::Validator::Validator::RecursiveValidator
   end
 
   def start_context(root = nil) : AVD::Validator::ContextualValidatorInterface
-    AVD::Validator::RecursiveContextualValidator.new create_context(root), @validator_factory
+    AVD::Validator::RecursiveContextualValidator.new create_context(root), @validator_factory, @metadata_factory
   end
 
   def in_context(context : AVD::ExecutionContextInterface) : AVD::Validator::ContextualValidatorInterface
-    AVD::Validator::RecursiveContextualValidator.new context, @validator_factory
+    AVD::Validator::RecursiveContextualValidator.new context, @validator_factory, @metadata_factory
   end
 
   private def create_context(root = nil) : AVD::ExecutionContextInterface
