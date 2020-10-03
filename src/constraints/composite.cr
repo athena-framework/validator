@@ -12,7 +12,7 @@ abstract class Athena::Validator::Constraints::Composite < Athena::Validator::Co
     self.initialize_nested_constraints
 
     unless constraints.is_a? Array
-      constraints = [constraints]
+      constraints = [constraints] of AVD::Constraint
     end
 
     # TODO: Prevent `Valid` constraints

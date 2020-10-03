@@ -26,8 +26,7 @@ struct AtLeastOneOfValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   @[DataProvider("invalid_combinations")]
-  @[Pending]
-  def test_invalid_combinations(value : _, constraints : Array(AVD::Constraint)) : Nil
+  def ptest_invalid_combinations(value : _, constraints : Array(AVD::Constraint)) : Nil
     constraint = self.new_constraint(constraints: constraints)
     self.validator.validate value, constraint
 
