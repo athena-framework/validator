@@ -158,12 +158,15 @@ module Athena::Validator::Spec
   end
 
   # A spec implementation of `AVD::Metadata::MetadataFactoryInterface`.
-  struct MockMetadataFactory
+  struct MockMetadataFactory(T1, T2, T3, T4)
     include AVD::Metadata::MetadataFactoryInterface
 
-    @metadatas = Hash(AVD::Validatable::Class, AVD::Metadata::ClassMetadataBase).new
+    @metadatas = Hash(AVD::Validatable::Class, AVD::Metadata::ClassMetadata(T1) |
+                                               AVD::Metadata::ClassMetadata(T2) |
+                                               AVD::Metadata::ClassMetadata(T3) |
+                                               AVD::Metadata::ClassMetadata(T4)).new
 
-    def metadata(object : AVD::Validatable) : AVD::Metadata::ClassMetadataBase
+    def metadata(object : AVD::Validatable) : AVD::Metadata::ClassMetadata
       if metadata = @metadatas[object.class]?
         return metadata
       end
@@ -171,8 +174,26 @@ module Athena::Validator::Spec
       object.class.validation_class_metadata
     end
 
-    def add_metadata(klass : AVD::Validatable::Class, metadata : AVD::Metadata::ClassMetadataBase) : Nil
+    def add_metadata(klass : AVD::Validatable::Class, metadata : AVD::Metadata::ClassMetadata) : Nil
       @metadatas[klass] = metadata
+    end
+  end
+
+  record EntitySequenceProvider, sequence : Array(String | Array(String)) do
+    include AVD::Validatable
+    include AVD::Constraints::GroupSequence::Provider
+
+    def group_sequence : Array(String | Array(String)) | AVD::Constraints::GroupSequence
+      @sequence || AVD::Constraints::GroupSequence.new [] of String
+    end
+  end
+
+  record EntityGroupSequenceProvider, sequence : AVD::Constraints::GroupSequence do
+    include AVD::Validatable
+    include AVD::Constraints::GroupSequence::Provider
+
+    def group_sequence : Array(String | Array(String)) | AVD::Constraints::GroupSequence
+      @sequence || Array(String | Array(String)).new
     end
   end
 

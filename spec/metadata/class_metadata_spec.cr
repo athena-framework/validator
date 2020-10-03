@@ -4,15 +4,6 @@ private record Entity do
   include AVD::Validatable
 end
 
-private record EntityProvider, sequence : Array(String) do
-  include AVD::Validatable
-  include AVD::Constraints::GroupSequence::Provider
-
-  def group_sequence : Array(String)
-    @sequence
-  end
-end
-
 struct ClassMetadataTest < ASPEC::TestCase
   @metadata : AVD::Metadata::ClassMetadata(Entity)
 
@@ -95,17 +86,17 @@ struct ClassMetadataTest < ASPEC::TestCase
   end
 
   def test_group_sequence_fails_if_is_provider : Nil
-    metadata = AVD::Metadata::ClassMetadata(EntityProvider).new
+    metadata = AVD::Metadata::ClassMetadata(AVD::Spec::EntitySequenceProvider).new
     metadata.group_sequence_provider = true
 
     expect_raises ArgumentError, "Defining a static group sequence is not allowed with a group sequence provider." do
-      metadata.group_sequence = ["EntityProvider", "Bar"]
+      metadata.group_sequence = ["Athena::Validator::Spec::EntitySequenceProvider", "Bar"]
     end
   end
 
   def test_group_sequence_provider_fails_if_is_provider : Nil
-    metadata = AVD::Metadata::ClassMetadata(EntityProvider).new
-    metadata.group_sequence = ["EntityProvider", "Bar"]
+    metadata = AVD::Metadata::ClassMetadata(AVD::Spec::EntitySequenceProvider).new
+    metadata.group_sequence = ["Athena::Validator::Spec::EntitySequenceProvider", "Bar"]
 
     expect_raises ArgumentError, "Defining a group sequence provider is not allowed with a static group sequence." do
       metadata.group_sequence_provider = true

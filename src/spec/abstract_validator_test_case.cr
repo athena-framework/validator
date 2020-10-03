@@ -9,20 +9,21 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     property! first_name : String
     property! last_name : String
     property! sub_object : SubEntity
+    property! sub_object2 : SubEntity
     property! hash_sub_object : Hash(String, SubEntity)
     property! nested_hash_sub_object : Hash(Int32, Hash(String, SubEntity))
     property! scalar_array : Array(Int32 | String)
     property! nil_array : Array(Nil)
   end
 
-  @metadata : AVD::Metadata::ClassMetadataBase
-  @sub_object_metadata : AVD::Metadata::ClassMetadataBase
-  @metadata_factory : AVD::Spec::MockMetadataFactory
+  @metadata : AVD::Metadata::ClassMetadata(Entity)
+  @sub_object_metadata : AVD::Metadata::ClassMetadata(SubEntity)
+  @metadata_factory : AVD::Spec::MockMetadataFactory(Entity, SubEntity, EntitySequenceProvider, EntityGroupSequenceProvider)
 
   def initialize
     @metadata = AVD::Metadata::ClassMetadata(Entity).new
     @sub_object_metadata = AVD::Metadata::ClassMetadata(SubEntity).new
-    @metadata_factory = AVD::Spec::MockMetadataFactory.new
+    @metadata_factory = AVD::Spec::MockMetadataFactory(Entity, SubEntity, EntitySequenceProvider, EntityGroupSequenceProvider).new
     @metadata_factory.add_metadata Entity, @metadata
     @metadata_factory.add_metadata SubEntity, @sub_object_metadata
   end
@@ -431,5 +432,211 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
 
   def test_validate_property_value_no_constraints : Nil
     self.validate_property_value(Entity.new, "last_name", "foo").should be_empty
+  end
+
+  def ptest_validate_object_only_once_per_group : Nil
+    object = Entity.new
+    object.sub_object = object.sub_object2 = SubEntity.new
+
+    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "message"
+    end
+
+    @metadata.add_property_constraint "sub_object", AVD::Constraints::Valid.new
+    @metadata.add_property_constraint "sub_object2", AVD::Constraints::Valid.new
+    @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback
+
+    self.validate(object).size.should eq 1
+  end
+
+  def ptest_validate_different_objects_separately : Nil
+    object = Entity.new
+    object.sub_object = SubEntity.new
+    object.sub_object2 = SubEntity.new
+
+    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "message"
+    end
+
+    @metadata.add_property_constraint "sub_object", AVD::Constraints::Valid.new
+    @metadata.add_property_constraint "sub_object2", AVD::Constraints::Valid.new
+    @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback
+
+    self.validate(object).size.should eq 2
+  end
+
+  def test_validate_single_group : Nil
+    object = Entity.new
+
+    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "message"
+    end
+
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group1"]
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group2"]
+
+    self.validate(object, groups: "group1").size.should eq 1
+  end
+
+  def test_validate_multiple_groups : Nil
+    object = Entity.new
+
+    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "message"
+    end
+
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group1"]
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group2"]
+
+    self.validate(object, groups: ["group1", "group2"]).size.should eq 2
+  end
+
+  def test_validate_replace_default_group_by_sequence_object : Nil
+    object = Entity.new
+
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "group2 message"
+    end
+
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "group3 message"
+    end
+
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: AVD::Constraints::Callback::CallbackProc.new { }, groups: ["group1"]
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback1, groups: ["group2"]
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback2, groups: ["group3"]
+
+    @metadata.group_sequence = AVD::Constraints::GroupSequence.new ["group1", "group2", "group3", "Athena::Validator::Spec::AbstractValidatorTestCase::Entity"]
+
+    violations = self.validate object, groups: "default"
+
+    violations.size.should eq 1
+    violations.first.message.should eq "group2 message"
+  end
+
+  def test_validate_replace_default_group_by_array : Nil
+    object = Entity.new
+
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "group2 message"
+    end
+
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "group3 message"
+    end
+
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: AVD::Constraints::Callback::CallbackProc.new { }, groups: ["group1"]
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback1, groups: ["group2"]
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback2, groups: ["group3"]
+
+    @metadata.group_sequence = ["group1", "group2", "group3", "Athena::Validator::Spec::AbstractValidatorTestCase::Entity"]
+
+    violations = self.validate object, groups: "default"
+
+    violations.size.should eq 1
+    violations.first.message.should eq "group2 message"
+  end
+
+  def ptest_validate_propagate_default_group_to_sub_object_when_replacing_default_group : Nil
+    object = Entity.new
+    object.sub_object = SubEntity.new
+
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "default group message"
+    end
+
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "group sequence message"
+    end
+
+    @metadata.add_property_constraint "sub_object", AVD::Constraints::Valid.new
+    @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback1, groups: ["default"]
+    @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback2, groups: ["group1"]
+
+    @metadata.group_sequence = AVD::Constraints::GroupSequence.new ["group1", "Athena::Validator::Spec::AbstractValidatorTestCase::Entity"]
+
+    violations = self.validate object, groups: "default"
+
+    violations.size.should eq 1
+    violations.first.message.should eq "default group message"
+  end
+
+  def test_validate_custom_group_when_default_group_was_replaced : Nil
+    object = Entity.new
+    object.sub_object = SubEntity.new
+
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "other group message"
+    end
+
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "group sequence message"
+    end
+
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback1, groups: ["other group"]
+    @metadata.add_constraint AVD::Constraints::Callback.new callback: callback2, groups: ["group1"]
+
+    @metadata.group_sequence = AVD::Constraints::GroupSequence.new ["group1", "Athena::Validator::Spec::AbstractValidatorTestCase::Entity"]
+
+    violations = self.validate object, groups: "other group"
+
+    violations.size.should eq 1
+    violations.first.message.should eq "other group message"
+  end
+
+  @[DataProvider("get_replace_default_group")]
+  def test_replace_default_group(sequence : Array(String | Array(String)) | AVD::Constraints::GroupSequence, expected_violations : Array) : Nil
+    object, metadata = case sequence
+                       in Array
+                         m = AVD::Metadata::ClassMetadata(EntitySequenceProvider).new
+                         @metadata_factory.add_metadata EntitySequenceProvider, m
+                         {EntitySequenceProvider.new(sequence), m}
+                       in AVD::Constraints::GroupSequence
+                         m = AVD::Metadata::ClassMetadata(EntityGroupSequenceProvider).new
+                         @metadata_factory.add_metadata EntityGroupSequenceProvider, m
+                         {EntityGroupSequenceProvider.new(sequence), m}
+                       end
+
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "violation in group2"
+    end
+
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+      context.add_violation "violation in group3"
+    end
+
+    metadata.add_constraint AVD::Constraints::Callback.new callback: AVD::Constraints::Callback::CallbackProc.new { }, groups: ["group1"]
+    metadata.add_constraint AVD::Constraints::Callback.new callback: callback1, groups: ["group2"]
+    metadata.add_constraint AVD::Constraints::Callback.new callback: callback2, groups: ["group3"]
+    metadata.group_sequence_provider = true
+
+    violations = self.validate object, groups: "default"
+
+    violations.size.should eq expected_violations.size
+
+    expected_violations.each_with_index do |message, idx|
+      violations[idx].message.should eq message
+    end
+  end
+
+  def get_replace_default_group : Tuple
+    {
+      {
+        AVD::Constraints::GroupSequence.new(["group1", "group2", "group3", "Athena::Validator::Spec::AbstractValidatorTestCase::Entity"]),
+        ["violation in group2"],
+      },
+      {
+        ["group1", "group2", "group3", "Athena::Validator::Spec::AbstractValidatorTestCase::Entity"] of String | Array(String),
+        ["violation in group2"],
+      },
+      {
+        AVD::Constraints::GroupSequence.new(["group1", ["group2", "group3"], "Athena::Validator::Spec::AbstractValidatorTestCase::Entity"]),
+        ["violation in group2", "violation in group3"],
+      },
+      {
+        ["group1", ["group2", "group3"], "Athena::Validator::Spec::AbstractValidatorTestCase::Entity"],
+        ["violation in group2", "violation in group3"],
+      },
+    }
   end
 end

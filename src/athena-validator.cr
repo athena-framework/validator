@@ -173,7 +173,7 @@ alias Assert = AVD::Annotations
 #
 #   # This class method is invoked when building the metadata associated with a type,
 #   # and can be used to manually wire up the constraints.
-#   def self.load_metadata(metadata : AVD::Metadata::ClassMetadataBase) : Nil
+#   def self.load_metadata(metadata : AVD::Metadata::ClassMetadata) : Nil
 #     metadata.add_property_constraint "name", AVD::Constraints::NotBlank.new
 #   end
 #

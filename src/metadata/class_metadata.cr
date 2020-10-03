@@ -1,11 +1,7 @@
 require "./generic_metadata"
-require "./class_metadata_interface"
 
-abstract struct Athena::Validator::Metadata::ClassMetadataBase; end
-
-struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metadata::ClassMetadataBase
+class Athena::Validator::Metadata::ClassMetadata(T)
   include Athena::Validator::Metadata::GenericMetadata
-  include Athena::Validator::Metadata::ClassMetadataInterface
 
   # Builds `self`, auto registering any annotation based annotations on `T`,
   # as well as those registered via `T.load_metadata`.
@@ -86,7 +82,7 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
     T
   end
 
-  def add_constraint(constraints : Array(AVD::Constraint)) : AVD::Metadata::ClassMetadataBase
+  def add_constraint(constraints : Array(AVD::Constraint)) : AVD::Metadata::ClassMetadata
     constraints.each do |constraint|
       self.add_constraint constraint
     end
@@ -94,7 +90,7 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
     self
   end
 
-  def add_constraint(constraint : AVD::Constraint) : AVD::Metadata::ClassMetadataBase
+  def add_constraint(constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
     constraint.add_implicit_group @default_group
 
     super constraint
@@ -121,7 +117,7 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
     self.add_property_constraint AVD::Metadata::PropertyMetadata(T).new(property_name), constraint
   end
 
-  def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterfaceBase, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadataBase
+  def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterfaceBase, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
     unless @properties.has_key? property_metadata.name
       @properties[property_metadata.name] = property_metadata
     end

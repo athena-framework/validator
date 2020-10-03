@@ -3,7 +3,7 @@ require "./spec_helper"
 private class ManualConstraints
   include AVD::Validatable
 
-  def self.load_metadata(class_metadata : AVD::Metadata::ClassMetadataBase) : Nil
+  def self.load_metadata(class_metadata : AVD::Metadata::ClassMetadata) : Nil
     class_metadata.add_property_constraint "name", AVD::Constraints::EqualTo.new("foo")
   end
 

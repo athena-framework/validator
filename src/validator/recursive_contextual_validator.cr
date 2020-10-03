@@ -256,7 +256,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
 
   private def validate_class_node(
     object : AVD::Validatable,
-    class_metadata : AVD::Metadata::ClassMetadataBase,
+    class_metadata : AVD::Metadata::ClassMetadata,
     property_path : String,
     groups : GROUPS_TYPE,
     cascaded_groups : Array(String)?,
@@ -356,7 +356,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     group_sequence.groups.each do |group_in_sequence|
       groups = group_in_sequence.is_a?(Array) ? group_in_sequence : [group_in_sequence]
 
-      if metadata.is_a? AVD::Metadata::ClassMetadataBase
+      if metadata.is_a? AVD::Metadata::ClassMetadata
         self.validate_class_node(
           value,
           metadata,
