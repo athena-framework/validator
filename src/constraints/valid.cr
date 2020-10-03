@@ -1,5 +1,8 @@
 class Athena::Validator::Constraints::Valid < Athena::Validator::Constraint
+  getter? traverse : Bool
+
   def initialize(
+    @traverse : Bool = true,
     groups : Array(String)? = nil,
     payload : Hash(String, String)? = nil
   )

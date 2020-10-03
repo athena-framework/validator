@@ -75,7 +75,7 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
   getter default_group : String
   getter group_sequence : AVD::Constraints::GroupSequence? = nil
 
-  @cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
+  @traversal_strategy : AVD::Metadata::TraversalStrategy = AVD::Metadata::TraversalStrategy::Implicit
   @properties : Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase) = Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase).new
 
   def initialize
@@ -167,8 +167,8 @@ struct Athena::Validator::Metadata::ClassMetadata(T) < Athena::Validator::Metada
     @properties.has_key? property_name
   end
 
-  def property_metadata(property_name : String) : AVD::Metadata::PropertyMetadataInterfaceBase
-    @properties[property_name]
+  def property_metadata(property_name : String) : AVD::Metadata::PropertyMetadataInterfaceBase?
+    @properties[property_name]?
   end
 
   def name : String?

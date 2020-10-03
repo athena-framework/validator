@@ -1,6 +1,6 @@
 require "./property_metadata_interface"
 
-struct Athena::Validator::Metadata::PropertyMetadata(EntityType)
+class Athena::Validator::Metadata::PropertyMetadata(EntityType)
   include Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::PropertyMetadataInterfaceBase
 
