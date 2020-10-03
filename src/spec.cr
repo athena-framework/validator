@@ -179,6 +179,23 @@ module Athena::Validator::Spec
     end
   end
 
+  # A constraint that always adds a violation.
+  class FailingConstraint < AVD::Constraint
+    def initialize(
+      message : String = "Failed",
+      groups : Array(String) | String | Nil = nil,
+      payload : Hash(String, String)? = nil
+    )
+      super message, groups, payload
+    end
+
+    struct Validator < AVD::ConstraintValidator
+      def validate(value : _, constraint : FailingConstraint) : Nil
+        self.context.add_violation constraint.message
+      end
+    end
+  end
+
   record EntitySequenceProvider, sequence : Array(String | Array(String)) do
     include AVD::Validatable
     include AVD::Constraints::GroupSequence::Provider

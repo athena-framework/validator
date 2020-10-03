@@ -1,12 +1,14 @@
 abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::TestCase
   private class SubEntity
     include AVD::Validatable
+
+    property value : String?
   end
 
   private class Entity
     include AVD::Validatable
 
-    property! first_name : String
+    property first_name : String?
     property! last_name : String
     property! sub_object : SubEntity
     property! sub_object2 : SubEntity
@@ -14,6 +16,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     property! nested_hash_sub_object : Hash(Int32, Hash(String, SubEntity))
     property! scalar_array : Array(Int32 | String)
     property! nil_array : Array(Nil)
+    property! data_hash : Hash(String, String)
   end
 
   @metadata : AVD::Metadata::ClassMetadata(Entity)
@@ -287,7 +290,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     object = Entity.new
     object.hash_sub_object = {"key" => SubEntity.new}
 
-    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
+    callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
       context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
     end
 
@@ -301,7 +304,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     object = Entity.new
     object.hash_sub_object = {"key" => SubEntity.new}
 
-    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
+    callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
       context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
     end
 
@@ -315,7 +318,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     object = Entity.new
     object.nested_hash_sub_object = {2 => {"key" => SubEntity.new}}
 
-    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
+    callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
       context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
     end
 
@@ -363,7 +366,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
       context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
     end
 
-    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
       context.add_violation "other violation"
     end
 
@@ -408,7 +411,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
       context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
     end
 
-    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
       context.add_violation "other violation"
     end
 
@@ -438,7 +441,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     object = Entity.new
     object.sub_object = object.sub_object2 = SubEntity.new
 
-    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "message"
     end
 
@@ -449,12 +452,12 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     self.validate(object).size.should eq 1
   end
 
-  def ptest_validate_different_objects_separately : Nil
+  def test_validate_different_objects_separately : Nil
     object = Entity.new
     object.sub_object = SubEntity.new
     object.sub_object2 = SubEntity.new
 
-    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "message"
     end
 
@@ -468,7 +471,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
   def test_validate_single_group : Nil
     object = Entity.new
 
-    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "message"
     end
 
@@ -481,7 +484,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
   def test_validate_multiple_groups : Nil
     object = Entity.new
 
-    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "message"
     end
 
@@ -494,11 +497,11 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
   def test_validate_replace_default_group_by_sequence_object : Nil
     object = Entity.new
 
-    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "group2 message"
     end
 
-    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "group3 message"
     end
 
@@ -517,11 +520,11 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
   def test_validate_replace_default_group_by_array : Nil
     object = Entity.new
 
-    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "group2 message"
     end
 
-    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "group3 message"
     end
 
@@ -537,15 +540,15 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     violations.first.message.should eq "group2 message"
   end
 
-  def ptest_validate_propagate_default_group_to_sub_object_when_replacing_default_group : Nil
+  def test_validate_propagate_default_group_to_sub_object_when_replacing_default_group : Nil
     object = Entity.new
     object.sub_object = SubEntity.new
 
-    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "default group message"
     end
 
-    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "group sequence message"
     end
 
@@ -565,11 +568,11 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     object = Entity.new
     object.sub_object = SubEntity.new
 
-    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "other group message"
     end
 
-    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "group sequence message"
     end
 
@@ -597,11 +600,11 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
                          {EntityGroupSequenceProvider.new(sequence), m}
                        end
 
-    callback1 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback1 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "violation in group2"
     end
 
-    callback2 = AVD::Constraints::Callback::CallbackProc.new do |value, context|
+    callback2 = AVD::Constraints::Callback::CallbackProc.new do |_value, context|
       context.add_violation "violation in group3"
     end
 

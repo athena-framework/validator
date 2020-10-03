@@ -16,7 +16,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
   end
 
   def at_path(path : String) : AVD::Validator::ContextualValidatorInterface
-    @default_property_path = @context.path path
+    @default_property_path = @context.property_path path
 
     self
   end
@@ -86,7 +86,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
 
       self
     else
-      raise "Could not validate #{value}"
+      raise ArgumentError.new "Could not validate values of type '#{value.class}' automatically.  Please provide a constraint."
     end
   end
 

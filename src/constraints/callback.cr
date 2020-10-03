@@ -36,8 +36,6 @@ class Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
 
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::Callback) : Nil
-      return if value.nil?
-
       if value.is_a?(AVD::Validatable) && (name = constraint.callback_name) && (metadata = self.context.metadata) && (metadata.is_a?(AVD::Metadata::ClassMetadata))
         metadata.invoke_callback name, value, self.context, constraint.payload
       elsif callback = constraint.callback
