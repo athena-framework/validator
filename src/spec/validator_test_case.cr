@@ -330,9 +330,6 @@ abstract struct Athena::Validator::Spec::ValidatorTestCase < AVD::Spec::Abstract
     violations.first.constraint.should eq constraint
   end
 
-  def ptest_validate_collection_constraint_has_correct_context : Nil
-  end
-
   def test_validate_sub_object_is_not_validated_if_group_in_valid_constraint_is_not_validated : Nil
     object = Entity.new
     object.first_name = ""

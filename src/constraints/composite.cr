@@ -3,7 +3,7 @@ abstract class Athena::Validator::Constraints::Composite < Athena::Validator::Co
 
   def initialize(
     constraints : Array(AVD::Constraint) | AVD::Constraint,
-    message : String = default_error_message,
+    message : String,
     groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
@@ -49,6 +49,6 @@ abstract class Athena::Validator::Constraints::Composite < Athena::Validator::Co
     @constraints.each &.add_implicit_group(group)
   end
 
-  protected def initialize_nested_constraints : Nil
+  def initialize_nested_constraints : Nil
   end
 end

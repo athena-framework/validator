@@ -1,5 +1,5 @@
 class Athena::Validator::Validator::RecursiveContextualValidator
-  private alias GROUPS_TYPE = Array(String) | Array(String | AVD::Constraints::GroupSequence)
+  private alias GroupsTypes = Array(String) | Array(String | AVD::Constraints::GroupSequence)
 
   include Athena::Validator::Validator::ContextualValidatorInterface
 
@@ -165,7 +165,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
   private def validate_each_object_in(
     collection : Iterable,
     property_path : String,
-    groups : GROUPS_TYPE,
+    groups : GroupsTypes,
     context : AVD::ExecutionContextInterface
   )
     collection.each_with_index do |item, idx|
@@ -179,7 +179,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
   private def validate_each_object_in(
     collection : Hash,
     property_path : String,
-    groups : GROUPS_TYPE,
+    groups : GroupsTypes,
     context : AVD::ExecutionContextInterface
   )
     collection.each do |key, value|
@@ -195,7 +195,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     object : _,
     metadata : AVD::Metadata::MetadataInterface?,
     property_path : String,
-    groups : GROUPS_TYPE,
+    groups : GroupsTypes,
     cascaded_groups : Array(String)?,
     traversal_strategy : AVD::Metadata::TraversalStrategy,
     context : AVD::ExecutionContextInterface
@@ -249,7 +249,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     end
   end
 
-  private def validate_object(object : AVD::Validatable, property_path : String, groups : GROUPS_TYPE, traversal_strategy : AVD::Metadata::TraversalStrategy, context : AVD::ExecutionContextInterface) : Nil
+  private def validate_object(object : AVD::Validatable, property_path : String, groups : GroupsTypes, traversal_strategy : AVD::Metadata::TraversalStrategy, context : AVD::ExecutionContextInterface) : Nil
     self.validate_class_node(
       object,
       @metadata_factory.metadata(object),
@@ -261,11 +261,12 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     )
   end
 
+  # ameba:disable Metrics/CyclomaticComplexity
   private def validate_class_node(
     object : AVD::Validatable,
     class_metadata : AVD::Metadata::ClassMetadata,
     property_path : String,
-    groups : GROUPS_TYPE,
+    groups : GroupsTypes,
     cascaded_groups : Array(String)?,
     traversal_strategy : AVD::Metadata::TraversalStrategy,
     context : AVD::ExecutionContextInterface
@@ -410,7 +411,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     end
   end
 
-  private def normalize_groups(groups) : GROUPS_TYPE
+  private def normalize_groups(groups) : GroupsTypes
     case groups
     in Nil                                     then @default_groups
     in String, AVD::Constraints::GroupSequence then [groups] of String | AVD::Constraints::GroupSequence
