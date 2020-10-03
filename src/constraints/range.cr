@@ -20,7 +20,7 @@ class Athena::Validator::Constraints::Range < Athena::Validator::Constraint
     not_in_range_message : String = "This value should be between {{ min }} and {{ max }}.",
     min_message : String = "This value should be {{ limit }} or more.",
     max_message : String = "This value should be {{ limit }} or less.",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     new range.begin, range.end, not_in_range_message, min_message, max_message, groups, payload
@@ -32,7 +32,7 @@ class Athena::Validator::Constraints::Range < Athena::Validator::Constraint
     @not_in_range_message : String = "This value should be between {{ min }} and {{ max }}.",
     @min_message : String = "This value should be {{ limit }} or more.",
     @max_message : String = "This value should be {{ limit }} or less.",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super "", groups, payload

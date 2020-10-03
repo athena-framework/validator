@@ -14,7 +14,7 @@ class Athena::Validator::Constraints::AtLeastOneOf < Athena::Validator::Constrai
     constraints : Array(AVD::Constraint) | AVD::Constraint,
     @include_internal_messages : Bool = true,
     message : String = "This value should satisfy at least one of the following constraints:",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super constraints, message, groups, payload

@@ -37,7 +37,7 @@ class Athena::Validator::Constraints::ISBN < Athena::Validator::Constraint
     @isbn10_message : String = "This value is not a valid ISBN-10.",
     @isbn13_message : String = "This value is not a valid ISBN-13.",
     @both_message : String = "This value is neither a valid ISBN-10 nor a valid ISBN-13.",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super "", groups, payload

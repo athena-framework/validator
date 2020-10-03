@@ -25,7 +25,7 @@ class Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
   def initialize(
     @callback_name : String? = nil,
     @callback : CallbackProc? = nil,
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super "", groups, payload

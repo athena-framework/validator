@@ -12,7 +12,7 @@ class Athena::Validator::Constraints::URL < Athena::Validator::Constraint
     @protocols : Array(String) = ["http", "https"],
     @relative_protocol : Bool = false,
     message : String = "This value is not a valid URL.",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super message, groups, payload

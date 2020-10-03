@@ -1,6 +1,6 @@
 abstract class Athena::Validator::Constraints::Compound < Athena::Validator::Constraints::Composite
   def initialize(
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super self.constraints, "", groups, payload

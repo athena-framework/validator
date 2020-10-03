@@ -32,7 +32,7 @@ class Athena::Validator::Constraints::IP < Athena::Validator::Constraint
   def initialize(
     @version : AVD::Constraints::IP::Version = :v4,
     message : String = "This value is not a valid IP address.",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super message, groups, payload

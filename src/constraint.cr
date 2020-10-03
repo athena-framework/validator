@@ -12,8 +12,12 @@ abstract class Athena::Validator::Constraint
   property groups : Array(String)
   getter payload : Hash(String, String)?
 
-  def initialize(@message : String, groups : Array(String)? = nil, @payload : Hash(String, String)? = nil)
-    @groups = groups || [DEFAULT_GROUP]
+  def initialize(@message : String, groups : Array(String) | String | Nil = nil, @payload : Hash(String, String)? = nil)
+    @groups = case groups
+              in Nil    then [DEFAULT_GROUP]
+              in Array  then groups
+              in String then [groups]
+              end
   end
 
   def add_implicit_group(group : String) : Nil

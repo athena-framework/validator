@@ -7,7 +7,7 @@ class Athena::Validator::Constraints::IsFalse < Athena::Validator::Constraint
 
   def initialize(
     message : String = "This value should be false.",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super message, groups, payload

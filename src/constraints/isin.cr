@@ -14,7 +14,7 @@ class Athena::Validator::Constraints::ISIN < Athena::Validator::Constraint
 
   def initialize(
     message : String = "This value is not a valid International Securities Identification Number (ISIN).",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super message, groups, payload

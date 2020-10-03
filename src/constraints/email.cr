@@ -26,7 +26,7 @@ class Athena::Validator::Constraints::Email < Athena::Validator::Constraint
   def initialize(
     @mode : AVD::Constraints::Email::Mode = :loose,
     message : String = "This value is not a valid email address.",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super message, groups, payload

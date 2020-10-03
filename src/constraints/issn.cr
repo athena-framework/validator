@@ -22,7 +22,7 @@ class Athena::Validator::Constraints::ISSN < Athena::Validator::Constraint
     @case_sensitive : Bool = false,
     @require_hypen : Bool = false,
     message : String = "This value is not a valid International Standard Serial Number (ISSN).",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super message, groups, payload

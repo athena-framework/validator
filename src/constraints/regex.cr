@@ -12,7 +12,7 @@ class Athena::Validator::Constraints::Regex < Athena::Validator::Constraint
     @pattern : ::Regex,
     @match : Bool = true,
     message : String = "This value is not valid.",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super message, groups, payload

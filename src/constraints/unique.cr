@@ -7,7 +7,7 @@ class Athena::Validator::Constraints::Unique < Athena::Validator::Constraint
 
   def initialize(
     message : String = "This collection should contain only unique elements.",
-    groups : Array(String)? = nil,
+    groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
     super message, groups, payload
