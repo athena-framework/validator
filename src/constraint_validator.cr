@@ -25,7 +25,9 @@ end
 # that can be used with [Athena DependencyInjection](https://github.com/athena-framework/dependency-injection).
 abstract struct Athena::Validator::ServiceConstraintValidator < Athena::Validator::ConstraintValidator
   macro inherited
-    def self.new
+    def self.new : NoReturn
+      # Validators of this type will be injected via DI and not directly instantiated within the factory.
+      raise ""
     end
   end
 end
