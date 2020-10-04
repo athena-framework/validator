@@ -99,7 +99,8 @@ alias Assert = AVD::Annotations
 # that should be used to render that message, etc.  The extra context allows for a lot of flexibility; both in terms of how the error could be rendered or handled.
 #
 # By default, in addition to any constraint specific arguments, the majority of the constraints have three optional arguments: `message`, `groups`, and `payload`.
-# * The `message` argument represents that message that should be used if the value is found to not be valid.
+#
+# * The `message` argument represents the message that should be used if the value is found to not be valid.
 # The message can also include placeholders that will be replaced when the message is rendered.
 # Most commonly this includes the invalid value itself, but some constraints have additional placeholders.
 # * The `payload` argument can be used to attach any domain specific data to the constraint; such as attaching a severity with each constraint
@@ -228,7 +229,7 @@ alias Assert = AVD::Annotations
 #     #
 #     # Overloads can be used to filter values of specific types.
 #     def validate(value : _, constraint : AVD::Constraints::AlphaNumeric) : Nil
-#       # custom constraints should ignore null and empty values to allow
+#       # Custom constraints should ignore nil and empty values to allow
 #       # other constraints (NotBlank, NotNull, etc.) take care of that
 #       return if value.nil? || value == ""
 #
@@ -258,11 +259,13 @@ alias Assert = AVD::Annotations
 #
 # See `AVD::ConstraintValidatorInterface` for more information on custom validators.
 #
+# NOTE:  The `AVD::Constraints::Compound` constraint can be used to create a constraint that consists of one or more other constraints.
+#
 # ### Validation Groups
 #
 # By default when validating an object, all constraints defined on that type will be checked.
 # However, in some cases you may only want to validate the object against _some_ of those constraints.
-# This can be accomplished via assigning each constraint to a validation group, then apply validation against one group of constraints.
+# This can be accomplished via assigning each constraint to a validation group, then apply validation against one specific group of constraints.
 #
 # For example, using our `User` class from earlier, say we only want to only validate certain properties when the user is first created.
 # To do this we can utilize the `groups` argument that all constraints have.
@@ -273,11 +276,11 @@ alias Assert = AVD::Annotations
 #
 #   def initialize(@email : String, @password : String, @city : String); end
 #
-#   @[Assert::Email(groups: ["create"])]
+#   @[Assert::Email(groups: "create")]
 #   getter email : String
 #
-#   @[Assert::NotBlank(groups: ["create"])]
-#   @[Assert::Size(7.., groups: ["create"])]
+#   @[Assert::NotBlank(groups: "create")]
+#   @[Assert::Size(7.., groups: "create")]
 #   getter password : String
 #
 #   @[Assert::Size(2..)]
@@ -305,7 +308,57 @@ alias Assert = AVD::Annotations
 #
 # ### Sequential Validation
 #
+# By default, all constraints are validated in a single "batch".  I.e. all constraints within the provided group(s) are validated, without regard
+# to if the previous/next constraint is/was (in)valid.  However, an `AVD::Constraints::GroupSequence` can be used to validate batches of constraints in steps.
+# I.e. validate the first "batch" of constraints, and only advance to the next batch if all constraints in that step are valid.
 #
+# ```
+# @[Assert::GroupSequence("User", "Secondary")]
+# class User
+#   include AVD::Validatable
+#
+#   @[Assert::NotBlank]
+#   getter username : String
+#
+#   @[Assert::NotBlank(groups: "Secondary")]
+#   getter password : String
+#
+#   def initialize(@username : String, @password : String); end
+# end
+#
+# # Instantiate a new `User` object where both properties are invalid.
+# user = User.new "", ""
+#
+# # Notice there is only one violation since there was a violation in the `User` group,
+# # it did not advance to the `Secondary` group.
+# AVD.validator.validate user # =>
+# # Object(User).username:
+# #   This value should not be blank. (code: 0d0c3254-3642-4cb0-9882-46ee5918e6e3)
+# ```
+#
+# #### Group Sequence Providers
+#
+# The `AVD::Constraints::GroupSequence` can be a useful tool for creating efficient validations, but it is quite limiting since the sequence is static on the type.
+# If more flexibility is required the `AVD::Constraints::GroupSequence::Provider` module can be included into a type.
+# The module allows the object to return the sequence it should use dynamically at runtime.
+#
+# ```
+# class User
+#   include AVD::Validatable
+#   include AVD::Constraints::GroupSequence::Provider
+#
+#   # ...
+#
+#   def group_sequence : Array(Array(String) | String) | AVD::Constraints::GroupSequence
+#     # Build out and return the sequence `self` should use.
+#   end
+# end
+# ```
+#
+# Alternatively, if you only want to apply constraints sequentially on a single property,
+# the `AVD::Constraints::Sequentially` constraint can be used to do this in a simpler way.
+#
+# NOTE: See the related types for more detailed information.
 module Athena::Validator
   # :nodoc:
   #
