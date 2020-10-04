@@ -14,8 +14,10 @@ jobs:
       - name: Install Build Dependencies
         run: apk add --update rsync
       - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: shards install
       - name: Build
-        run: crystal docs
+        run: crystal docs lib/athena-spec/src/athena-spec.cr src/athena-validator.cr src/spec.cr
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.6.1
         with:
