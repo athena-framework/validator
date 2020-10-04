@@ -37,8 +37,6 @@ class Athena::Validator::Constraints::Size < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     def validate(value : String | Indexable, constraint : AVD::Constraints::Size) : Nil
       return if value.nil?

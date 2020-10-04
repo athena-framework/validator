@@ -39,8 +39,6 @@ class Athena::Validator::Constraints::IP < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::IP) : Nil
       value = value.to_s

@@ -14,8 +14,6 @@ class Athena::Validator::Constraints::IsFalse < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::IsFalse) : Nil
       return if value.nil? || value == false

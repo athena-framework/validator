@@ -20,7 +20,7 @@ class Athena::Validator::Constraints::ISIN < Athena::Validator::Constraint
     super message, groups, payload
   end
 
-  struct Validator < Athena::Validator::ConstraintValidator
+  struct Validator < Athena::Validator::ServiceConstraintValidator
     @validator : AVD::Validator::ValidatorInterface
 
     def initialize(validator : AVD::Validator::ValidatorInterface? = nil)

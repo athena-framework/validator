@@ -19,8 +19,6 @@ class Athena::Validator::Constraints::URL < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::URL) : Nil
       value = value.to_s

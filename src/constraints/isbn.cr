@@ -48,8 +48,6 @@ class Athena::Validator::Constraints::ISBN < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::ISBN) : Nil
       value = value.to_s

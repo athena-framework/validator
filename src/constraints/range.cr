@@ -39,8 +39,6 @@ class Athena::Validator::Constraints::Range < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     #
     # ameba:disable Metrics/CyclomaticComplexity

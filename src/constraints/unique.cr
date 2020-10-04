@@ -14,8 +14,6 @@ class Athena::Validator::Constraints::Unique < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     def validate(value : Indexable?, constraint : AVD::Constraints::Unique) : Nil
       return if value.nil?

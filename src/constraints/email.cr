@@ -33,8 +33,6 @@ class Athena::Validator::Constraints::Email < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::Email) : Nil
       value = value.to_s
