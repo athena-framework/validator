@@ -12,6 +12,8 @@ end
 
 struct MockConstraintValidator < AVD::ConstraintValidator; end
 
+struct MockServiceConstraintValidator < AVD::ServiceConstraintValidator; end
+
 class CustomConstraint < AVD::Constraint
   @@error_names = {
     "abc123" => "FAKE_ERROR",
