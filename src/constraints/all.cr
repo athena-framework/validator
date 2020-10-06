@@ -10,8 +10,6 @@ class Athena::Validator::Constraints::All < Athena::Validator::Constraints::Comp
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     def validate(value : Hash?, constraint : AVD::Constraints::All) : Nil
       return if value.nil?

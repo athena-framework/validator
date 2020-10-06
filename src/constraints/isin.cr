@@ -21,11 +21,7 @@ class Athena::Validator::Constraints::ISIN < Athena::Validator::Constraint
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    @validator : AVD::Validator::ValidatorInterface
-
-    def initialize(validator : AVD::Validator::ValidatorInterface? = nil)
-      @validator = validator || AVD.validator
-    end
+    @validator : AVD::Validator::ValidatorInterface = AVD.validator
 
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::ISIN) : Nil

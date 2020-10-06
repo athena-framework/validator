@@ -8,8 +8,6 @@ class Athena::Validator::Constraints::Sequentially < Athena::Validator::Constrai
   end
 
   struct Validator < Athena::Validator::ConstraintValidator
-    include Basic
-
     # :inherit:
     def validate(value : _, constraint : AVD::Constraints::Sequentially) : Nil
       validator = self.context.validator.in_context self.context

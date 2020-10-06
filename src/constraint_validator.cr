@@ -3,11 +3,6 @@ require "./constraint_validator_interface"
 abstract struct Athena::Validator::ConstraintValidator
   include Athena::Validator::ConstraintValidatorInterface
 
-  # :nodoc:
-  #
-  # Denotes a built in validator that can be instantiated directly via `.new`.
-  module Basic; end
-
   @context : AVD::ExecutionContextInterface?
 
   def context : AVD::ExecutionContextInterface
@@ -23,5 +18,16 @@ abstract struct Athena::Validator::ConstraintValidator
 
   private def raise_invalid_type(value : _, supported_types : String) : NoReturn
     raise AVD::Exceptions::UnexpectedValueError.new value, supported_types
+  end
+end
+
+# Extension of `AVD::ConstraintValidator` used to denote a service validator
+# that can be used with [Athena DependencyInjection](https://github.com/athena-framework/dependency-injection).
+abstract struct Athena::Validator::ServiceConstraintValidator < Athena::Validator::ConstraintValidator
+  macro inherited
+    def self.new : NoReturn
+      # Validators of this type will be injected via DI and not directly instantiated within the factory.
+      raise ""
+    end
   end
 end
