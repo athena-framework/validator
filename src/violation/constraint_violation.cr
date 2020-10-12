@@ -10,7 +10,7 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
   getter parameters : Hash(String, String)
   getter plural : Int32?
   getter root : Root
-  getter constraint : AVD::Constraint?
+  getter! constraint : AVD::Constraint
   getter property_path : String
   getter code : String?
   getter cause : String?

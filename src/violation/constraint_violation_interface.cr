@@ -7,7 +7,7 @@ module Athena::Validator::Violation::ConstraintViolationInterface
   abstract def property_path : String
   abstract def invalid_value
   abstract def code : String?
-  abstract def constraint : AVD::Constraint?
+  abstract def constraint : AVD::Constraint
   abstract def cause : String?
 
   abstract def to_s(io : IO) : Nil

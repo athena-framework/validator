@@ -22,7 +22,7 @@ abstract struct Athena::Validator::ConstraintValidator
 end
 
 # Extension of `AVD::ConstraintValidator` used to denote a service validator
-# that can be used with [Athena DependencyInjection](https://github.com/athena-framework/dependency-injection).
+# that can be used with [Athena Dependency Injection](https://github.com/athena-framework/dependency-injection).
 abstract struct Athena::Validator::ServiceConstraintValidator < Athena::Validator::ConstraintValidator
   macro inherited
     def self.new : NoReturn
@@ -31,3 +31,6 @@ abstract struct Athena::Validator::ServiceConstraintValidator < Athena::Validato
     end
   end
 end
+
+# Compiler doesn't like there not being any instances of this
+private struct FakeConstraintValidator < Athena::Validator::ServiceConstraintValidator; end

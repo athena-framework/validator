@@ -209,7 +209,7 @@ alias Assert = AVD::Annotations
 #   # (Optional) A unique error code can also be defined to provide a machine readable identifier for a specific error.
 #   NOT_ALPHANUMERIC_ERROR = "1a83a8bd-ff79-4d5c-96e7-86d0b25b8a09"
 #
-#   # (Optional) Allows using the `.error_message(code : String) : String` method with this type.
+#   # (Optional) Allows using the `.error_message(code : String) : String` method with this constraint.
 #   @@error_names = {
 #     NOT_ALPHANUMERIC_ERROR => "NOT_ALPHANUMERIC_ERROR",
 #   }
@@ -217,7 +217,7 @@ alias Assert = AVD::Annotations
 #   # Define an initializer with our default message, and any additional arguments specific to this constraint.
 #   def initialize(
 #     message : String = "This value should contain only alphanumeric characters.",
-#     groups : Array(String)? = nil,
+#     groups : Array(String) | String | Nil = nil,
 #     payload : Hash(String, String)? = nil
 #   )
 #     super message, groups, payload
@@ -259,8 +259,6 @@ alias Assert = AVD::Annotations
 #
 # See `AVD::ConstraintValidatorInterface` for more information on custom validators.
 #
-# NOTE:  The `AVD::Constraints::Compound` constraint can be used to create a constraint that consists of one or more other constraints.
-#
 # ### Validation Groups
 #
 # By default when validating an object, all constraints defined on that type will be checked.
@@ -297,14 +295,7 @@ alias Assert = AVD::Annotations
 # violations.empty? # => true
 # ```
 #
-# Using this configuration, there are three groups at play within the `User` class:
-# 1. `default` - Contains constraints in the current type, and subtypes, that belong to no other group.  I.e. `city`.
-# 1. `User` - Equivalent to all constraints in the `default` group.  See the [Sequential Validation](./Validator.html#sequential-validation) section.
-# 1. `create` - A custom group that only contains the constraints explicitly associated with it.  I.e. `email`, and `password`.
-#
-# NOTE: When validating _just_ the `User` object, the `default` group is equivalent to the `User` group.
-# However, if the `User` object has other embedded types using the `AVD::Constraints::Valid` constraint, then validating the `User` object with the `User`
-# group would only validate constraints that are explicitly in the `User` group within the embedded types.
+# See the `Validation Groups` section within `AVD::Constraint` for some expanded information.
 #
 # ### Sequential Validation
 #
