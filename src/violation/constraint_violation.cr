@@ -70,7 +70,7 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
       @invalid_value_container == other.invalid_value_container &&
       @plural == other.plural &&
       @code == other.code &&
-      @constraint == other.constraint &&
+      @constraint == other.constraint? &&
       @cause == other.cause
   end
 end

@@ -36,6 +36,19 @@
 # AVD.validator.validate Example.new("Jim")
 # ```
 #
+# Constraints can also be added manually via code by defining an `self.load_metadata(metadata : AVD::Metadata::ClassMetadata) : Nil`
+# method and adding the constraints directly to the `AVD::Metadata::ClassMetadata` instance.
+#
+# ```
+# # This class method is invoked when building the metadata associated with a type,
+# # and can be used to manually wire up the constraints.
+# def self.load_metadata(metadata : AVD::Metadata::ClassMetadata) : Nil
+#   metadata.add_property_constraint "name", AVD::Constraints::NotBlank.new
+# end
+# ```
+#
+# The metadata for each type is lazily loaded when an instance of that type is validated, and is only built once.
+#
 # ### Arguments
 #
 # While most constraints can be instantiated with an argless constructor,they do have a set of optional arguments.

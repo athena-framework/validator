@@ -358,6 +358,11 @@ module Athena::Validator
   # NOTE: Constraints, including custom ones, are automatically added to this namespace.
   module Annotations; end
 
+  # Contains all of the built in `AVD::Constraint`s.
+  # See each individual constraint for more information.
+  # The `Assert` alias is used to apply these constraints via annotations.
+  module Constraints; end
+
   # :nodoc:
   abstract struct Container; end
 

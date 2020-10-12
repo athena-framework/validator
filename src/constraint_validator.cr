@@ -1,10 +1,10 @@
 require "./constraint_validator_interface"
 
+# Basic implementation of `AVD::ConstraintValidatorInterface`.
 abstract struct Athena::Validator::ConstraintValidator
   include Athena::Validator::ConstraintValidatorInterface
 
-  @context : AVD::ExecutionContextInterface?
-
+  # :inherit:
   def context : AVD::ExecutionContextInterface
     @context.not_nil!
   end
@@ -12,11 +12,25 @@ abstract struct Athena::Validator::ConstraintValidator
   # :nodoc:
   def context=(@context : AVD::ExecutionContextInterface); end
 
+  # :inherit:
   def validate(value : _, constraint : AVD::Constraint) : Nil
     # Noop if a given validator doesn't support a given type of value
   end
 
-  private def raise_invalid_type(value : _, supported_types : String) : NoReturn
+  # Can be used to raise an `AVD::Exceptions::UnexpectedValueError`
+  # in case `self` is only able to validate values of the *supported_types*.
+  #
+  # ```
+  # # Define a validate method to catch values of other types.
+  # # Overloads above would handle the valid types
+  # def validate(value : _, constraint : AVD::Constraints::MyConstraint) : Nil
+  #   self.raise_invalid_type value, "Int | Float"
+  # end
+  # ```
+  #
+  # This would result in a violation with the message `This value should be a valid: Int | Float`
+  # being added to the current `#context`.
+  def raise_invalid_type(value : _, supported_types : String) : NoReturn
     raise AVD::Exceptions::UnexpectedValueError.new value, supported_types
   end
 end
