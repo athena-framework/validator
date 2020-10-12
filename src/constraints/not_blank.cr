@@ -42,10 +42,7 @@ class Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
       return if value.nil? && constraint.allow_nil?
 
       if value.nil? || yield value
-        return self
-          .context
-          .build_violation(constraint.message, IS_BLANK_ERROR, value)
-          .add
+        self.context.add_violation constraint.message, IS_BLANK_ERROR, value
       end
     end
   end

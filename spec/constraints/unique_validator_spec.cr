@@ -16,7 +16,7 @@ struct UniqueValidatorTest < AVD::Spec::ConstraintValidatorTestCase
     self.validator.validate value, self.new_constraint message: "my_message"
 
     self
-      .build_violation("my_message", CONSTRAINT::IS_NOT_UNIQUE, value)
+      .build_violation("my_message", CONSTRAINT::IS_NOT_UNIQUE_ERROR, value)
       .assert_violation
   end
 

@@ -18,10 +18,7 @@ class Athena::Validator::Constraints::NotNull < Athena::Validator::Constraint
     def validate(value : _, constraint : AVD::Constraints::NotNull) : Nil
       return unless value.nil?
 
-      self
-        .context
-        .build_violation(constraint.message, IS_NULL_ERROR, value)
-        .add
+      self.context.add_violation constraint.message, IS_NULL_ERROR, value
     end
   end
 end

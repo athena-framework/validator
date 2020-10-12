@@ -40,38 +40,23 @@ class Athena::Validator::Constraints::ISSN < Athena::Validator::Constraint
       if canonical[4]? == '-'
         canonical = canonical.delete '-'
       elsif constraint.require_hypen?
-        return self
-          .context
-          .build_violation(constraint.message, MISSING_HYPHEN_ERROR, value)
-          .add
+        return self.context.add_violation constraint.message, MISSING_HYPHEN_ERROR, value
       end
 
       self.validate_size canonical do |code|
-        return self
-          .context
-          .build_violation(constraint.message, code, value)
-          .add
+        return self.context.add_violation constraint.message, code, value
       end
 
       char = self.validate_characters canonical do
-        return self
-          .context
-          .build_violation(constraint.message, INVALID_CHARACTERS_ERROR, value)
-          .add
+        return self.context.add_violation constraint.message, INVALID_CHARACTERS_ERROR, value
       end
 
       if constraint.case_sensitive? && char == 'x'
-        return self
-          .context
-          .build_violation(constraint.message, INVALID_CASE_ERROR, value)
-          .add
+        return self.context.add_violation constraint.message, INVALID_CASE_ERROR, value
       end
 
       self.validate_checksum char, canonical do
-        self
-          .context
-          .build_violation(constraint.message, CHECKSUM_FAILED_ERROR, value)
-          .add
+        self.context.add_violation constraint.message, CHECKSUM_FAILED_ERROR, value
       end
     end
 

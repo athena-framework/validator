@@ -18,10 +18,7 @@ class Athena::Validator::Constraints::IsTrue < Athena::Validator::Constraint
     def validate(value : _, constraint : AVD::Constraints::IsTrue) : Nil
       return if value.nil? || value == true
 
-      self
-        .context
-        .build_violation(constraint.message, NOT_TRUE_ERROR, value)
-        .add
+      self.context.add_violation constraint.message, NOT_TRUE_ERROR, value
     end
   end
 end

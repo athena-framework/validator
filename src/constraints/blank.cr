@@ -19,10 +19,7 @@ class Athena::Validator::Constraints::Blank < Athena::Validator::Constraint
       return if value.nil?
       return if value.responds_to?(:blank?) && value.blank?
 
-      self
-        .context
-        .build_violation(constraint.message, NOT_BLANK_ERROR, value)
-        .add
+      self.context.add_violation constraint.message, NOT_BLANK_ERROR, value
     end
   end
 end

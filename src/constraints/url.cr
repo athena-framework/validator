@@ -26,10 +26,7 @@ class Athena::Validator::Constraints::URL < Athena::Validator::Constraint
       return if value.nil? || value.empty?
       return if value.matches? self.pattern(constraint)
 
-      self
-        .context
-        .build_violation(constraint.message, INVALID_URL_ERROR, value)
-        .add
+      self.context.add_violation constraint.message, INVALID_URL_ERROR, value
     end
 
     def pattern(constraint : AVD::Constraints::URL) : ::Regex

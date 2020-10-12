@@ -404,10 +404,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
 
       validator.validate value, constraint
     rescue type_error : AVD::Exceptions::UnexpectedValueError
-      context
-        .build_violation("This value should be a valid: {{ type }}")
-        .add_parameter("{{ type }}", type_error.expected_type)
-        .add
+      context.add_violation "This value should be a valid: {{ type }}", {"{{ type }}" => type_error.supported_types}
     end
   end
 

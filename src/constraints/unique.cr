@@ -1,8 +1,8 @@
 class Athena::Validator::Constraints::Unique < Athena::Validator::Constraint
-  IS_NOT_UNIQUE = "fd1f83d6-94b5-44bc-b39d-b1ff367ebfb8"
+  IS_NOT_UNIQUE_ERROR = "fd1f83d6-94b5-44bc-b39d-b1ff367ebfb8"
 
   @@error_names = {
-    IS_NOT_UNIQUE => "IS_NOT_UNIQUE",
+    IS_NOT_UNIQUE_ERROR => "IS_NOT_UNIQUE_ERROR",
   }
 
   def initialize(
@@ -21,10 +21,7 @@ class Athena::Validator::Constraints::Unique < Athena::Validator::Constraint
       set = Set(typeof(value[0])).new value.size
 
       unless value.all? { |x| set.add?(x) }
-        self
-          .context
-          .build_violation(constraint.message, IS_NOT_UNIQUE, value)
-          .add
+        self.context.add_violation constraint.message, IS_NOT_UNIQUE_ERROR, value
       end
     end
 

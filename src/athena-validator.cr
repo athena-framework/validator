@@ -363,6 +363,9 @@ module Athena::Validator
   # The `Assert` alias is used to apply these constraints via annotations.
   module Constraints; end
 
+  # Contains all custom exceptions defined within `Athena::Validator`.
+  module Exceptions; end
+
   # :nodoc:
   abstract struct Container; end
 

@@ -26,10 +26,7 @@ class Athena::Validator::Constraints::Regex < Athena::Validator::Constraint
       return if value.nil? || value.empty?
       return unless constraint.match? ^ value.matches? constraint.pattern
 
-      self
-        .context
-        .build_violation(constraint.message, REGEX_FAILED_ERROR, value)
-        .add
+      self.context.add_violation constraint.message, REGEX_FAILED_ERROR, value
     end
   end
 end

@@ -32,25 +32,16 @@ class Athena::Validator::Constraints::ISIN < Athena::Validator::Constraint
       value = value.upcase
 
       if VALIDATION_LENGTH != value.size
-        return self
-          .context
-          .build_violation(constraint.message, INVALID_LENGTH_ERROR, value)
-          .add
+        return self.context.add_violation constraint.message, INVALID_LENGTH_ERROR, value
       end
 
       unless value.matches? VALIDATION_PATTERN
-        return self
-          .context
-          .build_violation(constraint.message, INVALID_PATTERN_ERROR, value)
-          .add
+        return self.context.add_violation constraint.message, INVALID_PATTERN_ERROR, value
       end
 
       return if self.is_correct_checksum value
 
-      self
-        .context
-        .build_violation(constraint.message, INVALID_CHECKSUM_ERROR, value)
-        .add
+      self.context.add_violation constraint.message, INVALID_CHECKSUM_ERROR, value
     end
 
     private def is_correct_checksum(isin : String) : Bool
