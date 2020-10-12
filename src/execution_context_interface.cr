@@ -25,6 +25,8 @@ module Athena::Validator::ExecutionContextInterface
   abstract def add_violation(message : String, code : String) : Nil
 
   # Adds a violation with the provided *message*, and *code*, *value* parameter.
+  #
+  # The provided *value* is added to the violations' parameters as `"{{ value }}"`.
   abstract def add_violation(message : String, code : String, value : _) : Nil
 
   # Returns an `AVD::Violation::ConstraintViolationBuilderInterface` with the provided *message*.
@@ -43,10 +45,10 @@ module Athena::Validator::ExecutionContextInterface
   # Returns the class that is currently being validated.
   abstract def class_name
 
-  # Returns the `AVD::Constraint` that is currently being validated.
+  # Returns the `AVD::Constraint` that is currently being validated, if any.
   abstract def constraint : AVD::Constraint?
 
-  # Returns the group that is currently being validated.
+  # Returns the group that is currently being validated, if any.
   abstract def group : String?
 
   # Returns the object initially passed to `#validate`.

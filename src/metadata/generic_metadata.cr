@@ -4,14 +4,17 @@ module Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::MetadataInterface
 
   getter constraints : Array(AVD::Constraint) = [] of AVD::Constraint
+
+  # :inherit:
   getter cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
-  getter traversal_strategy : AVD::Metadata::TraversalStrategy = AVD::Metadata::TraversalStrategy::None
   @constraints_by_group = {} of String => Array(AVD::Constraint)
 
+  # Adds the provided *constraint* to `self`'s `#constraints` array.
+  #
+  # Sets `#cascading_strategy` to `true` if the *constraint* is `AVD::Constraints::Valid`.
   def add_constraint(constraint : AVD::Constraint) : AVD::Metadata::GenericMetadata
     if constraint.is_a? AVD::Constraints::Valid
       @cascading_strategy = :cascade
-      @traversal_strategy = constraint.traverse? ? AVD::Metadata::TraversalStrategy::Implicit : AVD::Metadata::TraversalStrategy::None
 
       return self
     end
@@ -25,12 +28,14 @@ module Athena::Validator::Metadata::GenericMetadata
     self
   end
 
+  # Adds each of the provided *constraints* to `self`.
   def add_constraints(constraints : Array(AVD::Constraint)) : AVD::Metadata::GenericMetadata
     constraints.each &->add_constraint(AVD::Constraint)
 
     self
   end
 
+  # :inherit:
   def find_constraints(group : String) : Array(AVD::Constraint)
     @constraints_by_group[group]? || Array(AVD::Constraint).new
   end

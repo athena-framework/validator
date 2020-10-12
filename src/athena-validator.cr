@@ -366,6 +366,13 @@ module Athena::Validator
   # Contains all custom exceptions defined within `Athena::Validator`.
   module Exceptions; end
 
+  # Includes types used to store metadata associated with a given `AVD::Validatable` instance.
+  #
+  # Most likely you won't have to work any of these directly.
+  # However if you are adding constraints manually to properties using the `self.load_metadata` method,
+  # you should be familiar with `AVD::Metadata::ClassMetadata`.
+  module Metadata; end
+
   # :nodoc:
   abstract struct Container; end
 

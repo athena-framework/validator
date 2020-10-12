@@ -1,5 +1,6 @@
 require "./metadata_factory_interface"
 
+# Basic implementation of `AVD::Metadata::MetadataFactoryInterface`.
 class Athena::Validator::Metadata::MetadataFactory
   include Athena::Validator::Metadata::MetadataFactoryInterface
 

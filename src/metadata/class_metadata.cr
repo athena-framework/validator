@@ -1,5 +1,10 @@
 require "./generic_metadata"
 
+# Represents metadata associated with an `AVD::Validatable` instance.
+#
+# `self` is lazily initialized and cached at the class level.
+#
+# Includes metadata about the class; such as its name, constraints, etc.
 class Athena::Validator::Metadata::ClassMetadata(T)
   include Athena::Validator::Metadata::GenericMetadata
 
@@ -68,10 +73,12 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     class_metadata
   end
 
+  # The `#class_name` based group for `self`.
   getter default_group : String
+
+  # The `AVD::Constraints::GroupSequence` used by `self`, if any.
   getter group_sequence : AVD::Constraints::GroupSequence? = nil
 
-  @traversal_strategy : AVD::Metadata::TraversalStrategy = AVD::Metadata::TraversalStrategy::Implicit
   @properties : Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase) = Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase).new
 
   def initialize
@@ -82,6 +89,7 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     T
   end
 
+  # Adds each of the provided *constraints* to `self`.
   def add_constraint(constraints : Array(AVD::Constraint)) : AVD::Metadata::ClassMetadata
     constraints.each do |constraint|
       self.add_constraint constraint
@@ -90,6 +98,9 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     self
   end
 
+  # :inherit:
+  #
+  # Also adds the `#class_name` based group via `AVD::Constraint#add_implicit_group`.
   def add_constraint(constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
     constraint.add_implicit_group @default_group
 
@@ -98,26 +109,27 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     self
   end
 
-  # Helper method to aid in adding constraints to properties via `.load_metadata`.
+  # Adds a hash of constraints to `self`, where the keys represent the property names, and the value
+  # is the constraint/array of constraints to add.
   def add_property_constraints(property_hash : Hash(String, AVD::Constraint | Array(AVD::Constraint))) : Nil
     property_hash.each do |property_name, constraints|
       self.add_property_constraint property_name, constraints
     end
   end
 
-  # :ditto:
+  # Adds each of the provided *constraints* to the provided *property_name*.
   def add_property_constraint(property_name : String, constraints : Array(AVD::Constraint)) : Nil
     constraints.each do |constraint|
       self.add_property_constraint property_name, constraint
     end
   end
 
-  # :ditto:
+  # Adds the provided *constraint* to the provided *property_name*.
   def add_property_constraint(property_name : String, constraint : AVD::Constraint) : Nil
     self.add_property_constraint AVD::Metadata::PropertyMetadata(T).new(property_name), constraint
   end
 
-  def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterfaceBase, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
+  protected def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterfaceBase, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
     unless @properties.has_key? property_metadata.name
       @properties[property_metadata.name] = property_metadata
     end
@@ -129,10 +141,16 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     self
   end
 
+  # Returns an array of the properties who `self` has constraints defined for.
   def constrained_properties : Array(String)
     @properties.keys
   end
 
+  # Sets the `AVD::Constraints::GroupSequence` that should be used for `self`.
+  #
+  # Raises an `ArgumentError` if `self` is an `AVD::Constraints::GroupSequence::Provider`,
+  # the *sequence* contains `AVD::Constraint::DEFAULT_GROUP`,
+  # or the `#class_name` based group is missing.
   def group_sequence=(sequence : Array(String) | AVD::Constraints::GroupSequence) : self
     raise ArgumentError.new "Defining a static group sequence is not allowed with a group sequence provider." if @group_sequence_provider
 
@@ -153,16 +171,19 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     self
   end
 
+  # Denotes `self` as a `AVD::Constraints::GroupSequence::Provider`.
   def group_sequence_provider=(active : Bool) : Nil
     raise ArgumentError.new "Defining a group sequence provider is not allowed with a static group sequence." unless @group_sequence.nil?
     # TODO: ensure `T` implements the module interface
     @group_sequence_provider = active
   end
 
+  # Returns `true` if `self` has property metadata for the provided *property_name*.
   def has_property_metadata?(property_name : String) : Bool
     @properties.has_key? property_name
   end
 
+  # Returns an `AVD::Metadata::PropertyMetadataInterfaceBase` instance for the provided *property_name*, if any.
   def property_metadata(property_name : String) : AVD::Metadata::PropertyMetadataInterfaceBase?
     @properties[property_name]?
   end
@@ -171,7 +192,7 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     nil
   end
 
-  def invoke_callback(name : String, object : AVD::Validatable, context : AVD::ExecutionContextInterface, payload : Hash(String, String)?) : Nil
+  protected def invoke_callback(name : String, object : AVD::Validatable, context : AVD::ExecutionContextInterface, payload : Hash(String, String)?) : Nil
     {% begin %}
       case name
         {% for callback in T.methods.select &.annotation(Assert::Callback) %}

@@ -4,10 +4,12 @@ class Athena::Validator::Metadata::PropertyMetadata(EntityType)
   include Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::PropertyMetadataInterfaceBase
 
+  # :inherit:
   getter name : String
 
   def initialize(@name : String); end
 
+  # Returns the class the property `self` represents belongs to.
   def class_name : EntityType.class
     EntityType
   end

@@ -45,7 +45,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
         @default_property_path,
         groups,
         nil,
-        AVD::Metadata::TraversalStrategy::Implicit,
         @context
       )
 
@@ -65,7 +64,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
         value,
         @default_property_path,
         groups,
-        AVD::Metadata::TraversalStrategy::Implicit,
         @context
       )
 
@@ -115,7 +113,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
       property_path,
       groups,
       nil,
-      AVD::Metadata::TraversalStrategy::Implicit,
       @context
     )
 
@@ -148,7 +145,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
       property_path,
       groups,
       nil,
-      AVD::Metadata::TraversalStrategy::Implicit,
       @context
     )
 
@@ -171,7 +167,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     collection.each_with_index do |item, idx|
       case item
       when Iterable, Hash   then self.validate_each_object_in(item, "#{property_path}[#{idx}]", groups, context)
-      when AVD::Validatable then self.validate_object(item, "#{property_path}[#{idx}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
+      when AVD::Validatable then self.validate_object(item, "#{property_path}[#{idx}]", groups, context)
       end
     end
   end
@@ -185,7 +181,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     collection.each do |key, value|
       case value
       when Iterable, Hash   then self.validate_each_object_in(value, "#{property_path}[#{key}]", groups, context)
-      when AVD::Validatable then self.validate_object(value, "#{property_path}[#{key}]", groups, AVD::Metadata::TraversalStrategy::Implicit, context)
+      when AVD::Validatable then self.validate_object(value, "#{property_path}[#{key}]", groups, context)
       end
     end
   end
@@ -197,7 +193,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     property_path : String,
     groups : GroupsTypes,
     cascaded_groups : Array(String)?,
-    traversal_strategy : AVD::Metadata::TraversalStrategy,
     context : AVD::ExecutionContextInterface
   )
     context.set_node value, object, metadata, property_path
@@ -209,7 +204,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
           object,
           metadata,
           property_path,
-          traversal_strategy,
           group,
           nil,
           context
@@ -243,20 +237,18 @@ class Athena::Validator::Validator::RecursiveContextualValidator
         value,
         property_path,
         cascaded_groups,
-        traversal_strategy,
         context
       )
     end
   end
 
-  private def validate_object(object : AVD::Validatable, property_path : String, groups : GroupsTypes, traversal_strategy : AVD::Metadata::TraversalStrategy, context : AVD::ExecutionContextInterface) : Nil
+  private def validate_object(object : AVD::Validatable, property_path : String, groups : GroupsTypes, context : AVD::ExecutionContextInterface) : Nil
     self.validate_class_node(
       object,
       @metadata_factory.metadata(object),
       property_path,
       groups,
       nil,
-      traversal_strategy,
       context
     )
   end
@@ -268,7 +260,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     property_path : String,
     groups : GroupsTypes,
     cascaded_groups : Array(String)?,
-    traversal_strategy : AVD::Metadata::TraversalStrategy,
     context : AVD::ExecutionContextInterface
   ) : Nil
     context.set_node object, object, class_metadata, property_path
@@ -298,7 +289,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
           object,
           class_metadata,
           property_path,
-          traversal_strategy,
           group,
           default_overridden ? AVD::Constraint::DEFAULT_GROUP : nil,
           context
@@ -329,15 +319,10 @@ class Athena::Validator::Validator::RecursiveContextualValidator
         AVD::PropertyPath.append(property_path, property_name),
         groups,
         cascaded_groups,
-        AVD::Metadata::TraversalStrategy::Implicit,
         context
       )
     end
 
-    traversal_strategy = class_metadata.traversal_strategy if traversal_strategy.implicit?
-
-    return if traversal_strategy.none?
-    return if traversal_strategy.implicit? && !object.is_a? Iterable
     return unless object.is_a? Iterable
 
     self.validate_each_object_in(
@@ -353,7 +338,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     object : _,
     metadata : AVD::Metadata::MetadataInterface?,
     property_path : String,
-    traversal_strategy : AVD::Metadata::TraversalStrategy,
     group_sequence : AVD::Constraints::GroupSequence,
     cascaded_groups : String?,
     context : AVD::ExecutionContextInterface
@@ -371,7 +355,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
           property_path,
           groups,
           cascaded_groups,
-          traversal_strategy,
           context
         )
       else
@@ -382,7 +365,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
           property_path,
           groups,
           cascaded_groups,
-          traversal_strategy,
           context
         )
       end
