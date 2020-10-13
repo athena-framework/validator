@@ -377,7 +377,7 @@ module Athena::Validator
   module Validator; end
 
   # Contains types related to constraint violations.
-  module Violations; end
+  module Violation; end
 
   # :nodoc:
   abstract struct Container; end

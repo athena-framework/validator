@@ -17,44 +17,7 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
   )
   end
 
-  def at_path(path : String) : AVD::Violation::ConstraintViolationBuilderInterface
-    @property_path = AVD::PropertyPath.append @property_path, path
-
-    self
-  end
-
-  def add_parameter(key : String, value : _) : AVD::Violation::ConstraintViolationBuilderInterface
-    @parameters[key] = value.to_s
-
-    self
-  end
-
-  def set_parameters(@parameters : Hash(String, String)) : AVD::Violation::ConstraintViolationBuilderInterface
-    self
-  end
-
-  def invalid_value(value : _) : AVD::Violation::ConstraintViolationBuilderInterface
-    @invalid_value = AVD::ValueContainer.new value
-
-    self
-  end
-
-  def plural(@plural : Int32) : AVD::Violation::ConstraintViolationBuilderInterface
-    self
-  end
-
-  def code(@code : String?) : AVD::Violation::ConstraintViolationBuilderInterface
-    self
-  end
-
-  def cause(@cause : String?) : AVD::Violation::ConstraintViolationBuilderInterface
-    self
-  end
-
-  def constraint(@constraint : AVD::Constraint?) : AVD::Violation::ConstraintViolationBuilderInterface
-    self
-  end
-
+  # :inherit:
   def add : Nil
     # Split and determine the message to use based on plural value
     translated_message = if !(count = @plural).nil? && @message.includes? '|'
@@ -79,5 +42,51 @@ class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
       @constraint,
       @cause
     )
+  end
+
+  # :inherit:
+  def add_parameter(key : String, value : _) : AVD::Violation::ConstraintViolationBuilderInterface
+    @parameters[key] = value.to_s
+
+    self
+  end
+
+  # :inherit:
+  def at_path(path : String) : AVD::Violation::ConstraintViolationBuilderInterface
+    @property_path = AVD::PropertyPath.append @property_path, path
+
+    self
+  end
+
+  # :inherit:
+  def cause(@cause : String?) : AVD::Violation::ConstraintViolationBuilderInterface
+    self
+  end
+
+  # :inherit:
+  def code(@code : String?) : AVD::Violation::ConstraintViolationBuilderInterface
+    self
+  end
+
+  # :inherit:
+  def constraint(@constraint : AVD::Constraint?) : AVD::Violation::ConstraintViolationBuilderInterface
+    self
+  end
+
+  # :inherit:
+  def invalid_value(value : _) : AVD::Violation::ConstraintViolationBuilderInterface
+    @invalid_value = AVD::ValueContainer.new value
+
+    self
+  end
+
+  # :inherit:
+  def plural(@plural : Int32) : AVD::Violation::ConstraintViolationBuilderInterface
+    self
+  end
+
+  # :inherit:
+  def set_parameters(@parameters : Hash(String, String)) : AVD::Violation::ConstraintViolationBuilderInterface
+    self
   end
 end
