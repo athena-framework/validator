@@ -1,5 +1,6 @@
 require "./constraint_violation_list_interface"
 
+# Basic implementation of `AVD::Violation::ConstraintViolationListInterface`.
 struct Athena::Validator::Violation::ConstraintViolationList
   include Athena::Validator::Violation::ConstraintViolationListInterface
   include Indexable(Athena::Validator::Violation::ConstraintViolationInterface)
@@ -12,6 +13,7 @@ struct Athena::Validator::Violation::ConstraintViolationList
     end
   end
 
+  # Returns a new `AVD::Violation::ConstraintViolationInterface` that conists only of violations with the provided *error_code*.
   def find_by_code(error_code : String) : AVD::Violation::ConstraintViolationListInterface
     self.class.new @violations.select &.code.==(error_code)
   end

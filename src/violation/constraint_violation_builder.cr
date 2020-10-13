@@ -1,5 +1,6 @@
 require "./constraint_violation_builder_interface"
 
+# Basic implementation of `AVD::Violation::ConstraintViolationBuilderInterface`.
 class Athena::Validator::Violation::ConstraintViolationBuilder(Root)
   include Athena::Validator::Violation::ConstraintViolationBuilderInterface
 

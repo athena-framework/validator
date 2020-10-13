@@ -6,7 +6,7 @@ module Athena::Validator::Violation::ConstraintViolationBuilderInterface
   abstract def add : Nil
 
   # Adds a parameter with the provided *key* and *value* to the violations' `AVD::Violation::ConstraintViolationInterface#parameters`.
-  # The provided *value* is stringified via `#to_s` before adding to the parameters.
+  # The provided *value* is stringified via `#to_s` before being added to the parameters.
   #
   # Returns `self` for chaining.
   abstract def add_parameter(key : String, value : _) : AVD::Violation::ConstraintViolationBuilderInterface

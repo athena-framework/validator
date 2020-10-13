@@ -1,5 +1,6 @@
 require "./constraint_violation_interface"
 
+# Basic implementation of `AVD::Violation::ConstraintViolationInterface`.
 struct Athena::Validator::Violation::ConstraintViolation(Root)
   include Athena::Validator::Violation::ConstraintViolationInterface
 

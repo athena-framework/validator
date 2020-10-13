@@ -2,7 +2,7 @@ require "../spec_helper"
 
 private alias CONSTRAINT = AVD::Constraints::EqualTo
 
-struct EqualToValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
+struct EqualToValidatorTest < AVD::Spec::ComparisonConstraintValidatorTestCase
   def valid_comparisons : Tuple
     {
       {3, 3},
