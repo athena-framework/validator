@@ -1,3 +1,6 @@
+# A recursive implementation of `AVD::Validator::ContextualValidatorInterface`.
+#
+# See `Athena::Validator.validator`.
 class Athena::Validator::Validator::RecursiveContextualValidator
   private alias GroupsTypes = Array(String) | Array(String | AVD::Constraints::GroupSequence)
 
@@ -15,12 +18,14 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     @default_property_path = @context.property_path
   end
 
+  # :inherit:
   def at_path(path : String) : AVD::Validator::ContextualValidatorInterface
     @default_property_path = @context.property_path path
 
     self
   end
 
+  # :inherit:
   def validate(value : _, constraints : Array(AVD::Constraint) | AVD::Constraint | Nil = nil, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Validator::ContextualValidatorInterface
     groups = self.normalize_groups groups
 
@@ -88,6 +93,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     end
   end
 
+  # :inherit:
   def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Validator::ContextualValidatorInterface
     groups = self.normalize_groups groups
 
@@ -122,6 +128,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     self
   end
 
+  # :inherit:
   def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Validator::ContextualValidatorInterface
     groups = self.normalize_groups groups
 
@@ -154,6 +161,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     self
   end
 
+  # :inherit:
   def violations : AVD::Violation::ConstraintViolationListInterface
     @context.violations
   end

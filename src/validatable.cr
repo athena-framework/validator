@@ -1,3 +1,19 @@
+# When included, denotes that a type (class or struct) can be validated via `Athena::Validator`.
+#
+# ### Example
+#
+# ```
+# class Example
+#   include AVD::Validatable
+#
+#   def initialize(@name : String); end
+#
+#   @[Assert::NotBlank]
+#   property name : String
+# end
+#
+# AVD.validator.validate Example.new("Jim")
+# ```
 module Athena::Validator::Validatable
   # :nodoc:
   module Class; end
