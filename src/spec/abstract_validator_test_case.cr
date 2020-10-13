@@ -1,3 +1,4 @@
+# :nodoc:
 abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::TestCase
   private class SubEntity
     include AVD::Validatable

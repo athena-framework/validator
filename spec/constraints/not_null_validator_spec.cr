@@ -9,22 +9,19 @@ struct NotNullValidatorTest < AVD::Spec::ConstraintValidatorTestCase
     self.assert_no_violation
   end
 
-  def valid_values : NamedTuple
+  def valid_values : Tuple
     {
-      string:       {""},
-      bool_false:   {false},
-      bool_true:    {true},
-      zero:         {0},
-      null_pointer: {Pointer(Void).null},
+      {""},
+      {false},
+      {true},
+      {0},
+      {Pointer(Void).null},
     }
   end
 
   def test_nil_is_invalid
     self.validator.validate nil, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::IS_NULL_ERROR, nil)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::IS_NULL_ERROR, nil
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface

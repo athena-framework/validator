@@ -72,10 +72,7 @@ struct ISBNValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("invalid_isbn10s")]
   def test_invalid_isbn10s(value : String, code : String) : Nil
     self.validator.validate value, self.new_constraint type: CONSTRAINT::Type::ISBN10, isbn10_message: "my_message"
-
-    self
-      .build_violation("my_message", code, value)
-      .assert_violation
+    self.assert_violation "my_message", code, value
   end
 
   def invalid_isbn10s : Tuple
@@ -98,10 +95,7 @@ struct ISBNValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("invalid_isbn13s")]
   def test_invalid_isbn13s(value : String, code : String) : Nil
     self.validator.validate value, self.new_constraint type: CONSTRAINT::Type::ISBN13, isbn13_message: "my_message"
-
-    self
-      .build_violation("my_message", code, value)
-      .assert_violation
+    self.assert_violation "my_message", code, value
   end
 
   def invalid_isbn13s : Tuple
@@ -130,9 +124,7 @@ struct ISBNValidatorTest < AVD::Spec::ConstraintValidatorTestCase
       code = CONSTRAINT::TYPE_NOT_RECOGNIZED_ERROR
     end
 
-    self
-      .build_violation("my_message", code, value)
-      .assert_violation
+    self.assert_violation "my_message", code, value
   end
 
   @[DataProvider("invalid_isbn13s")]
@@ -144,9 +136,7 @@ struct ISBNValidatorTest < AVD::Spec::ConstraintValidatorTestCase
       code = CONSTRAINT::TYPE_NOT_RECOGNIZED_ERROR
     end
 
-    self
-      .build_violation("my_message", code, value)
-      .assert_violation
+    self.assert_violation "my_message", code, value
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface

@@ -79,7 +79,7 @@ class Athena::Validator::Metadata::ClassMetadata(T)
   # The `AVD::Constraints::GroupSequence` used by `self`, if any.
   getter group_sequence : AVD::Constraints::GroupSequence? = nil
 
-  @properties : Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase) = Hash(String, AVD::Metadata::PropertyMetadataInterfaceBase).new
+  @properties : Hash(String, AVD::Metadata::PropertyMetadataInterface) = Hash(String, AVD::Metadata::PropertyMetadataInterface).new
 
   def initialize
     @default_group = T.to_s
@@ -129,7 +129,7 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     self.add_property_constraint AVD::Metadata::PropertyMetadata(T).new(property_name), constraint
   end
 
-  protected def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterfaceBase, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
+  protected def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterface, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
     unless @properties.has_key? property_metadata.name
       @properties[property_metadata.name] = property_metadata
     end
@@ -183,8 +183,8 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     @properties.has_key? property_name
   end
 
-  # Returns an `AVD::Metadata::PropertyMetadataInterfaceBase` instance for the provided *property_name*, if any.
-  def property_metadata(property_name : String) : AVD::Metadata::PropertyMetadataInterfaceBase?
+  # Returns an `AVD::Metadata::PropertyMetadataInterface` instance for the provided *property_name*, if any.
+  def property_metadata(property_name : String) : AVD::Metadata::PropertyMetadataInterface?
     @properties[property_name]?
   end
 

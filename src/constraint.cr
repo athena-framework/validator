@@ -12,7 +12,7 @@
 #
 # ### Example
 #
-# A constraint can be instantiated and passed to a validator directory:
+# A constraint can be instantiated and passed to a validator directly:
 #
 # ```
 # # An array of constraints can also be passed.
@@ -27,6 +27,7 @@
 #
 #   def initialize(@name : String); end
 #
+#   # More than one constraint can be applied to a property.
 #   @[Assert::NotBlank]
 #   property name : String
 # end
@@ -53,11 +54,11 @@
 #
 # While most constraints can be instantiated with an argless constructor,they do have a set of optional arguments.
 # * The `message` argument represents the message that should be used if the value is found to not be valid.
-# The message can also include placeholders that will be replaced when the message is rendered.
+# The message can also include placeholders, in the form of `{{ key }}`, that will be replaced when the message is rendered.
 # Most commonly this includes the invalid value itself, but some constraints have additional placeholders.
 # * The `payload` argument can be used to attach any domain specific data to the constraint; such as attaching a severity with each constraint
-# to have more serious violations be handled differently.
-# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validation Groups](./Validator/Constraint.html#validation-groups) section.
+# to have more serious violations be handled differently.  See the [Payload](./Constraint.html#payload) section.
+# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validation Groups](./Constraint.html#validation-groups) section.
 #
 # For example:
 #
@@ -78,7 +79,7 @@
 # The first argument of the constructor is known as the default argument.
 # This argument is special when using the annotation based approach in that it can be supplied as a positional argument within the annotation.
 #
-# For example the default argument for `AVD::Constraints::GreaterThan` is the value that the property should be compared against.
+# For example the default argument for `AVD::Constraints::GreaterThan` is the value that the value being validated should be compared against.
 #
 # Thus:
 #
@@ -100,7 +101,7 @@
 #
 # The `groups` argument defined on every `AVD::Constraint` type can be used to run a subset of validations.
 #
-# For example, say we only want to only validate certain properties when the user is first created:
+# For example, say we only want to validate certain properties when the user is first created:
 #
 # ```
 # class User
@@ -125,13 +126,13 @@
 # # if no groups are supplied, then all constraints in the "default" group will be used.
 # violations = AVD.validator.validate user, groups: "create"
 #
-# # There are no violations since the city's size is not validated since it's not in the "create" group
+# # There are no violations since the city's size is not validated since it's not in the "create" group.
 # violations.empty? # => true
 # ```
 #
 # Using this configuration, there are three groups at play within the `User` class:
 # 1. `default` - Contains constraints in the current type, and subtypes, that belong to no other group.  I.e. `city`.
-# 1. `User` - Equivalent to all constraints in the `default` group.  See `AVD::Constraints::GroupSequence`, and the note below.
+# 1. `User` - In this example, equivalent to all constraints in the `default` group.  See `AVD::Constraints::GroupSequence`, and the note below.
 # 1. `create` - A custom group that only contains the constraints explicitly associated with it.  I.e. `email`, and `password`.
 #
 # NOTE: When validating _just_ the `User` object, the `default` group is equivalent to the `User` group.
@@ -216,7 +217,7 @@
 #
 #       # Otherwise, it is invalid and we need to add a violation,
 #       # see `AVD::ExecutionContextInterface` for additional information.
-#       self.context.add_violation(constraint.message, NOT_ALPHANUMERIC_ERROR, value)
+#       self.context.add_violation constraint.message, NOT_ALPHANUMERIC_ERROR, value
 #     end
 #   end
 # end

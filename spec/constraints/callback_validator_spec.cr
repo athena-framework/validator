@@ -12,8 +12,7 @@ struct CallbackValidatorTest < AVD::Spec::ConstraintValidatorTestCase
     end
 
     self.validator.validate 123, constraint
-
-    self.build_violation("my_message").assert_violation
+    self.assert_violation "my_message"
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface

@@ -15,10 +15,7 @@ struct ISSNValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("valid_lowercase_issns")]
   def test_case_sensitive_issns(value : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message", case_sensitive: true
-
-    self
-      .build_violation("my_message", CONSTRAINT::INVALID_CASE_ERROR, value)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::INVALID_CASE_ERROR, value
   end
 
   def valid_lowercase_issns : Tuple
@@ -36,10 +33,7 @@ struct ISSNValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("valid_non_hyphenated_issns")]
   def test_hyphen_required_issns(value : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message", require_hypen: true
-
-    self
-      .build_violation("my_message", CONSTRAINT::MISSING_HYPHEN_ERROR, value)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::MISSING_HYPHEN_ERROR, value
   end
 
   def valid_non_hyphenated_issns : Tuple
@@ -93,10 +87,7 @@ struct ISSNValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("invalid_issns")]
   def test_invalid_issns(value : String | Number, code : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", code, value)
-      .assert_violation
+    self.assert_violation "my_message", code, value
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface

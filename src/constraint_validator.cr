@@ -22,7 +22,7 @@ abstract struct Athena::Validator::ConstraintValidator
   #
   # ```
   # # Define a validate method to catch values of other types.
-  # # Overloads above would handle the valid types
+  # # Overloads above would handle the valid types.
   # def validate(value : _, constraint : AVD::Constraints::MyConstraint) : Nil
   #   self.raise_invalid_type value, "Int | Float"
   # end

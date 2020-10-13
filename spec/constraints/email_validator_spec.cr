@@ -60,10 +60,7 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("invalid_emails")]
   def test_invalid_emails(value : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::INVALID_FORMAT_ERROR, value)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::INVALID_FORMAT_ERROR, value
   end
 
   def invalid_emails : Tuple
@@ -78,10 +75,7 @@ struct EmailValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("invalid_emails_html5")]
   def test_invalid_emails_html5(value : String) : Nil
     self.validator.validate value, self.new_constraint mode: CONSTRAINT::Mode::HTML5, message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::INVALID_FORMAT_ERROR, value)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::INVALID_FORMAT_ERROR, value
   end
 
   def invalid_emails_html5 : Tuple

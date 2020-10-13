@@ -101,7 +101,7 @@ alias Assert = AVD::Annotations
 # By default, in addition to any constraint specific arguments, the majority of the constraints have three optional arguments: `message`, `groups`, and `payload`.
 #
 # * The `message` argument represents the message that should be used if the value is found to not be valid.
-# The message can also include placeholders that will be replaced when the message is rendered.
+# The message can also include placeholders, in the form of `{{ key }}`, that will be replaced when the message is rendered.
 # Most commonly this includes the invalid value itself, but some constraints have additional placeholders.
 # * The `payload` argument can be used to attach any domain specific data to the constraint; such as attaching a severity with each constraint
 # to have more serious violations be handled differently.
@@ -242,7 +242,7 @@ alias Assert = AVD::Annotations
 #
 #       # Otherwise, it is invalid and we need to add a violation,
 #       # see `AVD::ExecutionContextInterface` for additional information.
-#       self.context.add_violation(constraint.message, NOT_ALPHANUMERIC_ERROR, value)
+#       self.context.add_violation constraint.message, NOT_ALPHANUMERIC_ERROR, value
 #     end
 #   end
 # end
@@ -265,7 +265,7 @@ alias Assert = AVD::Annotations
 # However, in some cases you may only want to validate the object against _some_ of those constraints.
 # This can be accomplished via assigning each constraint to a validation group, then apply validation against one specific group of constraints.
 #
-# For example, using our `User` class from earlier, say we only want to only validate certain properties when the user is first created.
+# For example, using our `User` class from earlier, say we only want to validate certain properties when the user is first created.
 # To do this we can utilize the `groups` argument that all constraints have.
 #
 # ```
@@ -291,7 +291,7 @@ alias Assert = AVD::Annotations
 # # if no groups are supplied, then all constraints in the "default" group will be used.
 # violations = AVD.validator.validate user, groups: "create"
 #
-# # There are no violations since the city's size is not validated since it's not in the "create" group
+# # There are no violations since the city's size is not validated since it's not in the "create" group.
 # violations.empty? # => true
 # ```
 #

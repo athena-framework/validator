@@ -11,10 +11,7 @@ struct IsNullValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("invalid_values")]
   def test_invalid_values(value : _) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::NOT_NULL_ERROR, value)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::NOT_NULL_ERROR, value
   end
 
   def invalid_values : Tuple

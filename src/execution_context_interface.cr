@@ -51,14 +51,11 @@ module Athena::Validator::ExecutionContextInterface
   # Returns the group that is currently being validated, if any.
   abstract def group : String?
 
-  # Returns the object initially passed to `#validate`.
-  abstract def root
-
   # Returns an `AVD::Metadata::MetadataInterface` object for the value currently being validated.
   #
   # This would be an `AVD::Metadata::PropertyMetadataInterface` if the current value is an object,
   # an `AVD::Metadata::GenericMetadata` if the current value is a plain value, and an
-  # `AVD::Metadata::ClassMetadataInterface` if the current value value is an entire class.
+  # `AVD::Metadata::ClassMetadata` if the current value value is an entire class.
   abstract def metadata : AVD::Metadata::MetadataInterface?
 
   # Returns the object that is currently being validated.
@@ -79,6 +76,9 @@ module Athena::Validator::ExecutionContextInterface
   # addresses, the property path when validating the first street of the first address
   # would be `addresses[0].street`.
   abstract def property_path : String
+
+  # Returns the object initially passed to `AVD::Validator::ValidatorInterface#validate`.
+  abstract def root
 
   # Returns a reference to an `AVD::Validator::ValidatorInterface` that can be used to validate
   # additional constraints as part of another constraint.

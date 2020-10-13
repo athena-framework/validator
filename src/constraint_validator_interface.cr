@@ -1,7 +1,7 @@
 # A constraint validator is responsible for implementing the actual validation logic for a given `AVD::Constraint`.
 #
-# Constraint validates should inherit from this type and implement a `#validate` method.
-# Most commonly the validator type will be defined within the namespace of the `AVD::Constraint` itself.
+# Constraint validators should inherit from this type and implement a `#validate` method.
+# Most commonly the validator type will be defined within the namespace of the related `AVD::Constraint` itself.
 #
 # The `#validate` method itself does not return anything.
 # Violations are added to the current `#context`, either as a single error message, or augmented with additional metadata about the failure.
@@ -47,6 +47,8 @@
 #   end
 # end
 # ```
+#
+# NOTE:  Normally custom validators should not handle `nil` or `blank` values as they are handled via other constraints.
 #
 # ### Service Based Validators
 #

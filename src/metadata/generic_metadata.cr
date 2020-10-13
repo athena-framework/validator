@@ -11,7 +11,7 @@ module Athena::Validator::Metadata::GenericMetadata
 
   # Adds the provided *constraint* to `self`'s `#constraints` array.
   #
-  # Sets `#cascading_strategy` to `true` if the *constraint* is `AVD::Constraints::Valid`.
+  # Sets `#cascading_strategy` to `AVD::Metadata::CascadingStrategy::Cascade` if the *constraint* is `AVD::Constraints::Valid`.
   def add_constraint(constraint : AVD::Constraint) : AVD::Metadata::GenericMetadata
     if constraint.is_a? AVD::Constraints::Valid
       @cascading_strategy = :cascade

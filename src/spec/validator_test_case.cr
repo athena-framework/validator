@@ -1,3 +1,4 @@
+# :nodoc:
 abstract struct Athena::Validator::Spec::ValidatorTestCase < AVD::Spec::AbstractValidatorTestCase
   getter! validator : AVD::Validator::ValidatorInterface
 

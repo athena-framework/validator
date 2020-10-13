@@ -2,7 +2,7 @@ require "./property_metadata_interface"
 
 class Athena::Validator::Metadata::PropertyMetadata(EntityType)
   include Athena::Validator::Metadata::GenericMetadata
-  include Athena::Validator::Metadata::PropertyMetadataInterfaceBase
+  include Athena::Validator::Metadata::PropertyMetadataInterface
 
   # :inherit:
   getter name : String

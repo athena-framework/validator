@@ -253,7 +253,6 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     )
   end
 
-  # ameba:disable Metrics/CyclomaticComplexity
   private def validate_class_node(
     object : AVD::Validatable,
     class_metadata : AVD::Metadata::ClassMetadata,

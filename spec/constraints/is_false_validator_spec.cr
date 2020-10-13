@@ -15,18 +15,12 @@ struct IsFalseValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   def test_true_is_invalid : Nil
     self.validator.validate true, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::NOT_FALSE_ERROR, true)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::NOT_FALSE_ERROR, true
   end
 
   def test_zero_is_invalid : Nil
     self.validator.validate 0, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::NOT_FALSE_ERROR, 0)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::NOT_FALSE_ERROR, 0
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface
