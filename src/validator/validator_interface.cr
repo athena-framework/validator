@@ -1,15 +1,15 @@
 module Athena::Validator::Validator::ValidatorInterface
   # Validates the provided *value*, optionally against the provided *constraints*, optionally using the provided *groups*.
   # `AVD::Constraint::DEFAULT_GROUP` is assumed if no *groups* are provided.
-  abstract def validate(value : _, constraints : Array(AVD::Constraint) | AVD::Constraint | Nil = nil, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Validator::ContextualValidatorInterface
+  abstract def validate(value : _, constraints : Array(AVD::Constraint) | AVD::Constraint | Nil = nil, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
 
   # Validates a property of the provided *object* against the constraints defined for that property, optionally using the provided *groups*.
   # `AVD::Constraint::DEFAULT_GROUP` is assumed if no *groups* are provided.
-  abstract def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Validator::ContextualValidatorInterface
+  abstract def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
 
   # Validates a value against the constraints defined on the property of the provided *object*.
   # `AVD::Constraint::DEFAULT_GROUP` is assumed if no *groups* are provided.
-  abstract def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Validator::ContextualValidatorInterface
+  abstract def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
 
   # Creates a new `AVD::ExecutionContextInterface` and returns a new validator for that context.
   #

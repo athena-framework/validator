@@ -1,5 +1,9 @@
+# Defines common logic for comparison based constraints, such as `AVD::Constraints::GreaterThan`, or `AVD::Constraints::EqualTo`.
 module Athena::Validator::Constraints::AbstractComparison(ValueType)
+  # Returns the expected value.
   getter value : ValueType
+
+  # Returns the type of the expected value.
   getter value_type : ValueType.class = ValueType
 
   def initialize(
@@ -11,5 +15,6 @@ module Athena::Validator::Constraints::AbstractComparison(ValueType)
     super message, groups, payload
   end
 
-  protected abstract def default_error_message : String
+  # Returns the default error message for this constraint.
+  abstract def default_error_message : String
 end

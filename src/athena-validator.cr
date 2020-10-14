@@ -105,7 +105,7 @@ alias Assert = AVD::Annotations
 # Most commonly this includes the invalid value itself, but some constraints have additional placeholders.
 # * The `payload` argument can be used to attach any domain specific data to the constraint; such as attaching a severity with each constraint
 # to have more serious violations be handled differently.
-# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validation Groups](./Validator.html#validation-groups) section.
+# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validation Groups](#validation-groups) section.
 #
 # ```
 # validator = AVD.validator
@@ -295,7 +295,7 @@ alias Assert = AVD::Annotations
 # violations.empty? # => true
 # ```
 #
-# See the `Validation Groups` section within `AVD::Constraint` for some expanded information.
+# See `AVD::Constraint@validation-groups` for some expanded information.
 #
 # ### Sequential Validation
 #

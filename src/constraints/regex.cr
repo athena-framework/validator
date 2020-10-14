@@ -11,7 +11,7 @@ class Athena::Validator::Constraints::Regex < Athena::Validator::Constraint
   def initialize(
     @pattern : ::Regex,
     @match : Bool = true,
-    message : String = "This value is not valid.",
+    message : String = "This value should match '{{ pattern }}'.",
     groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
@@ -26,7 +26,11 @@ class Athena::Validator::Constraints::Regex < Athena::Validator::Constraint
       return if value.nil? || value.empty?
       return unless constraint.match? ^ value.matches? constraint.pattern
 
-      self.context.add_violation constraint.message, REGEX_FAILED_ERROR, value
+      self
+        .context
+        .build_violation(constraint.message, REGEX_FAILED_ERROR, value)
+        .add_parameter("{{ pattern }}", constraint.pattern)
+        .add
     end
   end
 end

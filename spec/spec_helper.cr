@@ -5,7 +5,7 @@ require "../src/spec"
 ASPEC.run_all
 
 class MockConstraint < AVD::Constraint
-  def validated_by
+  def validated_by : AVD::ConstraintValidator.class
     MockConstraintValidator
   end
 end

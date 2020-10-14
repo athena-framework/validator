@@ -40,7 +40,11 @@ struct RegexValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("invalid_values")]
   def test_invalid_values(value : _) : Nil
     self.validator.validate value, self.new_constraint pattern: /^[0-9]+$/, message: "my_message"
-    self.assert_violation "my_message", CONSTRAINT::REGEX_FAILED_ERROR, value
+
+    self
+      .build_violation("my_message", CONSTRAINT::REGEX_FAILED_ERROR, value)
+      .add_parameter("{{ pattern }}", /^[0-9]+$/)
+      .assert_violation
   end
 
   def invalid_values : Tuple

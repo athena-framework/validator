@@ -1,4 +1,3 @@
-# :nodoc:
 abstract class Athena::Validator::Constraints::Composite < Athena::Validator::Constraint
   getter constraints : Array(AVD::Constraint) = [] of AVD::Constraint
 

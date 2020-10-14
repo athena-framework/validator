@@ -1,5 +1,61 @@
 require "./composite"
 
+# Asserts each element of an `Iterable` is valid based on a collection of constraints.
+#
+# ## Configuration
+#
+# ### Required Arguments
+#
+# #### constraints
+#
+# The `AVD::Constraint`(s) that you want to apply to each element of the underlying iterable.
+#
+# ### Optional Arguments
+#
+# NOTE: This constraint does not support a `message` argument.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
+#
+# ## Examples
+#
+# ### Annotation
+#
+# ```
+# class Example
+#   include AVD::Validatable
+#
+#   # Assert each string is not blank and is at least 5 characters long.
+#   @[Assert::All([
+#     @[Assert::NotBlank],
+#     @[Assert::Size(5..)],
+#   ])]
+#   getter strings : Array(String)
+# end
+# ```
+#
+# NOTE: The annotation approach only supports two levels of nested annotations.
+# Manually wire up the constraint via code if you require more than that.
+#
+# ### Direct
+#
+# ```
+# constraint = AVD::Constraints::All.new([
+#   AVD::Constraints::NotBlank.new,
+#   AVD::Constraints::Size.new(5..),
+# ])
+# ```
 class Athena::Validator::Constraints::All < Athena::Validator::Constraints::Composite
   def initialize(
     constraints : Array(AVD::Constraint) | AVD::Constraint,
@@ -9,6 +65,7 @@ class Athena::Validator::Constraints::All < Athena::Validator::Constraints::Comp
     super constraints, "", groups, payload
   end
 
+  # `AVD::ConstraintValidator` for `AVD::Constraints::All`.
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:
     def validate(value : Hash?, constraint : AVD::Constraints::All) : Nil

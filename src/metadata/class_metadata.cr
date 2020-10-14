@@ -22,13 +22,34 @@ class Athena::Validator::Metadata::ClassMetadata(T)
           {% if ann = ivar.annotation Assert.constant(ann_name).resolve %}
             {% default_arg = ann.args.empty? ? nil : ann.args.first %}
 
-
             {% if default_arg.is_a? ArrayLiteral %}
               {% default_arg = default_arg.map do |arg|
                    if arg.is_a? Annotation
-                     arg_name = arg.stringify.gsub(/@\[/, "").gsub(/\(.*/, "").split("::").last
+                     arg_name = arg.stringify.gsub(/@\[/, "").gsub(/\(.*/, "").split("::").last.gsub(/\]/, "")
 
                      inner_default_arg = arg.args.empty? ? nil : arg.args.first
+
+                     # Support only 2 levels deep for now.
+                     inner_default_arg = if inner_default_arg.is_a? ArrayLiteral
+                                           inner_default_arg.map do |inner_arg|
+                                             if inner_arg.is_a? Annotation
+                                               inner_arg_name = inner_arg.stringify.gsub(/@\[/, "").gsub(/\(.*/, "").split("::").last.gsub(/\]/, "")
+
+                                               inner_inner_default_arg = inner_arg.args.empty? ? nil : inner_arg.args.first
+
+                                               %(AVD::Constraints::#{inner_arg_name.id}.new(#{inner_inner_default_arg ? "#{inner_inner_default_arg},".id : "".id}#{inner_arg.named_args.double_splat})).id
+                                             else
+                                               inner_arg
+                                             end
+                                           end
+                                         else
+                                           inner_default_arg
+                                         end
+
+                     # Hack this to work correctly for now.
+                     if arg_name == "All" || arg_name == "AtLeastOneOf"
+                       inner_default_arg = "#{inner_default_arg} of AVD::Constraint".id
+                     end
 
                      # Resolve constraints from the annotations,
                      # TODO: Figure out a better way to do this.

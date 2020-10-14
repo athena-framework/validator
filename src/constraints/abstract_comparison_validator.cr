@@ -1,6 +1,10 @@
+# Defines common logic for comparison based constraint validators.
 abstract struct Athena::Validator::Constraints::ComparisonValidator < Athena::Validator::ConstraintValidator
-  protected abstract def compare_values(actual : _, expected : _) : Bool
-  protected abstract def error_code : String
+  # Returns `true` if the provided *actual* and *expected* values are compatible, otherwise `false`.
+  abstract def compare_values(actual : _, expected : _) : Bool
+
+  # Returns the expected error code for `self`.
+  abstract def error_code : String
 
   # :inherit:
   def validate(value : _, constraint : AVD::Constraints::AbstractComparison) : Nil
