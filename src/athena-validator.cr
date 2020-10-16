@@ -140,7 +140,7 @@ alias Assert = AVD::Annotations
 #
 #   # Arguments to the constraint can be used normally as well.
 #   # The constraint's default argument can also be supplied positionally: `@[Assert::GreaterThan(0)]`.
-#   @[Assert::NotNull(message: "A user's age cannot be null")]
+#   @[Assert::NotNil(message: "A user's age cannot be null")]
 #   getter age : Int32?
 # end
 #
@@ -230,7 +230,7 @@ alias Assert = AVD::Annotations
 #     # Overloads can be used to filter values of specific types.
 #     def validate(value : _, constraint : AVD::Constraints::AlphaNumeric) : Nil
 #       # Custom constraints should ignore nil and empty values to allow
-#       # other constraints (NotBlank, NotNull, etc.) take care of that
+#       # other constraints (NotBlank, NotNil, etc.) take care of that
 #       return if value.nil? || value == ""
 #
 #       # We'll cast the value to a string,

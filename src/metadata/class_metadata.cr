@@ -77,7 +77,7 @@ class Athena::Validator::Metadata::ClassMetadata(T)
       {% end %}
 
       {% for callback in T.class.methods.select &.annotation(Assert::Callback) %}
-        class_metadata.add_constraint AVD::Constraints::Callback.new(callback: ->T.{{callback.name.id}}(AVD::Constraints::Callback::Value, AVD::ExecutionContextInterface, Hash(String, String)?), {{callback.annotation(Assert::Callback).named_args.double_splat}})
+        class_metadata.add_constraint AVD::Constraints::Callback.new(callback: ->T.{{callback.name.id}}(AVD::Constraints::Callback::ValueContainer, AVD::ExecutionContextInterface, Hash(String, String)?), {{callback.annotation(Assert::Callback).named_args.double_splat}})
       {% end %}
     {% end %}
 

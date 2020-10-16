@@ -221,7 +221,7 @@
 #     # Overloads can be used to filter values of specific types.
 #     def validate(value : _, constraint : AVD::Constraints::AlphaNumeric) : Nil
 #       # Custom constraints should ignore nil and empty values to allow
-#       # other constraints (NotBlank, NotNull, etc.) take care of that
+#       # other constraints (NotBlank, NotNil, etc.) take care of that
 #       return if value.nil? || value == ""
 #
 #       # We'll cast the value to a string,
