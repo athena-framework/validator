@@ -1,3 +1,17 @@
+# A constraint composed of other constraints.
+# handles normalizing the groups of the nested constraints, via the following algorithm:
+#
+# * If groups are passed explicitly to the composite constraint, but
+#   not to the nested constraints, the options of the composite
+#   constraint are copied to the nested constraints
+# * If groups are passed explicitly to the nested constraints, but not
+#   to the composite constraint, the groups of all nested constraints
+#   are merged and used as groups for the composite constraint
+# * If groups are passed explicitly to both the composite and its nested
+#   constraints, the groups of the nested constraints must be a subset
+#   of the groups of the composite constraint.
+#
+# NOTE: You most likely want to use `AVD::Constraints::Compound` instead of this type.
 abstract class Athena::Validator::Constraints::Composite < Athena::Validator::Constraint
   getter constraints : Array(AVD::Constraint) = [] of AVD::Constraint
 
@@ -8,8 +22,6 @@ abstract class Athena::Validator::Constraints::Composite < Athena::Validator::Co
     payload : Hash(String, String)? = nil
   )
     super message, groups, payload
-
-    self.initialize_nested_constraints
 
     unless constraints.is_a? Array
       constraints = [constraints] of AVD::Constraint
@@ -47,8 +59,5 @@ abstract class Athena::Validator::Constraints::Composite < Athena::Validator::Co
     super group
 
     @constraints.each &.add_implicit_group(group)
-  end
-
-  def initialize_nested_constraints : Nil
   end
 end

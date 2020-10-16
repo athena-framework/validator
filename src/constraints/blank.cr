@@ -29,28 +29,6 @@
 #
 # Any arbitrary domain-specific data that should be stored with this constraint.
 # The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
-#
-# ## Examples
-#
-# ### Annotation
-#
-# ```
-# class Example
-#   include AVD::Validatable
-#
-#   def initialize(@string : String); end
-#
-#   # Assert the string is blank.
-#   @[Assert::Blank]
-#   getter string : String
-# end
-# ```
-#
-# ### Direct
-#
-# ```
-# constraint = AVD::Constraints::Blank.new
-# ```
 class Athena::Validator::Constraints::Blank < Athena::Validator::Constraint
   NOT_BLANK_ERROR = "c815f901-c581-4fb7-a85d-b8c5bc757959"
 

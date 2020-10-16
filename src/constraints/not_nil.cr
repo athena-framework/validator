@@ -32,28 +32,6 @@
 #
 # Any arbitrary domain-specific data that should be stored with this constraint.
 # The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
-#
-# ## Examples
-#
-# ### Annotation
-#
-# ```
-# class Example
-#   include AVD::Validatable
-#
-#   def initialize(@string : String); end
-#
-#   # Force this value to be either `true` or `false`.
-#   @[Assert::NotNil]
-#   getter active : Bool?
-# end
-# ```
-#
-# ### Direct
-#
-# ```
-# constraint = AVD::Constraints::NotNil.new
-# ```
 class Athena::Validator::Constraints::NotNil < Athena::Validator::Constraint
   IS_NIL_ERROR = "c7e77b14-744e-44c0-aa7e-391c69cc335c"
 

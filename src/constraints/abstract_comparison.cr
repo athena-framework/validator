@@ -15,6 +15,6 @@ module Athena::Validator::Constraints::AbstractComparison(ValueType)
     super message, groups, payload
   end
 
-  # Returns the default error message for this constraint.
+  # Returns the `AVD::Constraint#message` for this constraint.
   abstract def default_error_message : String
 end
