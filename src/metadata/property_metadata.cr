@@ -1,6 +1,6 @@
 require "./property_metadata_interface"
 
-class Athena::Validator::Metadata::PropertyMetadata(EntityType)
+class Athena::Validator::Metadata::PropertyMetadata(EntityType, PropertyIdx)
   include Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::PropertyMetadataInterface
 
@@ -16,13 +16,17 @@ class Athena::Validator::Metadata::PropertyMetadata(EntityType)
 
   protected def get_value(obj : EntityType)
     {% begin %}
-      case @name
-        {% for column in EntityType.instance_vars %}
-          when {{column.name.stringify}} then obj.@{{column.id}}
-        {% end %}
-      else
-        raise "BUG: Unknown column #{@name} within #{EntityType}"
-      end
+      {% unless PropertyIdx == Nil %}
+        obj.@{{EntityType.instance_vars[PropertyIdx].name.id}}
+      {% else %}
+        case @name
+          {% for ivar in EntityType.instance_vars %}
+            when {{ivar.name.stringify}} then obj.@{{ivar.id}}
+          {% end %}
+        else
+          raise "BUG: Unknown property #{@name} within #{EntityType}"
+        end
+      {% end %}
     {% end %}
   end
 end

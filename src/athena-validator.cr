@@ -404,3 +404,33 @@ module Athena::Validator
     AVD::Validator::RecursiveValidator.new
   end
 end
+
+# class User
+#   include AVD::Validatable
+
+#   def self.load_metadata(metadata)
+#     metadata.add_getter_constraint "is_safe_password?", AVD::Constraints::IsTrue.new message: "Your password cannot be the same as your name."
+#   end
+
+#   property name : String
+#   property password : String
+
+#   def initialize(@name : String, @password : String); end
+
+#   # @[Assert::IsTrue(message: "Your password cannot be the same as your name.")]
+#   def is_safe_password? : Bool
+#     @name != @password
+#   end
+# end
+
+# validator = AVD.validator
+
+# user = User.new "foo", "foo"
+
+# puts validator.validate user # =>
+# # Object(User).is_safe_password?:
+# #   Your password cannot be the same as your name. (code: beabd93e-3673-4dfc-8796-01bd1504dd19)
+
+# user.password = "bar"
+
+# puts validator.validate user # => ""
