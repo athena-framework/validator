@@ -2,14 +2,14 @@
 #
 # ### Example
 #
-# Using the spec from `AVD::Constraints::NotNull`:
+# Using the spec from `AVD::Constraints::NotNil`:
 #
 # ```
 # # Makes for a bit less typing when needing to reference the constraint.
-# private alias CONSTRAINT = AVD::Constraints::NotNull
+# private alias CONSTRAINT = AVD::Constraints::NotNil
 #
 # # Define our test case inheriting from the abstract ConstraintValidatorTestCase.
-# struct NotNullValidatorTest < AVD::Spec::ConstraintValidatorTestCase
+# struct NotNilValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 #   @[DataProvider("valid_values")]
 #   def test_valid_values(value : _) : Nil
 #     # Validate the value against a new instance of the constraint.

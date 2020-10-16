@@ -10,7 +10,7 @@
 # `Athena::Validator` comes with a set of common constraints built in.
 # See the individual types within `AVD::Constraints` for more information.
 #
-# ### Example
+# ## Usage
 #
 # A constraint can be instantiated and passed to a validator directly:
 #
@@ -50,7 +50,7 @@
 #
 # The metadata for each type is lazily loaded when an instance of that type is validated, and is only built once.
 #
-# ### Arguments
+# ## Arguments
 #
 # While most constraints can be instantiated with an argless constructor,they do have a set of optional arguments.
 # * The `message` argument represents the message that should be used if the value is found to not be valid.
@@ -74,7 +74,7 @@
 # ```
 # Customizing the message can be a good way for those consuming the errors to determine _WHY_ a given value is not valid.
 #
-# #### Default Argument
+# ### Default Argument
 #
 # The first argument of the constructor is known as the default argument.
 # This argument is special when using the annotation based approach in that it can be supplied as a positional argument within the annotation.
@@ -97,7 +97,49 @@
 #
 # NOTE: Only the first argument can be supplied positionally, all other arguments must be provided as named arguments within the annotation.
 #
-# ### Validation Groups
+# ### Message Plurality
+#
+# `Athena::Validator` has very basic support for pluralizing constraint `#message`s via `AVD::Violation::ConstraintViolationInterface#plural`.
+#
+# For example the `#message` could have different versions based on the plurality of the violation.
+# Currently this only supports two contexts: singular (1/nil) and plural (2+).
+#
+# Multiple messages, separated by a `|`, can be included as part of an `AVD::Constraint` message.
+# For example from `AVD::Constraints::Size`:
+#
+# `min_message : String = "This value is too short. It should have {{ limit }} {{ type }} or more.|This value is too short. It should have {{ limit }} {{ type }}s or more."`
+#
+# If violations' `#plural` method returns `1` (or `nil`) the first message will be used.  If `#plural` is `2` or more, the latter message will be used.
+#
+# TODO: Support more robust translations; like language or multiple pluralities.
+#
+# ### Payload
+#
+# The `payload` argument defined on every `AVD::Constraint` type can be used to store custom domain specific information with a constraint.
+# This data can later be retrieved off of an `AVD::Violation::ConstraintViolationInterface`.
+# An example use case for this could be mapping a "severity" to a CSS class based on how important each specific constraint is.
+#
+# ```
+# class User
+#   include AVD::Validatable
+#
+#   def initialize(@email : String, @password : String); end
+#
+#   @[Assert::NotBlank(payload: {"severity" => "error"})]
+#   getter email : String
+#
+#   @[Assert::NotBlank(payload: {"severity" => "warning"})]
+#   getter password : String
+# end
+#
+# violations = AVD.validator.validate User.new "", ""
+#
+# # Use this when rendering HTML, or JSON to allow dynamically customizing the response object.
+# violations[0].constraint.payload # => {"severity" => "error"}
+# violations[1].constraint.payload # => {"severity" => "warning"}
+# ```
+#
+# ## Validation Groups
 #
 # The `groups` argument defined on every `AVD::Constraint` type can be used to run a subset of validations.
 #
@@ -143,35 +185,9 @@
 # to if the previous/next constraint is/was (in)valid.  However, an `AVD::Constraints::GroupSequence` can be used to validate batches of constraints in steps.
 # I.e. validate the first "batch" of constraints, and only advance to the next batch if all constraints in that step are valid.
 #
-# ### Payload
-#
-# The `payload` argument defined on every `AVD::Constraint` type can be used to store custom domain specific information with a constraint.
-# This data can later be retrieved off of an `AVD::Violation::ConstraintViolationInterface`.
-# An example use case for this could be mapping a "severity" to a CSS class based on how important each specific constraint is.
-#
-# ```
-# class User
-#   include AVD::Validatable
-#
-#   def initialize(@email : String, @password : String); end
-#
-#   @[Assert::NotBlank(payload: {"severity" => "error"})]
-#   getter email : String
-#
-#   @[Assert::NotBlank(payload: {"severity" => "warning"})]
-#   getter password : String
-# end
-#
-# violations = AVD.validator.validate User.new "", ""
-#
-# # Use this when rendering HTML, or JSON to allow dynamically customizing the response object.
-# violations[0].constraint.payload # => {"severity" => "error"}
-# violations[1].constraint.payload # => {"severity" => "warning"}
-# ```
-#
 # NOTE: The payload is not used with the framework itself.
 #
-# ### Custom Constraints
+# ## Custom Constraints
 #
 # If the built in `AVD::Constraints` are not sufficient to handle validating a given value/object; custom ones can be defined.
 # Let's make a new constraint that asserts a string contains only alphanumeric characters.

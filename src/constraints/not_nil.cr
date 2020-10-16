@@ -1,4 +1,7 @@
-# Validates that a value is blank; meaning equal to an empty string or `nil`.
+# Validates that a value is not `nil`.
+#
+# NOTE: Due to Crystal's static typing, when validating objects the property's type must be nilable,
+# otherwise `nil` is inherently not allowed due to the compiler's type checking.
 #
 # ## Configuration
 #
@@ -6,9 +9,9 @@
 #
 # #### message
 #
-# **Type:** `String` **Default:** `This value should be blank.`
+# **Type:** `String` **Default:** `This value should not be null.`
 #
-# The message that will be shown if the value is not blank.
+# The message that will be shown if the value is `nil`.
 #
 # ##### Placeholders
 #
@@ -40,26 +43,26 @@
 #
 #   def initialize(@string : String); end
 #
-#   # Assert the string is blank.
-#   @[Assert::Blank]
-#   getter string : String
+#   # Force this value to be either `true` or `false`.
+#   @[Assert::NotNil]
+#   getter active : Bool?
 # end
 # ```
 #
 # ### Direct
 #
 # ```
-# constraint = AVD::Constraints::Blank.new
+# constraint = AVD::Constraints::NotNil.new
 # ```
-class Athena::Validator::Constraints::Blank < Athena::Validator::Constraint
-  NOT_BLANK_ERROR = "c815f901-c581-4fb7-a85d-b8c5bc757959"
+class Athena::Validator::Constraints::NotNil < Athena::Validator::Constraint
+  IS_NIL_ERROR = "c7e77b14-744e-44c0-aa7e-391c69cc335c"
 
   @@error_names = {
-    NOT_BLANK_ERROR => "NOT_BLANK_ERROR",
+    IS_NIL_ERROR => "IS_NIL_ERROR",
   }
 
   def initialize(
-    message : String = "This value should be blank.",
+    message : String = "This value should not be null.",
     groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
@@ -68,11 +71,10 @@ class Athena::Validator::Constraints::Blank < Athena::Validator::Constraint
 
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:
-    def validate(value : _, constraint : AVD::Constraints::Blank) : Nil
-      return if value.nil?
-      return if value.responds_to?(:blank?) && value.blank?
+    def validate(value : _, constraint : AVD::Constraints::NotNil) : Nil
+      return unless value.nil?
 
-      self.context.add_violation constraint.message, NOT_BLANK_ERROR, value
+      self.context.add_violation constraint.message, IS_NIL_ERROR, value
     end
   end
 end

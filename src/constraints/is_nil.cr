@@ -1,8 +1,8 @@
-class Athena::Validator::Constraints::IsNull < Athena::Validator::Constraint
-  NOT_NULL_ERROR = "2c88e3c7-9275-4b9b-81b4-48c6c44b1804"
+class Athena::Validator::Constraints::IsNil < Athena::Validator::Constraint
+  NOT_NIL_ERROR = "2c88e3c7-9275-4b9b-81b4-48c6c44b1804"
 
   @@error_names = {
-    NOT_NULL_ERROR => "NOT_NULL_ERROR",
+    NOT_NIL_ERROR => "NOT_NIL_ERROR",
   }
 
   def initialize(
@@ -15,10 +15,10 @@ class Athena::Validator::Constraints::IsNull < Athena::Validator::Constraint
 
   struct Validator < Athena::Validator::ConstraintValidator
     # :inherit:
-    def validate(value : _, constraint : AVD::Constraints::IsNull) : Nil
+    def validate(value : _, constraint : AVD::Constraints::IsNil) : Nil
       return if value.nil?
 
-      self.context.add_violation constraint.message, NOT_NULL_ERROR, value
+      self.context.add_violation constraint.message, NOT_NIL_ERROR, value
     end
   end
 end

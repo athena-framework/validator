@@ -1,6 +1,6 @@
 require "./composite"
 
-# Asserts that a value satisfies at least one of the provided constraints.
+# Validates that a value satisfies at least one of the provided constraints.
 # Validation stops as soon as one constraint is satisfied.
 #
 # ## Configuration
@@ -20,6 +20,13 @@ require "./composite"
 # If the validation failed message should include the list of messages for the internal constraints.
 # See the [message](#message) argument for an example.
 #
+# #### message_collection
+#
+# **Type:** `String` **Default:** `Each element of this collection should satisfy its own set of constraints.`
+#
+# The message that will be shown if validation fails and the internal constraint is an `AVD::Constraints::All`.
+# See the [message](#message) argument for an example.
+#
 # #### message
 #
 # **Type:** `String` **Default:** `This value should satisfy at least one of the following constraints:`
@@ -28,16 +35,9 @@ require "./composite"
 # By default, it'll be followed by the list of messages from the internal [constraints](#constraints);
 # configurable via the [include_internal_messages](#include_internal_messages) argument.
 #
-# For example, if the above `grades` property in the example below fails to validate, the message will be:
+# For example, if the `grades` property in the example below fails to validate, the message will be:
 #
 # > This value should satisfy at least one of the following constraints: [1] This value is too short. It should have 3 items or more. [2] Each element of this collection should satisfy its own set of constraints.
-#
-# #### message_collection
-#
-# **Type:** `String` **Default:** `Each element of this collection should satisfy its own set of constraints.`
-#
-# The message that will be shown if validation fails and the internal constraint is an `AVD::Constraint::All`.
-# See the [message](#message) argument for an example.
 #
 # #### groups
 #

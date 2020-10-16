@@ -1,8 +1,8 @@
 require "../spec_helper"
 
-private alias CONSTRAINT = AVD::Constraints::NotNull
+private alias CONSTRAINT = AVD::Constraints::NotNil
 
-struct NotNullValidatorTest < AVD::Spec::ConstraintValidatorTestCase
+struct NotNilValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("valid_values")]
   def test_valid_values(value : _) : Nil
     self.validator.validate value, self.new_constraint
@@ -21,7 +21,7 @@ struct NotNullValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   def test_nil_is_invalid
     self.validator.validate nil, self.new_constraint message: "my_message"
-    self.assert_violation "my_message", CONSTRAINT::IS_NULL_ERROR, nil
+    self.assert_violation "my_message", CONSTRAINT::IS_NIL_ERROR, nil
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface

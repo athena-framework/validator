@@ -1,6 +1,6 @@
 require "./composite"
 
-# Asserts each element of an `Iterable` is valid based on a collection of constraints.
+# Validates each element of an `Iterable` is valid based on a collection of constraints.
 #
 # ## Configuration
 #
@@ -35,6 +35,8 @@ require "./composite"
 # ```
 # class Example
 #   include AVD::Validatable
+#
+#   def initialize(@strings : Array(String)); end
 #
 #   # Assert each string is not blank and is at least 5 characters long.
 #   @[Assert::All([

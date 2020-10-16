@@ -30,17 +30,7 @@ module Athena::Validator::Violation::ConstraintViolationInterface
 
   # Returns a number used to pluralize the violation message.
   #
-  # For example the `#message_template` could have different versions based on the plurality of the violation.
-  # Currently this only supports two contexts: singular (1) and plural (2+).
-  #
-  # Multiple messages, separated by a `|`, can be included as part of an `AVD::Constraint` message.
-  # For example from `AVD::Constraints::Size`:
-  #
-  # `min_message : String = "This value is too short. It should have {{ limit }} {{ type }} or more.|This value is too short. It should have {{ limit }} {{ type }}s or more."`
-  #
-  # If `#plural` is `1` (or `nil`) the first message will be used.  If `#plural` is `2` or more, the latter message will be used.
-  #
-  # TODO: Support more robust translations; like language or multiple pluralities.
+  # The returned value is used to determine the right plurlaization form.
   abstract def plural : Int32?
 
   # Returns the path from the root element to the violation.
