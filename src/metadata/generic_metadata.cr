@@ -1,13 +1,14 @@
 require "./metadata_interface"
 
-module Athena::Validator::Metadata::GenericMetadata
+class Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::MetadataInterface
+
+  @constraints_by_group = {} of String => Array(AVD::Constraint)
 
   getter constraints : Array(AVD::Constraint) = [] of AVD::Constraint
 
   # :inherit:
   getter cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
-  @constraints_by_group = {} of String => Array(AVD::Constraint)
 
   # Adds the provided *constraint* to `self`'s `#constraints` array.
   #

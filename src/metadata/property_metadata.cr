@@ -1,20 +1,7 @@
 require "./property_metadata_interface"
 
-class Athena::Validator::Metadata::PropertyMetadata(EntityType, PropertyIdx)
-  include Athena::Validator::Metadata::GenericMetadata
-  include Athena::Validator::Metadata::PropertyMetadataInterface
-
-  # :inherit:
-  getter name : String
-
-  def initialize(@name : String); end
-
-  # Returns the class the property `self` represents belongs to.
-  def class_name : EntityType.class
-    EntityType
-  end
-
-  protected def get_value(obj : EntityType)
+class Athena::Validator::Metadata::PropertyMetadata(EntityType) < Athena::Validator::Metadata::MemberMetadata(EntityType)
+  protected def value(obj : EntityType)
     {% begin %}
       {% unless PropertyIdx == Nil %}
         obj.@{{EntityType.instance_vars[PropertyIdx].name.id}}
