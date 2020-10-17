@@ -9,6 +9,8 @@ require "./composite"
 #
 # #### constraints
 #
+# **Type:** `Array(AVD::Constraint) | AVD::Constraint`
+#
 # The `AVD::Constraint`(s) from which at least one of has to be satisfied in order for the validation to succeed.
 #
 # ### Optional Arguments

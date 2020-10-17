@@ -1,3 +1,53 @@
+# Validates that a value matches a regular expression.
+# The underlying value is converted to a string via `#to_s` before being validated.
+#
+# NOTE: As with most other constraints, `nil` and empty strings are considered valid values, in order to allow the value to be optional.
+# If the value is required, consider combining this constraint with `AVD::Constraints::NotBlank`.
+#
+# ## Configuration
+#
+# ### Required Arguments
+#
+# #### pattern
+#
+# **Type:** `::Regex`
+#
+# The `::Regex` pattern that the value should match.
+#
+# ### Optional Arguments
+#
+# #### match
+#
+# **Type:** `Bool` **Default:** `true`
+#
+# If set to `false`, validation will require the value does _NOT_ match the [pattern](#pattern).
+#
+# #### message
+#
+# **Type:** `String` **Default:** `This value should match '{{ pattern }}'.`
+#
+# The message that will be shown if the value does not match the [pattern](#pattern).
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+# * `{{ pattern }}` - The regular expression pattern that the value should match.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::Regex < Athena::Validator::Constraint
   REGEX_FAILED_ERROR = "108987a0-2d81-44a0-b8d4-1c7ab8815343"
 

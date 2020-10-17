@@ -6,6 +6,8 @@
 #
 # #### constraints
 #
+# **Type:** `Array(AVD::Constraint) | AVD::Constraint`
+#
 # The `AVD::Constraint`(s) that are to be applied sequentially.
 #
 # ### Optional Arguments

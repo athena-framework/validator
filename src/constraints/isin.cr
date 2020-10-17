@@ -6,6 +6,8 @@
 #
 # ## Configuration
 #
+# ### Optional Arguments
+#
 # #### message
 #
 # **Type:** `String` **Default:** `This value is not a valid International Securities Identification Number (ISIN).`

@@ -8,6 +8,8 @@ require "./composite"
 #
 # #### constraints
 #
+# **Type:** `Array(AVD::Constraint) | AVD::Constraint`
+#
 # The `AVD::Constraint`(s) that you want to apply to each element of the underlying iterable.
 #
 # ### Optional Arguments
