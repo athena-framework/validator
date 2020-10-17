@@ -9,7 +9,7 @@
 # **Type:** `::Range`
 #
 # The `::Range` that defines the minimum and maximum values, if any.
-# An endless range can be used to only have minimum or maximum.
+# An endless range can be used to only have a minimum or maximum.
 #
 # ### Optional Arguments
 #

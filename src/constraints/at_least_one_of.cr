@@ -57,8 +57,6 @@ require "./composite"
 #
 # ## Usage
 #
-# ### Annotation
-#
 # ```
 # class Example
 #   include AVD::Validatable
@@ -86,17 +84,6 @@ require "./composite"
 #
 # NOTE: The annotation approach only supports two levels of nested annotations.
 # Manually wire up the constraint via code if you require more than that.
-#
-# ### Direct
-#
-# ```
-# constraint = AVD::Constraints::AtLeastOneOf.new([
-#   AVD::Constraints::Size.new(3..),
-#   AVD::Constraints::All.new([
-#     AVD::Constraints::GreaterThanOrEqual.new(5),
-#   ] of AVD::Constraint),
-# ])
-# ```
 class Athena::Validator::Constraints::AtLeastOneOf < Athena::Validator::Constraints::Composite
   DEFAULT_ERROR_MESSAGE = "This value should satisfy at least one of the following constraints:"
   AT_LEAST_ONE_OF_ERROR = "811994eb-b634-42f5-ae98-13eec66481b6"

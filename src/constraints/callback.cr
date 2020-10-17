@@ -4,6 +4,44 @@
 # NOTE: The callback method itself does _fail_ or return any value.
 # Instead it should directly add violations to the `AVD::ExecutionContextInterface` argument.
 #
+# ## Configuration
+#
+# ### Required Arguments
+#
+# #### callback
+#
+# **Type:** `AVD::Constraints::Callback::CallbackProc?` **Default:** `nil`
+#
+# The proc that should be invoked as the callback for this constraint.
+#
+# NOTE: If this argument is not supplied, the [callback_name](#callback_name) argument must be.
+#
+# #### callback_name
+#
+# **Type:** `String?` **Default:** `nil`
+#
+# The name of the method that should be invoked as the callback for this constraint.
+#
+# NOTE: If this argument is not supplied, the [callback](#callback) argument must be.
+#
+# ### Optional Arguments
+#
+# NOTE: This constraint does not support a `message` argument.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
+#
 # ## Usage
 #
 # The callback constraint supports two callback methods when validating objects, and one callback method when using the constraint directly.
@@ -79,44 +117,6 @@
 # See the related types for more information.
 #
 # Proc/block based callbacks operate similarly to [Class Methods](#static-methods) in that they receive the value as an argument.
-#
-# ## Configuration
-#
-# ### Required Arguments
-#
-# #### callback
-#
-# **Type:** `AVD::Constraints::Callback::CallbackProc?` **Default:** `nil`
-#
-# The proc that should be invoked as the callback for this constraint.
-#
-# NOTE: If this argument is not supplied, the [callback_name](#callback_name) argument must be.
-#
-# #### callback_name
-#
-# **Type:** `String?` **Default:** `nil`
-#
-# The name of the method that should be invoked as the callback for this constraint.
-#
-# NOTE: If this argument is not supplied, the [callback](#callback) argument must be.
-#
-# ### Optional Arguments
-#
-# NOTE: This constraint does not support a `message` argument.
-#
-# #### groups
-#
-# **Type:** `Array(String) | String | Nil` **Default:** `nil`
-#
-# The `AVD:Constraint@validation-groups` this constraint belongs to.
-# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
-#
-# #### payload
-#
-# **Type:** `Hash(String, String)?` **Default:** `nil`
-#
-# Any arbitrary domain-specific data that should be stored with this constraint.
-# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::Callback < Athena::Validator::Constraint
   # :nodoc:
   abstract struct ValueContainer; end

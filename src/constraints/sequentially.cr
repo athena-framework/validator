@@ -43,8 +43,6 @@
 #
 # To solve this we can validate these constraints sequentially.
 #
-# ### Annotation
-#
 # ```
 # class Location
 #   include AVD::Validatable
@@ -65,17 +63,6 @@
 #
 # NOTE: The annotation approach only supports two levels of nested annotations.
 # Manually wire up the constraint via code if you require more than that.
-#
-# ### Direct
-#
-# ```
-# constraint = AVD::Constraints::Sequentially.new([
-#   AVD::Constraints::NotBlank.new,
-#   AVD::Constraints::Size.new(10..),
-#   AVD::Constraints::Regex.new(Location::PATTERN),
-#   AVD::Constraints::CustomGeolocalizationConstraint.new,
-# ])
-# ```
 class Athena::Validator::Constraints::Sequentially < Athena::Validator::Constraints::Composite
   def initialize(
     constraints : Array(AVD::Constraint) | AVD::Constraint,

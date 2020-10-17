@@ -32,8 +32,6 @@ require "./composite"
 #
 # ## Usage
 #
-# ### Annotation
-#
 # ```
 # class Example
 #   include AVD::Validatable
@@ -51,15 +49,6 @@ require "./composite"
 #
 # NOTE: The annotation approach only supports two levels of nested annotations.
 # Manually wire up the constraint via code if you require more than that.
-#
-# ### Direct
-#
-# ```
-# constraint = AVD::Constraints::All.new([
-#   AVD::Constraints::NotBlank.new,
-#   AVD::Constraints::Size.new(5..),
-# ])
-# ```
 class Athena::Validator::Constraints::All < Athena::Validator::Constraints::Composite
   def initialize(
     constraints : Array(AVD::Constraint) | AVD::Constraint,

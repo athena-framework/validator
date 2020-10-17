@@ -2,6 +2,26 @@
 #
 # NOTE: See `AVD::Constraint@custom-constraints` for common documentation on defining custom constraints.
 #
+# ## Configuration
+#
+# ### Optional Arguments
+#
+# NOTE: This constraint does not support a `message` argument.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
+#
 # ## Usage
 #
 # This constraint is not used directly on its own;
@@ -36,26 +56,6 @@
 # ```
 # constraint = AVD::Constraints::ValidPassword.new
 # ```
-#
-# ## Configuration
-#
-# ### Optional Arguments
-#
-# NOTE: This constraint does not support a `message` argument.
-#
-# #### groups
-#
-# **Type:** `Array(String) | String | Nil` **Default:** `nil`
-#
-# The `AVD:Constraint@validation-groups` this constraint belongs to.
-# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
-#
-# #### payload
-#
-# **Type:** `Hash(String, String)?` **Default:** `nil`
-#
-# Any arbitrary domain-specific data that should be stored with this constraint.
-# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 abstract class Athena::Validator::Constraints::Compound < Athena::Validator::Constraints::Composite
   def initialize(
     groups : Array(String) | String | Nil = nil,
