@@ -98,9 +98,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     groups = self.normalize_groups groups
 
     class_metadata = @metadata_factory.metadata object
-    property_metadata = class_metadata.property_metadata(property_name)
-
-    return self if property_metadata.nil?
+    property_metadatas = class_metadata.property_metadata property_name
 
     property_path = AVD::PropertyPath.append @default_property_path, property_name
 
@@ -110,17 +108,19 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     previous_path = @context.property_path
     previous_group = @context.group
 
-    property_value = property_metadata.get_value object
+    property_metadatas.each do |property_metadata|
+      property_value = property_metadata.value object
 
-    self.validate_generic_node(
-      property_value,
-      object,
-      property_metadata,
-      property_path,
-      groups,
-      nil,
-      @context
-    )
+      self.validate_generic_node(
+        property_value,
+        object,
+        property_metadata,
+        property_path,
+        groups,
+        nil,
+        @context
+      )
+    end
 
     @context.set_node previous_value, previous_object, previous_metadata, previous_path
     @context.group = previous_group
@@ -133,9 +133,7 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     groups = self.normalize_groups groups
 
     class_metadata = @metadata_factory.metadata object
-    property_metadata = class_metadata.property_metadata(property_name)
-
-    return self if property_metadata.nil?
+    property_metadatas = class_metadata.property_metadata property_name
 
     property_path = AVD::PropertyPath.append @default_property_path, property_name
 
@@ -145,15 +143,17 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     previous_path = @context.property_path
     previous_group = @context.group
 
-    self.validate_generic_node(
-      value,
-      object,
-      property_metadata,
-      property_path,
-      groups,
-      nil,
-      @context
-    )
+    property_metadatas.each do |property_metadata|
+      self.validate_generic_node(
+        value,
+        object,
+        property_metadata,
+        property_path,
+        groups,
+        nil,
+        @context
+      )
+    end
 
     @context.set_node previous_value, previous_object, previous_metadata, previous_path
     @context.group = previous_group
@@ -313,21 +313,21 @@ class Athena::Validator::Validator::RecursiveContextualValidator
     return if groups.empty?
 
     class_metadata.constrained_properties.each do |property_name|
-      property_metadata = class_metadata.property_metadata(property_name)
+      # A constraint can be applied to a property and getter of that property,
+      # thus resulting in two metadata objects being returned.
+      class_metadata.property_metadata(property_name).each do |property_metadata|
+        property_value = property_metadata.value object
 
-      return if property_metadata.nil?
-
-      property_value = property_metadata.get_value object
-
-      self.validate_generic_node(
-        property_value,
-        object,
-        property_metadata,
-        AVD::PropertyPath.append(property_path, property_name),
-        groups,
-        cascaded_groups,
-        context
-      )
+        self.validate_generic_node(
+          property_value,
+          object,
+          property_metadata,
+          AVD::PropertyPath.append(property_path, property_name),
+          groups,
+          cascaded_groups,
+          context
+        )
+      end
     end
 
     return unless object.is_a? Iterable

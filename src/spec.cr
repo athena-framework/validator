@@ -157,13 +157,14 @@ module Athena::Validator::Spec
   end
 
   # A spec implementation of `AVD::Metadata::MetadataFactoryInterface`, supporting a fixed number of additional metadatas
-  struct MockMetadataFactory(T1, T2, T3, T4)
+  struct MockMetadataFactory(T1, T2, T3, T4, T5)
     include AVD::Metadata::MetadataFactoryInterface
 
     @metadatas = Hash(AVD::Validatable::Class, AVD::Metadata::ClassMetadata(T1) |
                                                AVD::Metadata::ClassMetadata(T2) |
                                                AVD::Metadata::ClassMetadata(T3) |
-                                               AVD::Metadata::ClassMetadata(T4)).new
+                                               AVD::Metadata::ClassMetadata(T4) |
+                                               AVD::Metadata::ClassMetadata(T5)).new
 
     def metadata(object : AVD::Validatable) : AVD::Metadata::ClassMetadata
       if metadata = @metadatas[object.class]?

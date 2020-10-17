@@ -6,7 +6,4 @@ module Athena::Validator::Metadata::MetadataInterface
 
   # Returns an array of all constraints in the provided *group*.
   abstract def find_constraints(group : String) : Array(AVD::Constraint)
-
-  # Returns the name of the class `self` represents.
-  abstract def class_name
 end

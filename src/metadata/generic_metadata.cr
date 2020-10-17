@@ -3,11 +3,12 @@ require "./metadata_interface"
 module Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::MetadataInterface
 
+  @constraints_by_group = {} of String => Array(AVD::Constraint)
+
   getter constraints : Array(AVD::Constraint) = [] of AVD::Constraint
 
   # :inherit:
   getter cascading_strategy : AVD::Metadata::CascadingStrategy = AVD::Metadata::CascadingStrategy::None
-  @constraints_by_group = {} of String => Array(AVD::Constraint)
 
   # Adds the provided *constraint* to `self`'s `#constraints` array.
   #
@@ -40,7 +41,7 @@ module Athena::Validator::Metadata::GenericMetadata
     @constraints_by_group[group]? || Array(AVD::Constraint).new
   end
 
-  protected def get_value(entity : AVD::Validatable)
-    raise "BUG: Invoked default get_value"
+  protected def value(entity : AVD::Validatable)
+    raise "BUG: Invoked default value method."
   end
 end

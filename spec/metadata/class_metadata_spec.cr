@@ -52,7 +52,7 @@ struct ClassMetadataTest < ASPEC::TestCase
 
   def test_add_property_constraint_property_metadata_and_single : Nil
     @metadata.add_property_constraint(
-      AVD::Metadata::PropertyMetadata(Entity).new("name"),
+      AVD::Metadata::PropertyMetadata(Entity, Nil).new("name"),
       CustomConstraint.new ""
     )
 
@@ -105,7 +105,7 @@ struct ClassMetadataTest < ASPEC::TestCase
 
   def test_has_property_metadata : Nil
     @metadata.add_property_constraint(
-      AVD::Metadata::PropertyMetadata(Entity).new("name"),
+      AVD::Metadata::PropertyMetadata(Entity, Nil).new("name"),
       CustomConstraint.new ""
     )
 
@@ -114,10 +114,10 @@ struct ClassMetadataTest < ASPEC::TestCase
   end
 
   def test_property_metadata : Nil
-    name_metadata = AVD::Metadata::PropertyMetadata(Entity).new "name"
+    name_metadata = AVD::Metadata::PropertyMetadata(Entity, Nil).new "name"
 
     @metadata.add_property_constraint name_metadata, CustomConstraint.new ""
 
-    @metadata.property_metadata("name").should eq name_metadata
+    @metadata.property_metadata("name").should eq [name_metadata]
   end
 end
