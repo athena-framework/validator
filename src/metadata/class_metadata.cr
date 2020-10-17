@@ -151,6 +151,7 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     self
   end
 
+  # Adds the provided *constraint* to the provided *method_name*.
   def add_getter_constraint(method_name : String, constraint : AVD::Constraint) : self
     self.add_getter_constraint AVD::Metadata::GetterMetadata(T, Nil).new(method_name), constraint
   end
