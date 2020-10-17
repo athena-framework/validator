@@ -196,6 +196,38 @@ alias Assert = AVD::Annotations
 # The metadata for each type is lazily loaded when an instance of that type is validated, and is only built once.
 # See `AVD::Metadata::ClassMetadata` for some additional ways to register property constraints.
 #
+# #### Getters
+#
+# Constraints can also be applied to getter methods of an object.
+# This allows for dynamic validations based on the return value of the method.
+# For example, say we wanted to assert that a user's name is not the same as their password.
+#
+# ```
+# class User
+#   include AVD::Validatable
+#
+#   property name : String
+#   property password : String
+#
+#   def initialize(@name : String, @password : String); end
+#
+#   @[Assert::IsTrue(message: "Your password cannot be the same as your name.")]
+#   def is_safe_password? : Bool
+#     @name != @password
+#   end
+# end
+#
+# validator = AVD.validator
+#
+# user = User.new "foo", "foo"
+#
+# validator.validate(user).empty? # => false
+#
+# user.password = "bar"
+#
+# validator.validate(user).empty? # => true
+# ```
+#
 # ### Custom Constraints
 #
 # If the built in `AVD::Constraints` are not sufficient to handle validating a given value/object; custom ones can be defined.

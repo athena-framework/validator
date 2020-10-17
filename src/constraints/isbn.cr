@@ -1,3 +1,81 @@
+# Validates that an [International Standard Book Number (ISBN)](https://en.wikipedia.org/wiki/Isbn) is either a valid `ISBN-10` or `ISBN-13`.
+# The underlying value is converted to a string via `#to_s` before being validated.
+#
+# NOTE: As with most other constraints, `nil` and empty strings are considered valid values, in order to allow the value to be optional.
+# If the value is required, consider combining this constraint with `AVD::Constraints::NotBlank`.
+#
+# ## Configuration
+#
+# ### Optional Arguments
+#
+# #### type
+#
+# **Type:** `AVD::Constraints::ISBN::Type` **Default:** `AVD::Constraints::ISBN::Type::Both`
+#
+# Type of ISBN to validate against.
+#
+# #### message
+#
+# **Type:** `String` **Default:** `""`
+#
+# The message that will be shown if the value is invalid.
+# This message has priority over the other messages if not empty.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+#
+# #### isbn10_message
+#
+# **Type:** `String` **Default:** `This value is not a valid ISBN-10.`
+#
+# The message that will be shown if [type](#type) is `AVD::Constraints::ISBN::Type::ISBN10` and the value is invalid.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+#
+# #### isbn13_message
+#
+# **Type:** `String` **Default:** `This value is not a valid ISBN-13.`
+#
+# The message that will be shown if [type](#type) is `AVD::Constraints::ISBN::Type::ISBN13` and the value is invalid.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+#
+# #### both_message
+#
+# **Type:** `String` **Default:** `This value is neither a valid ISBN-10 nor a valid ISBN-13.`
+#
+# The message that will be shown if [type](#type) is `AVD::Constraints::ISBN::Type::Both` and the value is invalid.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::ISBN < Athena::Validator::Constraint
   enum Type
     ISBN10
@@ -37,13 +115,16 @@ class Athena::Validator::Constraints::ISBN < Athena::Validator::Constraint
     @isbn10_message : String = "This value is not a valid ISBN-10.",
     @isbn13_message : String = "This value is not a valid ISBN-13.",
     @both_message : String = "This value is neither a valid ISBN-10 nor a valid ISBN-13.",
+    message : String = "",
     groups : Array(String) | String | Nil = nil,
     payload : Hash(String, String)? = nil
   )
-    super "", groups, payload
+    super message, groups, payload
   end
 
   def message : String
+    return @message unless @message.empty?
+
     @type.message self
   end
 

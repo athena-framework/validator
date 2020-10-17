@@ -17,7 +17,7 @@ class Athena::Validator::Metadata::GetterMetadata(EntityType, MethodIdx)
   protected def value(obj : EntityType)
     {% begin %}
       {% unless MethodIdx == Nil %}
-        obj.@{{EntityType.methods[MethodIdx].name.id}}
+        obj.{{EntityType.methods[MethodIdx].name.id}}
       {% else %}
         case @name
           {% for m in EntityType.methods.reject &.name.ends_with? '=' %}

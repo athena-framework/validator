@@ -12,6 +12,11 @@ struct ISBNValidatorTest < AVD::Spec::ConstraintValidatorTestCase
     self.validator.validate "", self.new_constraint
   end
 
+  def test_message_is_used_if_set : Nil
+    self.validator.validate "asdf", self.new_constraint message: "my_message"
+    self.assert_violation "my_message", CONSTRAINT::INVALID_CHARACTERS_ERROR, "asdf"
+  end
+
   @[DataProvider("valid_isbn10s")]
   def test_valid_isbn10s(value : String) : Nil
     self.validator.validate value, self.new_constraint type: CONSTRAINT::Type::ISBN10

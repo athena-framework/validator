@@ -28,7 +28,7 @@ require "./composite"
 # Any arbitrary domain-specific data that should be stored with this constraint.
 # The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 #
-# ## Examples
+# ## Usage
 #
 # ### Annotation
 #
