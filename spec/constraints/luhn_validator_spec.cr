@@ -44,10 +44,7 @@ struct LuhnValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("invalid_numbers")]
   def test_invalid_numbers(value : String, code : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", code, value)
-      .assert_violation
+    self.assert_violation "my_message", code, value
   end
 
   def invalid_numbers : Tuple

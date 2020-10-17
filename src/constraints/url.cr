@@ -1,3 +1,50 @@
+# Validates that a value is a valid URL string.
+# The underlying value is converted to a string via `#to_s` before being validated.
+#
+# NOTE: As with most other constraints, `nil` and empty strings are considered valid values, in order to allow the value to be optional.
+# If the value is required, consider combining this constraint with `AVD::Constraints::NotBlank`.
+#
+# ## Configuration
+#
+# ### Optional Arguments
+#
+# #### protocols
+#
+# **Type:** `Array(String)` **Default:** `["http", "https"]`
+#
+# The protocols considered to be valid for the URL.
+#
+# #### relative_protocol
+#
+# **Type:** `Bool` **Default:** `false`
+#
+# If `true` the protocol is considered optional.
+#
+# #### message
+#
+# **Type:** `String` **Default:** `This value is not a valid URL.`
+#
+# The message that will be shown if the URL is not valid.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::URL < Athena::Validator::Constraint
   INVALID_URL_ERROR = "e87ceba6-a896-4906-9957-b102045272ee"
 
@@ -26,10 +73,7 @@ class Athena::Validator::Constraints::URL < Athena::Validator::Constraint
       return if value.nil? || value.empty?
       return if value.matches? self.pattern(constraint)
 
-      self
-        .context
-        .build_violation(constraint.message, INVALID_URL_ERROR, value)
-        .add
+      self.context.add_violation constraint.message, INVALID_URL_ERROR, value
     end
 
     def pattern(constraint : AVD::Constraints::URL) : ::Regex

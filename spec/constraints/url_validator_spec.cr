@@ -119,20 +119,14 @@ struct URLValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   @[DataProvider("invalid_urls")]
   def test_invalid_urls(value : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::INVALID_URL_ERROR, value)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::INVALID_URL_ERROR, value
   end
 
   @[DataProvider("invalid_urls")]
   @[DataProvider("invalid_relative_urls")]
   def test_invalid_relative_urls(value : String) : Nil
     self.validator.validate value, self.new_constraint message: "my_message", relative_protocol: true
-
-    self
-      .build_violation("my_message", CONSTRAINT::INVALID_URL_ERROR, value)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::INVALID_URL_ERROR, value
   end
 
   def invalid_urls : Tuple

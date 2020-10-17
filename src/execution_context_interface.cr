@@ -1,6 +1,22 @@
 # Stores contextual data related to the current validation run.
 #
 # This includes the violations generated so far, the current constraint, value being validated, etc.
+#
+# ### Adding Violations
+#
+# As mentioned in the `AVD::ConstraintValidatorInterface` documentation,
+# violations are not returned from the `AVD::ConstraintValidatorInterface#validate` method.
+# Instead they are added to the `AVD::ConstraintValidatorInterface#context` instance.
+#
+# The simplest way to do so is via the `#add_violation` method, which accepts the violation message,
+# and any parameters that should be used to render the message.
+# Additional overloads exist to make adding a value with a specific message, and code, or message, code, and `{{ value }}` placeholder value easier.
+#
+# #### Building violations
+#
+# In some cases you may wish to add additional data to the `AVD::Violation::ConstraintViolationInterface` before adding it to `self`.
+# To do this, you can also use the `#build_violation` method, which returns an `AVD::Violation::ConstraintViolationBuilderInterface`
+# that can be used to construct a violation, with an easier API.
 module Athena::Validator::ExecutionContextInterface
   # Adds a violation with the provided *message*, and optionally *parameters* based on the node currently being validated.
   abstract def add_violation(message : String, parameters : Hash(String, String) = {} of String => String) : Nil
@@ -9,6 +25,8 @@ module Athena::Validator::ExecutionContextInterface
   abstract def add_violation(message : String, code : String) : Nil
 
   # Adds a violation with the provided *message*, and *code*, *value* parameter.
+  #
+  # The provided *value* is added to the violations' parameters as `"{{ value }}"`.
   abstract def add_violation(message : String, code : String, value : _) : Nil
 
   # Returns an `AVD::Violation::ConstraintViolationBuilderInterface` with the provided *message*.
@@ -21,26 +39,23 @@ module Athena::Validator::ExecutionContextInterface
 
   # Returns an `AVD::Violation::ConstraintViolationBuilderInterface` with the provided *message*, and *code*, and *value*.
   #
-  # The provided *value* is added to the violation's parameters as `"{{ value }}"`.
+  # The provided *value* is added to the violations' parameters as `"{{ value }}"`.
   abstract def build_violation(message : String, code : String, value : _) : AVD::Violation::ConstraintViolationBuilderInterface
 
   # Returns the class that is currently being validated.
   abstract def class_name
 
-  # Returns the `AVD::Constraint` that is currently being validated.
+  # Returns the `AVD::Constraint` that is currently being validated, if any.
   abstract def constraint : AVD::Constraint?
 
-  # Returns the group that is currently being validated.
+  # Returns the group that is currently being validated, if any.
   abstract def group : String?
-
-  # Returns the object initially passed to `#validate`.
-  abstract def root
 
   # Returns an `AVD::Metadata::MetadataInterface` object for the value currently being validated.
   #
   # This would be an `AVD::Metadata::PropertyMetadataInterface` if the current value is an object,
   # an `AVD::Metadata::GenericMetadata` if the current value is a plain value, and an
-  # `AVD::Metadata::ClassMetadataInterface` if the current value value is an entire class.
+  # `AVD::Metadata::ClassMetadata` if the current value value is an entire class.
   abstract def metadata : AVD::Metadata::MetadataInterface?
 
   # Returns the object that is currently being validated.
@@ -61,6 +76,9 @@ module Athena::Validator::ExecutionContextInterface
   # addresses, the property path when validating the first street of the first address
   # would be `addresses[0].street`.
   abstract def property_path : String
+
+  # Returns the object initially passed to `AVD::Validator::ValidatorInterface#validate`.
+  abstract def root
 
   # Returns a reference to an `AVD::Validator::ValidatorInterface` that can be used to validate
   # additional constraints as part of another constraint.

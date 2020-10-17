@@ -1,3 +1,34 @@
+# Validates that a value is blank; meaning equal to an empty string or `nil`.
+#
+# ## Configuration
+#
+# ### Optional Arguments
+#
+# #### message
+#
+# **Type:** `String` **Default:** `This value should be blank.`
+#
+# The message that will be shown if the value is not blank.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::Blank < Athena::Validator::Constraint
   NOT_BLANK_ERROR = "c815f901-c581-4fb7-a85d-b8c5bc757959"
 
@@ -19,10 +50,7 @@ class Athena::Validator::Constraints::Blank < Athena::Validator::Constraint
       return if value.nil?
       return if value.responds_to?(:blank?) && value.blank?
 
-      self
-        .context
-        .build_violation(constraint.message, NOT_BLANK_ERROR, value)
-        .add
+      self.context.add_violation constraint.message, NOT_BLANK_ERROR, value
     end
   end
 end

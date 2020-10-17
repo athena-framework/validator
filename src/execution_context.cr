@@ -1,6 +1,7 @@
 require "./validator/validator_interface"
 require "./execution_context_interface"
 
+# Basic implementation of `AVD::ExecutionContextInterface`.
 class Athena::Validator::ExecutionContext(Root)
   include Athena::Validator::ExecutionContextInterface
 

@@ -1,3 +1,4 @@
+# :nodoc:
 abstract struct Athena::Validator::Spec::ValidatorTestCase < AVD::Spec::AbstractValidatorTestCase
   getter! validator : AVD::Validator::ValidatorInterface
 
@@ -22,7 +23,7 @@ abstract struct Athena::Validator::Spec::ValidatorTestCase < AVD::Spec::Abstract
   end
 
   def test_validate_constraint_without_group : Nil
-    self.validate(nil, AVD::Constraints::NotNull.new).size.should eq 1
+    self.validate(nil, AVD::Constraints::NotNil.new).size.should eq 1
   end
 
   def test_validate_empty_array_as_constraint : Nil
@@ -371,7 +372,7 @@ abstract struct Athena::Validator::Spec::ValidatorTestCase < AVD::Spec::Abstract
     @metadata.add_property_constraint "sub_object", AVD::Constraints::Valid.new groups: ["group1", "group2"]
 
     @sub_object_metadata.add_property_constraint "value", AVD::Constraints::NotBlank.new groups: "group1"
-    @sub_object_metadata.add_property_constraint "value", AVD::Constraints::NotNull.new groups: "group2"
+    @sub_object_metadata.add_property_constraint "value", AVD::Constraints::NotNil.new groups: "group2"
 
     self.validate(object, nil, ["default", "group1", "group2"]).size.should eq 3
   end

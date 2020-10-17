@@ -1,19 +1,37 @@
 require "./constraint_violation_interface"
 
+# Basic implementation of `AVD::Violation::ConstraintViolationInterface`.
 struct Athena::Validator::Violation::ConstraintViolation(Root)
   include Athena::Validator::Violation::ConstraintViolationInterface
 
   protected getter invalid_value_container : AVD::Container
 
-  getter message : String
-  getter message_template : String?
-  getter parameters : Hash(String, String)
-  getter plural : Int32?
-  getter root : Root
-  getter constraint : AVD::Constraint?
-  getter property_path : String
-  getter code : String?
+  # :inherit:
   getter cause : String?
+
+  # :inherit:
+  getter code : String?
+
+  # :inherit:
+  getter! constraint : AVD::Constraint
+
+  # :inherit:
+  getter message : String
+
+  # :inherit:
+  getter message_template : String?
+
+  # :inherit:
+  getter parameters : Hash(String, String)
+
+  # :inherit:
+  getter plural : Int32?
+
+  # :inherit:
+  getter property_path : String
+
+  # :inherit:
+  getter root : Root
 
   def initialize(
     @message : String,
@@ -29,10 +47,24 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
   )
   end
 
+  # :inherit:
   def invalid_value
     @invalid_value_container.value
   end
 
+  # :inherit:
+  def to_json(builder : JSON::Builder) : Nil
+    builder.object do
+      builder.field "property", @property_path
+      builder.field "message", @message
+
+      if (code = @code)
+        builder.field "code", code
+      end
+    end
+  end
+
+  # :inherit:
   def to_s(io : IO) : Nil
     klass = case @root
             when Hash             then "Hash"
@@ -50,17 +82,7 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
     io.puts "#{klass}#{@property_path}:\n\t#{@message}#{code}"
   end
 
-  def to_json(builder : JSON::Builder) : Nil
-    builder.object do
-      builder.field "property", @property_path
-      builder.field "message", @message
-
-      if (code = @code)
-        builder.field "code", code
-      end
-    end
-  end
-
+  # Returns `true` if *other* is the same as `self`, otherwise `false`.
   def ==(other : self) : Bool
     @message == other.message &&
       @message_template == other.message_template &&
@@ -70,7 +92,7 @@ struct Athena::Validator::Violation::ConstraintViolation(Root)
       @invalid_value_container == other.invalid_value_container &&
       @plural == other.plural &&
       @code == other.code &&
-      @constraint == other.constraint &&
+      @constraint == other.constraint? &&
       @cause == other.cause
   end
 end

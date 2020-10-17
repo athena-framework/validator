@@ -1,5 +1,6 @@
 require "./constraint_validator_factory_interface"
 
+# Basic implementation of `AVD::ConstraintValidatorFactoryInterface`.
 struct Athena::Validator::ConstraintValidatorFactory
   include Athena::Validator::ConstraintValidatorFactoryInterface
 

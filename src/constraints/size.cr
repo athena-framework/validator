@@ -1,3 +1,78 @@
+# Validates that the `#size` of a `String` or `Indexable` value is between some minimum and maximum.
+#
+# ## Configuration
+#
+# ### Required Arguments
+#
+# #### range
+#
+# **Type:** `::Range`
+#
+# The `::Range` that defines the minimum and maximum values, if any.
+# An endless range can be used to only have a minimum or maximum.
+#
+# ### Optional Arguments
+#
+# NOTE: This constraint does not support a `message` argument.
+#
+# #### exact_message
+#
+# **Type:** `String` **Default:** `This value should have exactly {{ limit }} {{ type }}.|This value should have exactly {{ limit }} {{ type }}s.`
+#
+# The message that will be shown if min and max values are equal and the underlying value’s size is not exactly this value.
+# The message is pluralized depending on how many elements/characters the underlying value has.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+# * `{{ limit }}` - The exact expected size.
+# * `{{ type }}` - `character` if the value is a string or `item` if the value is an indexable.
+#
+# #### min_message
+#
+# **Type:** `String` **Default:** `This value is too short. It should have {{ limit }} {{ type }} or more.|This value is too short. It should have {{ limit }} {{ type }}s or more.`
+#
+# The message that will be shown if the underlying value’s size is less than the min.
+# The message is pluralized depending on how many elements/characters the underlying value has.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+# * `{{ limit }}` - The expected minimum size.
+# * `{{ type }}` - `character` if the value is a string or `item` if the value is an indexable.
+#
+# #### max_message
+#
+# **Type:** `String` **Default:** `This value is too long. It should have {{ limit }} {{ type }} or less.|This value is too long. It should have {{ limit }} {{ type }}s or less.`
+#
+# The message that will be shown if the underlying value’s size is greater than the max.
+# The message is pluralized depending on how many elements/characters the underlying value has.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+# * `{{ limit }}` - The expected minimum size.
+# * `{{ type }}` - `character` if the value is a string or `item` if the value is an indexable.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::Size < Athena::Validator::Constraint
   TOO_SHORT_ERROR = "8ba31c71-1b37-4b76-8bc9-66896589b01f"
   TOO_LONG_ERROR  = "a1fa7a63-ea3b-46a0-adcc-5e1bcc26f73a"

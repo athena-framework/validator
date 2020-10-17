@@ -17,36 +17,19 @@ struct NotBlankValidatorTest < AVD::Spec::ConstraintValidatorTestCase
     }
   end
 
-  def test_nil_is_invalid
-    self.validator.validate nil, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::IS_BLANK_ERROR, nil)
-      .assert_violation
-  end
-
   def test_blank_is_invalid
     self.validator.validate "", self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::IS_BLANK_ERROR, "")
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::IS_BLANK_ERROR, ""
   end
 
   def test_false_is_invalid
     self.validator.validate false, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::IS_BLANK_ERROR, false)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::IS_BLANK_ERROR, false
   end
 
   def test_empty_array_is_invalid
     self.validator.validate [] of String, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", CONSTRAINT::IS_BLANK_ERROR, [] of String)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::IS_BLANK_ERROR, [] of String
   end
 
   def test_allow_nil_true
@@ -56,10 +39,7 @@ struct NotBlankValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   def test_allow_nil_false
     self.validator.validate nil, self.new_constraint message: "my_message", allow_nil: false
-
-    self
-      .build_violation("my_message", CONSTRAINT::IS_BLANK_ERROR, nil)
-      .assert_violation
+    self.assert_violation "my_message", CONSTRAINT::IS_BLANK_ERROR, nil
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface

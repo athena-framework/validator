@@ -101,11 +101,11 @@ alias Assert = AVD::Annotations
 # By default, in addition to any constraint specific arguments, the majority of the constraints have three optional arguments: `message`, `groups`, and `payload`.
 #
 # * The `message` argument represents the message that should be used if the value is found to not be valid.
-# The message can also include placeholders that will be replaced when the message is rendered.
+# The message can also include placeholders, in the form of `{{ key }}`, that will be replaced when the message is rendered.
 # Most commonly this includes the invalid value itself, but some constraints have additional placeholders.
 # * The `payload` argument can be used to attach any domain specific data to the constraint; such as attaching a severity with each constraint
 # to have more serious violations be handled differently.
-# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validation Groups](./Validator.html#validation-groups) section.
+# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validation Groups](#validation-groups) section.
 #
 # ```
 # validator = AVD.validator
@@ -140,7 +140,7 @@ alias Assert = AVD::Annotations
 #
 #   # Arguments to the constraint can be used normally as well.
 #   # The constraint's default argument can also be supplied positionally: `@[Assert::GreaterThan(0)]`.
-#   @[Assert::NotNull(message: "A user's age cannot be null")]
+#   @[Assert::NotNil(message: "A user's age cannot be null")]
 #   getter age : Int32?
 # end
 #
@@ -196,6 +196,38 @@ alias Assert = AVD::Annotations
 # The metadata for each type is lazily loaded when an instance of that type is validated, and is only built once.
 # See `AVD::Metadata::ClassMetadata` for some additional ways to register property constraints.
 #
+# #### Getters
+#
+# Constraints can also be applied to getter methods of an object.
+# This allows for dynamic validations based on the return value of the method.
+# For example, say we wanted to assert that a user's name is not the same as their password.
+#
+# ```
+# class User
+#   include AVD::Validatable
+#
+#   property name : String
+#   property password : String
+#
+#   def initialize(@name : String, @password : String); end
+#
+#   @[Assert::IsTrue(message: "Your password cannot be the same as your name.")]
+#   def is_safe_password? : Bool
+#     @name != @password
+#   end
+# end
+#
+# validator = AVD.validator
+#
+# user = User.new "foo", "foo"
+#
+# validator.validate(user).empty? # => false
+#
+# user.password = "bar"
+#
+# validator.validate(user).empty? # => true
+# ```
+#
 # ### Custom Constraints
 #
 # If the built in `AVD::Constraints` are not sufficient to handle validating a given value/object; custom ones can be defined.
@@ -209,7 +241,7 @@ alias Assert = AVD::Annotations
 #   # (Optional) A unique error code can also be defined to provide a machine readable identifier for a specific error.
 #   NOT_ALPHANUMERIC_ERROR = "1a83a8bd-ff79-4d5c-96e7-86d0b25b8a09"
 #
-#   # (Optional) Allows using the `.error_message(code : String) : String` method with this type.
+#   # (Optional) Allows using the `.error_message(code : String) : String` method with this constraint.
 #   @@error_names = {
 #     NOT_ALPHANUMERIC_ERROR => "NOT_ALPHANUMERIC_ERROR",
 #   }
@@ -217,7 +249,7 @@ alias Assert = AVD::Annotations
 #   # Define an initializer with our default message, and any additional arguments specific to this constraint.
 #   def initialize(
 #     message : String = "This value should contain only alphanumeric characters.",
-#     groups : Array(String)? = nil,
+#     groups : Array(String) | String | Nil = nil,
 #     payload : Hash(String, String)? = nil
 #   )
 #     super message, groups, payload
@@ -230,7 +262,7 @@ alias Assert = AVD::Annotations
 #     # Overloads can be used to filter values of specific types.
 #     def validate(value : _, constraint : AVD::Constraints::AlphaNumeric) : Nil
 #       # Custom constraints should ignore nil and empty values to allow
-#       # other constraints (NotBlank, NotNull, etc.) take care of that
+#       # other constraints (NotBlank, NotNil, etc.) take care of that
 #       return if value.nil? || value == ""
 #
 #       # We'll cast the value to a string,
@@ -242,7 +274,7 @@ alias Assert = AVD::Annotations
 #
 #       # Otherwise, it is invalid and we need to add a violation,
 #       # see `AVD::ExecutionContextInterface` for additional information.
-#       self.context.add_violation(constraint.message, NOT_ALPHANUMERIC_ERROR, value)
+#       self.context.add_violation constraint.message, NOT_ALPHANUMERIC_ERROR, value
 #     end
 #   end
 # end
@@ -259,15 +291,13 @@ alias Assert = AVD::Annotations
 #
 # See `AVD::ConstraintValidatorInterface` for more information on custom validators.
 #
-# NOTE:  The `AVD::Constraints::Compound` constraint can be used to create a constraint that consists of one or more other constraints.
-#
 # ### Validation Groups
 #
 # By default when validating an object, all constraints defined on that type will be checked.
 # However, in some cases you may only want to validate the object against _some_ of those constraints.
 # This can be accomplished via assigning each constraint to a validation group, then apply validation against one specific group of constraints.
 #
-# For example, using our `User` class from earlier, say we only want to only validate certain properties when the user is first created.
+# For example, using our `User` class from earlier, say we only want to validate certain properties when the user is first created.
 # To do this we can utilize the `groups` argument that all constraints have.
 #
 # ```
@@ -293,18 +323,11 @@ alias Assert = AVD::Annotations
 # # if no groups are supplied, then all constraints in the "default" group will be used.
 # violations = AVD.validator.validate user, groups: "create"
 #
-# # There are no violations since the city's size is not validated since it's not in the "create" group
+# # There are no violations since the city's size is not validated since it's not in the "create" group.
 # violations.empty? # => true
 # ```
 #
-# Using this configuration, there are three groups at play within the `User` class:
-# 1. `default` - Contains constraints in the current type, and subtypes, that belong to no other group.  I.e. `city`.
-# 1. `User` - Equivalent to all constraints in the `default` group.  See the [Sequential Validation](./Validator.html#sequential-validation) section.
-# 1. `create` - A custom group that only contains the constraints explicitly associated with it.  I.e. `email`, and `password`.
-#
-# NOTE: When validating _just_ the `User` object, the `default` group is equivalent to the `User` group.
-# However, if the `User` object has other embedded types using the `AVD::Constraints::Valid` constraint, then validating the `User` object with the `User`
-# group would only validate constraints that are explicitly in the `User` group within the embedded types.
+# See `AVD::Constraint@validation-groups` for some expanded information.
 #
 # ### Sequential Validation
 #
@@ -367,6 +390,27 @@ module Athena::Validator
   # NOTE: Constraints, including custom ones, are automatically added to this namespace.
   module Annotations; end
 
+  # Contains all of the built in `AVD::Constraint`s.
+  # See each individual constraint for more information.
+  # The `Assert` alias is used to apply these constraints via annotations.
+  module Constraints; end
+
+  # Contains all custom exceptions defined within `Athena::Validator`.
+  module Exceptions; end
+
+  # Contains types used to store metadata associated with a given `AVD::Validatable` instance.
+  #
+  # Most likely you won't have to work any of these directly.
+  # However if you are adding constraints manually to properties using the `self.load_metadata` method,
+  # you should be familiar with `AVD::Metadata::ClassMetadata`.
+  module Metadata; end
+
+  # Contains types related to the validator itself.
+  module Validator; end
+
+  # Contains types related to constraint violations.
+  module Violation; end
+
   # :nodoc:
   abstract struct Container; end
 
@@ -381,6 +425,13 @@ module Athena::Validator
     end
   end
 
+  # Returns a new `AVD::Validator::ValidatorInterface`.
+  #
+  # ```
+  # validator = AVD.validator
+  #
+  # validator.validate "foo", AVD::Constraints::NotBlank.new
+  # ```
   def self.validator : AVD::Validator::ValidatorInterface
     AVD::Validator::RecursiveValidator.new
   end

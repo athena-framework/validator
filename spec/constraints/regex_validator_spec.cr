@@ -43,6 +43,7 @@ struct RegexValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
     self
       .build_violation("my_message", CONSTRAINT::REGEX_FAILED_ERROR, value)
+      .add_parameter("{{ pattern }}", /^[0-9]+$/)
       .assert_violation
   end
 

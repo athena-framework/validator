@@ -165,7 +165,9 @@ struct RangeValidatorTest < AVD::Spec::ConstraintValidatorTestCase
       {19.99999},
       {10},
       {20},
+      {20_i64},
       {10.0},
+      {10.0_f32},
       {20.0},
       {nil},
     }

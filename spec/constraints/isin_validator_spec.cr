@@ -87,10 +87,7 @@ struct ISINValidatorTest < AVD::Spec::ConstraintValidatorTestCase
 
   private def assert_violation(isin : String, code : String) : Nil
     self.validator.validate isin, self.new_constraint message: "my_message"
-
-    self
-      .build_violation("my_message", code, isin)
-      .assert_violation
+    self.assert_violation "my_message", code, isin
   end
 
   private def create_validator : AVD::ConstraintValidatorInterface

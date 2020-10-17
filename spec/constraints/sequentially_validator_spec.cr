@@ -9,7 +9,7 @@ struct SequentiallyValidatorTest < AVD::Spec::ConstraintValidatorTestCase
   end
 
   def ptest_stop_at_first_constraint_with_violation : Nil
-    self.validator.validate nil, self.new_constraint constraints: [AVD::Constraints::NotBlank.new, AVD::Constraints::NotNull.new]
+    self.validator.validate nil, self.new_constraint constraints: [AVD::Constraints::NotBlank.new, AVD::Constraints::NotNil.new]
 
     # TODO: Determine how to test this given it depends on an actual validator instance
   end

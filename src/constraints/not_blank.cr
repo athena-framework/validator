@@ -1,3 +1,40 @@
+# Validates that a value is not blank; meaning not equal to a blank string, an empty `Iterable`, `false`, or optionally `nil`.
+#
+# ## Configuration
+#
+# ### Optional Arguments
+#
+# #### allow_nil
+#
+# **Type:** `Bool` **Default:** `false`
+#
+# If set to `true`, `nil` values are considered valid and will not trigger a violation.
+#
+# #### message
+#
+# **Type:** `String` **Default:** `This value should not be blank.`
+#
+# The message that will be shown if the value is blank.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
   IS_BLANK_ERROR = "0d0c3254-3642-4cb0-9882-46ee5918e6e3"
 
@@ -32,7 +69,7 @@ class Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
     end
 
     # :inherit:
-    def validate(value : Indexable?, constraint : AVD::Constraints::NotBlank) : Nil
+    def validate(value : Iterable?, constraint : AVD::Constraints::NotBlank) : Nil
       validate_value(value, constraint) do |v|
         v.empty?
       end
@@ -42,10 +79,7 @@ class Athena::Validator::Constraints::NotBlank < Athena::Validator::Constraint
       return if value.nil? && constraint.allow_nil?
 
       if value.nil? || yield value
-        return self
-          .context
-          .build_violation(constraint.message, IS_BLANK_ERROR, value)
-          .add
+        self.context.add_violation constraint.message, IS_BLANK_ERROR, value
       end
     end
   end

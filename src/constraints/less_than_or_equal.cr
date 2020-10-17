@@ -1,3 +1,44 @@
+# Validates that a value is less than or equal to another.
+#
+# ## Configuration
+#
+# ### Required Arguments
+#
+# #### value
+#
+# **Type:** `Number | String | Time`
+#
+# Defines the value that the value being validated should be compared to.
+#
+# ### Optional Arguments
+#
+# #### message
+#
+# **Type:** `String` **Default:** `This value should be less than or equal to {{ compared_value }}.`
+#
+# The message that will be shown if the value is not less than or equal to the comparison value.
+#
+# ##### Placeholders
+#
+# The following placeholders can be used in this message:
+#
+# * `{{ value }}` - The current (invalid) value.
+# * `{{ compared_value }}` - The expected value.
+# * `{{ compared_value_type }}` - The type of the expected value.
+#
+# #### groups
+#
+# **Type:** `Array(String) | String | Nil` **Default:** `nil`
+#
+# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
+#
+# #### payload
+#
+# **Type:** `Hash(String, String)?` **Default:** `nil`
+#
+# Any arbitrary domain-specific data that should be stored with this constraint.
+# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::LessThanOrEqual(ValueType) < Athena::Validator::Constraint
   include Athena::Validator::Constraints::AbstractComparison(ValueType)
 

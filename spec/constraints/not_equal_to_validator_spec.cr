@@ -2,24 +2,24 @@ require "../spec_helper"
 
 private alias CONSTRAINT = AVD::Constraints::NotEqualTo
 
-struct NotEqualToValidatorTest < AVD::Spec::AbstractComparisonValidatorTestCase
-  def valid_comparisons : NamedTuple
+struct NotEqualToValidatorTest < AVD::Spec::ComparisonConstraintValidatorTestCase
+  def valid_comparisons : Tuple
     {
-      int:    {1, 2},
-      char:   {'b', 'a'},
-      string: {"b", "a"},
-      time:   {Time.utc(2020, 4, 8), Time.utc(2020, 4, 7)},
-      nil:    {nil, false},
+      {1, 2},
+      {'b', 'a'},
+      {"b", "a"},
+      {Time.utc(2020, 4, 8), Time.utc(2020, 4, 7)},
+      {nil, false},
 
     }
   end
 
-  def invalid_comparisons : NamedTuple
+  def invalid_comparisons : Tuple
     {
-      int:    {3, 3},
-      char:   {'a', 'a'},
-      string: {"a", "a"},
-      time:   {Time.utc(2020, 4, 7), Time.utc(2020, 4, 7)},
+      {3, 3},
+      {'a', 'a'},
+      {"a", "a"},
+      {Time.utc(2020, 4, 7), Time.utc(2020, 4, 7)},
     }
   end
 
