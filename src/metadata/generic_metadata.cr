@@ -1,6 +1,6 @@
 require "./metadata_interface"
 
-class Athena::Validator::Metadata::GenericMetadata
+module Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::MetadataInterface
 
   @constraints_by_group = {} of String => Array(AVD::Constraint)
@@ -41,7 +41,7 @@ class Athena::Validator::Metadata::GenericMetadata
     @constraints_by_group[group]? || Array(AVD::Constraint).new
   end
 
-  protected def get_value(entity : AVD::Validatable)
-    raise "BUG: Invoked default get_value"
+  protected def value(entity : AVD::Validatable)
+    raise "BUG: Invoked default value method."
   end
 end

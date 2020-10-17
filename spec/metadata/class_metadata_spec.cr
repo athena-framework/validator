@@ -118,6 +118,6 @@ struct ClassMetadataTest < ASPEC::TestCase
 
     @metadata.add_property_constraint name_metadata, CustomConstraint.new ""
 
-    @metadata.property_metadata("name").should eq name_metadata
+    @metadata.property_metadata("name").should eq [name_metadata]
   end
 end

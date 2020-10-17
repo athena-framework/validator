@@ -6,5 +6,5 @@ module Athena::Validator::Metadata::PropertyMetadataInterface
   abstract def name : String
 
   # Returns the value of the member represented by `self.
-  protected abstract def value(obj : AVD::Validatable)
+  protected abstract def value(obj)
 end

@@ -119,10 +119,9 @@ class Athena::Validator::Metadata::ClassMetadata(T)
   # The `AVD::Constraints::GroupSequence` used by `self`, if any.
   getter group_sequence : AVD::Constraints::GroupSequence? = nil
 
-  @properties : Hash(String, AVD::Metadata::PropertyMetadataInterface) = Hash(String, AVD::Metadata::PropertyMetadataInterface).new
   @getters : Hash(String, AVD::Metadata::PropertyMetadataInterface) = Hash(String, AVD::Metadata::PropertyMetadataInterface).new
-
   @members : Hash(String, Array(AVD::Metadata::PropertyMetadataInterface)) = Hash(String, Array(AVD::Metadata::PropertyMetadataInterface)).new
+  @properties : Hash(String, AVD::Metadata::PropertyMetadataInterface) = Hash(String, AVD::Metadata::PropertyMetadataInterface).new
 
   def initialize
     @default_group = T.to_s
@@ -133,7 +132,7 @@ class Athena::Validator::Metadata::ClassMetadata(T)
   end
 
   # Adds each of the provided *constraints* to `self`.
-  def add_constraint(constraints : Array(AVD::Constraint)) : AVD::Metadata::ClassMetadata
+  def add_constraint(constraints : Array(AVD::Constraint)) : self
     constraints.each do |constraint|
       self.add_constraint constraint
     end
@@ -144,7 +143,7 @@ class Athena::Validator::Metadata::ClassMetadata(T)
   # :inherit:
   #
   # Also adds the `#class_name` based group via `AVD::Constraint#add_implicit_group`.
-  def add_constraint(constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
+  def add_constraint(constraint : AVD::Constraint) : self
     constraint.add_implicit_group @default_group
 
     super constraint
@@ -152,59 +151,37 @@ class Athena::Validator::Metadata::ClassMetadata(T)
     self
   end
 
-  def add_getter_constraint(getter_metadata : AVD::Metadata::PropertyMetadataInterface, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
-    unless @getters.has_key? getter_metadata.name
-      @getters[getter_metadata.name] = getter_metadata
-    end
-
-    constraint.add_implicit_group @default_group
-
-    @getters[getter_metadata.name].add_constraint constraint
-
-    self
-  end
-
-  def add_getter_constraint(method_name : String, constraint : AVD::Constraint) : Nil
+  def add_getter_constraint(method_name : String, constraint : AVD::Constraint) : self
     self.add_getter_constraint AVD::Metadata::GetterMetadata(T, Nil).new(method_name), constraint
-
-    self
   end
 
   # Adds a hash of constraints to `self`, where the keys represent the property names, and the value
   # is the constraint/array of constraints to add.
-  def add_property_constraints(property_hash : Hash(String, AVD::Constraint | Array(AVD::Constraint))) : Nil
+  def add_property_constraints(property_hash : Hash(String, AVD::Constraint | Array(AVD::Constraint))) : self
     property_hash.each do |property_name, constraints|
       self.add_property_constraint property_name, constraints
     end
-  end
-
-  # Adds each of the provided *constraints* to the provided *property_name*.
-  def add_property_constraint(property_name : String, constraints : Array(AVD::Constraint)) : Nil
-    constraints.each do |constraint|
-      self.add_property_constraint property_name, constraint
-    end
-  end
-
-  # Adds the provided *constraint* to the provided *property_name*.
-  def add_property_constraint(property_name : String, constraint : AVD::Constraint) : Nil
-    self.add_property_constraint AVD::Metadata::PropertyMetadata(T, Nil).new(property_name), constraint
-  end
-
-  protected def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterface, constraint : AVD::Constraint) : AVD::Metadata::ClassMetadata
-    unless @properties.has_key? property_metadata.name
-      @properties[property_metadata.name] = property_metadata
-    end
-
-    constraint.add_implicit_group @default_group
-
-    @properties[property_metadata.name].add_constraint constraint
 
     self
   end
 
+  # Adds each of the provided *constraints* to the provided *property_name*.
+  def add_property_constraint(property_name : String, constraints : Array(AVD::Constraint)) : self
+    constraints.each do |constraint|
+      self.add_property_constraint property_name, constraint
+    end
+
+    self
+  end
+
+  # Adds the provided *constraint* to the provided *property_name*.
+  def add_property_constraint(property_name : String, constraint : AVD::Constraint) : self
+    self.add_property_constraint AVD::Metadata::PropertyMetadata(T, Nil).new(property_name), constraint
+  end
+
   # Returns an array of the properties who `self` has constraints defined for.
   def constrained_properties : Array(String)
-    @properties.keys + @getters.keys
+    @members.keys
   end
 
   # Sets the `AVD::Constraints::GroupSequence` that should be used for `self`.
@@ -241,16 +218,44 @@ class Athena::Validator::Metadata::ClassMetadata(T)
 
   # Returns `true` if `self` has property metadata for the provided *property_name*.
   def has_property_metadata?(property_name : String) : Bool
-    @properties.has_key? property_name
+    @members.has_key? property_name
   end
 
   # Returns an `AVD::Metadata::PropertyMetadataInterface` instance for the provided *property_name*, if any.
-  def property_metadata(property_name : String) : AVD::Metadata::PropertyMetadataInterface?
-    @properties[property_name]? || @getters[property_name]?
+  def property_metadata(property_name : String) : Array(AVD::Metadata::PropertyMetadataInterface)
+    @members.fetch(property_name) { [] of AVD::Metadata::PropertyMetadataInterface }
   end
 
   def name : String?
     nil
+  end
+
+  protected def add_getter_constraint(getter_metadata : AVD::Metadata::PropertyMetadataInterface, constraint : AVD::Constraint) : self
+    unless @getters.has_key? getter_metadata.name
+      @getters[getter_metadata.name] = getter_metadata
+
+      self.add_property_metadata getter_metadata
+    end
+
+    constraint.add_implicit_group @default_group
+
+    @getters[getter_metadata.name].add_constraint constraint
+
+    self
+  end
+
+  protected def add_property_constraint(property_metadata : AVD::Metadata::PropertyMetadataInterface, constraint : AVD::Constraint) : self
+    unless @properties.has_key? property_metadata.name
+      @properties[property_metadata.name] = property_metadata
+
+      self.add_property_metadata property_metadata
+    end
+
+    constraint.add_implicit_group @default_group
+
+    @properties[property_metadata.name].add_constraint constraint
+
+    self
   end
 
   protected def invoke_callback(name : String, object : AVD::Validatable, context : AVD::ExecutionContextInterface, payload : Hash(String, String)?) : Nil
@@ -266,5 +271,9 @@ class Athena::Validator::Metadata::ClassMetadata(T)
         raise "BUG: Unknown method #{name} within #{T}"
       end
     {% end %}
+  end
+
+  private def add_property_metadata(metadata : AVD::Metadata::PropertyMetadataInterface) : Nil
+    (@members[metadata.name] ||= Array(AVD::Metadata::PropertyMetadataInterface).new) << metadata
   end
 end

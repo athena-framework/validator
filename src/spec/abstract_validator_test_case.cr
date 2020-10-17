@@ -6,9 +6,18 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     property value : String?
   end
 
-  private class Entity
-    include AVD::Validatable
+  private abstract class Parent
+    macro inherited
+      include AVD::Validatable
+    end
+  end
 
+  private class EntityParent < Parent
+    property data : String = "data"
+    property child : Entity? = nil
+  end
+
+  private class Entity < Parent
     property first_name : String?
     property! last_name : String
     property! sub_object : SubEntity
@@ -22,12 +31,12 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
 
   @metadata : AVD::Metadata::ClassMetadata(Entity)
   @sub_object_metadata : AVD::Metadata::ClassMetadata(SubEntity)
-  @metadata_factory : AVD::Spec::MockMetadataFactory(Entity, SubEntity, EntitySequenceProvider, EntityGroupSequenceProvider)
+  @metadata_factory : AVD::Spec::MockMetadataFactory(EntityParent, Entity, SubEntity, EntitySequenceProvider, EntityGroupSequenceProvider)
 
   def initialize
     @metadata = AVD::Metadata::ClassMetadata(Entity).new
     @sub_object_metadata = AVD::Metadata::ClassMetadata(SubEntity).new
-    @metadata_factory = AVD::Spec::MockMetadataFactory(Entity, SubEntity, EntitySequenceProvider, EntityGroupSequenceProvider).new
+    @metadata_factory = AVD::Spec::MockMetadataFactory(EntityParent, Entity, SubEntity, EntitySequenceProvider, EntityGroupSequenceProvider).new
     @metadata_factory.add_metadata Entity, @metadata
     @metadata_factory.add_metadata SubEntity, @sub_object_metadata
   end
@@ -105,13 +114,13 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     object.first_name = "Fred"
 
     callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
-      property_metadata = @metadata.property_metadata "first_name"
+      property_metadatas = @metadata.property_metadata "first_name"
 
       context.class_name.should eq Entity
       context.property_name.should eq "first_name"
       context.property_path.should eq "first_name"
       context.group.should eq "group"
-      property_metadata.should eq context.metadata
+      property_metadatas.first.should eq context.metadata
       context.root.should eq object
       context.value.should eq "Fred"
       value.should eq "Fred"
@@ -120,6 +129,43 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     end
 
     @metadata.add_property_constraint "first_name", AVD::Constraints::Callback.new callback: callback, groups: ["group"]
+
+    violations = self.validate object, groups: "group"
+
+    violations.size.should eq 1
+
+    violation = violations.first
+
+    violation.message.should eq "message value"
+    violation.message_template.should eq "message {{ value }}"
+    violation.parameters.should eq({"{{ value }}" => "value"})
+    violation.property_path.should eq "first_name"
+    violation.root.should eq object
+    violation.invalid_value.should eq "Fred"
+    violation.plural.should be_nil
+    violation.code.should be_nil
+  end
+
+  def test_validate_getter_constraint : Nil
+    object = Entity.new
+    object.first_name = "Fred"
+
+    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
+      property_metadatas = @metadata.property_metadata "first_name"
+
+      context.class_name.should eq Entity
+      context.property_name.should eq "first_name"
+      context.property_path.should eq "first_name"
+      context.group.should eq "group"
+      property_metadatas.first.should eq context.metadata
+      context.root.should eq object
+      context.value.should eq "Fred"
+      value.should eq "Fred"
+
+      context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
+    end
+
+    @metadata.add_getter_constraint "first_name", AVD::Constraints::Callback.new callback: callback, groups: ["group"]
 
     violations = self.validate object, groups: "group"
 
@@ -215,79 +261,7 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     self.validate(object).should be_empty
   end
 
-  def test_validate_hash_sub_object : Nil
-    object = Entity.new
-    object.hash_sub_object = {"key" => SubEntity.new}
-
-    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
-      context.class_name.should eq SubEntity
-      context.property_name.should be_nil
-      context.property_path.should eq "hash_sub_object[key]"
-      context.group.should eq "group"
-      context.metadata.should eq @sub_object_metadata
-      context.root.should eq object
-      context.value.should eq object.hash_sub_object["key"]
-      value.should eq object.hash_sub_object["key"]
-
-      context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
-    end
-
-    @metadata.add_property_constraint "hash_sub_object", AVD::Constraints::Valid.new
-    @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group"]
-
-    violations = self.validate object, groups: "group"
-
-    violations.size.should eq 1
-
-    violation = violations.first
-
-    violation.message.should eq "message value"
-    violation.message_template.should eq "message {{ value }}"
-    violation.parameters.should eq({"{{ value }}" => "value"})
-    violation.property_path.should eq "hash_sub_object[key]"
-    violation.root.should eq object
-    violation.invalid_value.should eq object.hash_sub_object["key"]
-    violation.plural.should be_nil
-    violation.code.should be_nil
-  end
-
-  def test_validate_nested_hash_sub_object : Nil
-    object = Entity.new
-    object.nested_hash_sub_object = {2 => {"key" => SubEntity.new}}
-
-    callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
-      context.class_name.should eq SubEntity
-      context.property_name.should be_nil
-      context.property_path.should eq "nested_hash_sub_object[2][key]"
-      context.group.should eq "group"
-      context.metadata.should eq @sub_object_metadata
-      context.root.should eq object
-      context.value.should eq object.nested_hash_sub_object[2]["key"]
-      value.should eq object.nested_hash_sub_object[2]["key"]
-
-      context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
-    end
-
-    @metadata.add_property_constraint "nested_hash_sub_object", AVD::Constraints::Valid.new
-    @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group"]
-
-    violations = self.validate object, groups: "group"
-
-    violations.size.should eq 1
-
-    violation = violations.first
-
-    violation.message.should eq "message value"
-    violation.message_template.should eq "message {{ value }}"
-    violation.parameters.should eq({"{{ value }}" => "value"})
-    violation.property_path.should eq "nested_hash_sub_object[2][key]"
-    violation.root.should eq object
-    violation.invalid_value.should eq object.nested_hash_sub_object[2]["key"]
-    violation.plural.should be_nil
-    violation.code.should be_nil
-  end
-
-  def test_only_traversal_cascaded_hash : Nil
+  def test_validate_only_traversal_cascaded_hash : Nil
     object = Entity.new
     object.hash_sub_object = {"key" => SubEntity.new}
 
@@ -301,51 +275,127 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     self.validate(object, groups: "group").should be_empty
   end
 
-  def test_hash_traversal_cannot_be_disabled : Nil
-    object = Entity.new
-    object.hash_sub_object = {"key" => SubEntity.new}
+  {% for method in ["add_property_constraint", "add_getter_constraint"] %}
+    {% type = method.gsub(/add_/, "").id %}
 
-    callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
-      context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
+    def test_validate_hash_sub_object_{{type}} : Nil
+      object = Entity.new
+      object.hash_sub_object = {"key" => SubEntity.new}
+
+      callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
+        context.class_name.should eq SubEntity
+        context.property_name.should be_nil
+        context.property_path.should eq "hash_sub_object[key]"
+        context.group.should eq "group"
+        context.metadata.should eq @sub_object_metadata
+        context.root.should eq object
+        context.value.should eq object.hash_sub_object["key"]
+        value.should eq object.hash_sub_object["key"]
+
+        context.add_violation "message \{{ value }}", {"\{{ value }}" => "value"}
+      end
+
+      @metadata.{{method.id}} "hash_sub_object", AVD::Constraints::Valid.new
+      @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group"]
+
+      violations = self.validate object, groups: "group"
+
+      violations.size.should eq 1
+
+      violation = violations.first
+
+      violation.message.should eq "message value"
+      violation.message_template.should eq "message \{{ value }}"
+      violation.parameters.should eq({"\{{ value }}" => "value"})
+      violation.property_path.should eq "hash_sub_object[key]"
+      violation.root.should eq object
+      violation.invalid_value.should eq object.hash_sub_object["key"]
+      violation.plural.should be_nil
+      violation.code.should be_nil
     end
 
-    @metadata.add_property_constraint "hash_sub_object", AVD::Constraints::Valid.new traverse: false
-    @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group"]
+    def test_validate_nested_hash_sub_object_{{type}} : Nil
+      object = Entity.new
+      object.nested_hash_sub_object = {2 => {"key" => SubEntity.new}}
 
-    self.validate(object, groups: "group").size.should eq 1
-  end
+      callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
+        context.class_name.should eq SubEntity
+        context.property_name.should be_nil
+        context.property_path.should eq "nested_hash_sub_object[2][key]"
+        context.group.should eq "group"
+        context.metadata.should eq @sub_object_metadata
+        context.root.should eq object
+        context.value.should eq object.nested_hash_sub_object[2]["key"]
+        value.should eq object.nested_hash_sub_object[2]["key"]
 
-  def test_nested_hash_traversal_cannot_be_disabled : Nil
-    object = Entity.new
-    object.nested_hash_sub_object = {2 => {"key" => SubEntity.new}}
+        context.add_violation "message \{{ value }}", {"\{{ value }}" => "value"}
+      end
 
-    callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
-      context.add_violation "message {{ value }}", {"{{ value }}" => "value"}
+      @metadata.{{method.id}} "nested_hash_sub_object", AVD::Constraints::Valid.new
+      @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group"]
+
+      violations = self.validate object, groups: "group"
+
+      violations.size.should eq 1
+
+      violation = violations.first
+
+      violation.message.should eq "message value"
+      violation.message_template.should eq "message \{{ value }}"
+      violation.parameters.should eq({"\{{ value }}" => "value"})
+      violation.property_path.should eq "nested_hash_sub_object[2][key]"
+      violation.root.should eq object
+      violation.invalid_value.should eq object.nested_hash_sub_object[2]["key"]
+      violation.plural.should be_nil
+      violation.code.should be_nil
     end
 
-    @metadata.add_property_constraint "nested_hash_sub_object", AVD::Constraints::Valid.new traverse: false
-    @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group"]
+    def test_validate_hash_traversal_cannot_be_disabled_{{type}} : Nil
+      object = Entity.new
+      object.hash_sub_object = {"key" => SubEntity.new}
 
-    self.validate(object, groups: "group").size.should eq 1
-  end
+      callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
+        context.add_violation "message \{{ value }}", {"\{{ value }}" => "value"}
+      end
 
-  def test_ignore_scalars_during_array_traversal : Nil
-    object = Entity.new
-    object.scalar_array = ["string", 1234]
+      @metadata.{{method.id}} "hash_sub_object", AVD::Constraints::Valid.new traverse: false
+      @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group"]
 
-    @metadata.add_property_constraint "scalar_array", AVD::Constraints::Valid.new
+      self.validate(object, groups: "group").size.should eq 1
+    end
 
-    self.validate(object, groups: "group").should be_empty
-  end
+    def test_validate_nested_hash_traversal_cannot_be_disabled_{{type}} : Nil
+      object = Entity.new
+      object.nested_hash_sub_object = {2 => {"key" => SubEntity.new}}
 
-  def test_ignore_null_during_array_traversal : Nil
-    object = Entity.new
-    object.nil_array = [nil]
+      callback = AVD::Constraints::Callback::CallbackProc.new do |_value, context, _payload|
+        context.add_violation "message \{{ value }}", {"\{{ value }}" => "value"}
+      end
 
-    @metadata.add_property_constraint "nil_array", AVD::Constraints::Valid.new
+      @metadata.{{method.id}} "nested_hash_sub_object", AVD::Constraints::Valid.new traverse: false
+      @sub_object_metadata.add_constraint AVD::Constraints::Callback.new callback: callback, groups: ["group"]
 
-    self.validate(object, groups: "group").should be_empty
-  end
+      self.validate(object, groups: "group").size.should eq 1
+    end
+
+    def test_validate_ignore_scalars_during_array_traversal_{{type}} : Nil
+      object = Entity.new
+      object.scalar_array = ["string", 1234]
+
+      @metadata.{{method.id}} "scalar_array", AVD::Constraints::Valid.new
+
+      self.validate(object, groups: "group").should be_empty
+    end
+
+    def test_validate_ignore_null_during_array_traversal_{{type}} : Nil
+      object = Entity.new
+      object.nil_array = [nil]
+
+      @metadata.{{method.id}} "nil_array", AVD::Constraints::Valid.new
+
+      self.validate(object, groups: "group").should be_empty
+    end
+  {% end %}
 
   def test_validate_property : Nil
     object = Entity.new
@@ -353,13 +403,13 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     object.last_name = "Snow"
 
     callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
-      property_metadata = @metadata.property_metadata "first_name"
+      property_metadatas = @metadata.property_metadata "first_name"
 
       context.class_name.should eq Entity
       context.property_name.should eq "first_name"
       context.property_path.should eq "first_name"
       context.group.should eq "group"
-      context.metadata.should eq property_metadata
+      context.metadata.should eq property_metadatas.first
       context.root.should eq object
       context.value.should eq "Jon"
       value.should eq "Jon"
@@ -398,13 +448,13 @@ abstract struct Athena::Validator::Spec::AbstractValidatorTestCase < ASPEC::Test
     object.last_name = "Snow"
 
     callback = AVD::Constraints::Callback::CallbackProc.new do |value, context, _payload|
-      property_metadata = @metadata.property_metadata "first_name"
+      property_metadatas = @metadata.property_metadata "first_name"
 
       context.class_name.should eq Entity
       context.property_name.should eq "first_name"
       context.property_path.should eq "first_name"
       context.group.should eq "group"
-      context.metadata.should eq property_metadata
+      context.metadata.should eq property_metadatas.first
       context.root.should eq object
       context.value.should eq "Jon"
       value.should eq "Jon"

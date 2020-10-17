@@ -1,6 +1,6 @@
 require "./property_metadata_interface"
 
-class Athena::Validator::Metadata::PropertyMetadata(EntityType, PropertyIdx)
+class Athena::Validator::Metadata::GetterMetadata(EntityType, MethodIdx)
   include Athena::Validator::Metadata::GenericMetadata
   include Athena::Validator::Metadata::PropertyMetadataInterface
 
@@ -9,22 +9,22 @@ class Athena::Validator::Metadata::PropertyMetadata(EntityType, PropertyIdx)
 
   def initialize(@name : String); end
 
-  # Returns the class the property `self` represents, belongs to.
+  # Returns the class the method `self` represents, belongs to.
   def class_name : EntityType.class
     EntityType
   end
 
   protected def value(obj : EntityType)
     {% begin %}
-      {% unless PropertyIdx == Nil %}
-        obj.@{{EntityType.instance_vars[PropertyIdx].name.id}}
+      {% unless MethodIdx == Nil %}
+        obj.@{{EntityType.methods[MethodIdx].name.id}}
       {% else %}
         case @name
-          {% for ivar in EntityType.instance_vars %}
-            when {{ivar.name.stringify}} then obj.@{{ivar.id}}
+          {% for m in EntityType.methods.reject &.name.ends_with? '=' %}
+            when {{m.name.stringify}} then obj.{{m.name.id}}
           {% end %}
         else
-          raise "BUG: Unknown property '#{@name}' within #{EntityType}."
+          raise "BUG: Unknown method '#{@name}' within #{EntityType}."
         end
       {% end %}
     {% end %}
