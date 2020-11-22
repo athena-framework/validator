@@ -103,7 +103,7 @@ module Athena::Validator::Spec
   struct MockContextualValidator
     include Athena::Validator::Validator::ContextualValidatorInterface
 
-    setter @violations : AVD::Violation::ConstraintViolationListInterface
+    setter violations : AVD::Violation::ConstraintViolationListInterface
 
     def initialize(@violations : AVD::Violation::ConstraintViolationListInterface = AVD::Violation::ConstraintViolationList.new); end
 
@@ -140,7 +140,7 @@ module Athena::Validator::Spec
   struct MockValidator
     include Athena::Validator::Validator::ValidatorInterface
 
-    setter @violations : AVD::Violation::ConstraintViolationListInterface
+    setter violations : AVD::Violation::ConstraintViolationListInterface
 
     def initialize(@violations : AVD::Violation::ConstraintViolationListInterface = AVD::Violation::ConstraintViolationList.new); end
 
