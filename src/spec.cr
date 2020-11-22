@@ -100,7 +100,7 @@ module Athena::Validator::Spec
   #
   # Allows settings the violations that should be returned.
   # Defaults to no violations.
-  struct MockContextualValidator
+  class MockContextualValidator
     include Athena::Validator::Validator::ContextualValidatorInterface
 
     setter violations : AVD::Violation::ConstraintViolationListInterface
@@ -137,7 +137,7 @@ module Athena::Validator::Spec
   #
   # Allows settings the violations that should be returned.
   # Defaults to no violations.
-  struct MockValidator
+  class MockValidator
     include Athena::Validator::Validator::ValidatorInterface
 
     setter violations : AVD::Violation::ConstraintViolationListInterface
