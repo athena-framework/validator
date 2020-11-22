@@ -97,8 +97,13 @@ module Athena::Validator::Spec
   end
 
   # A spec implementation of `AVD::Validator::ContextualValidatorInterface`.
+  #
+  # Allows settings the violations that should be returned.
+  # Defaults to no violations.
   struct MockContextualValidator
     include Athena::Validator::Validator::ContextualValidatorInterface
+
+    def initialize(@violations : AVD::Violation::ConstraintViolationListInterface = AVD::Violation::ConstraintViolationList.new); end
 
     # :inherit:
     def at_path(path : String) : AVD::Validator::ContextualValidatorInterface
@@ -122,37 +127,42 @@ module Athena::Validator::Spec
 
     # :inherit:
     def violations : AVD::Violation::ConstraintViolationListInterface
-      AVD::Violation::ConstraintViolationList.new
+      @violations
     end
   end
 
   # A spec implementation of `AVD::Validator::ValidatorInterface`.
+  #
+  # Allows settings the violations that should be returned.
+  # Defaults to no violations.
   struct MockValidator
     include Athena::Validator::Validator::ValidatorInterface
 
+    def initialize(@violations : AVD::Violation::ConstraintViolationListInterface = AVD::Violation::ConstraintViolationList.new); end
+
     # :inherit:
     def validate(value : _, constraints : Array(AVD::Constraint) | AVD::Constraint | Nil = nil, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
-      AVD::Violation::ConstraintViolationList.new
+      @violations
     end
 
     # :inherit:
     def validate_property(object : AVD::Validatable, property_name : String, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
-      AVD::Violation::ConstraintViolationList.new
+      @violations
     end
 
     # :inherit:
     def validate_property_value(object : AVD::Validatable, property_name : String, value : _, groups : Array(String) | String | AVD::Constraints::GroupSequence | Nil = nil) : AVD::Violation::ConstraintViolationListInterface
-      AVD::Violation::ConstraintViolationList.new
+      @violations
     end
 
     # :inherit:
     def start_context(root = nil) : AVD::Validator::ContextualValidatorInterface
-      MockContextualValidator.new
+      MockContextualValidator.new @violations
     end
 
     # :inherit:
     def in_context(context : AVD::ExecutionContextInterface) : AVD::Validator::ContextualValidatorInterface
-      MockContextualValidator.new
+      MockContextualValidator.new @violations
     end
   end
 

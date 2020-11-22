@@ -143,7 +143,7 @@ abstract struct Athena::Validator::Spec::ConstraintValidatorTestCase < ASPEC::Te
   @group : String
   @metadata : Nil = nil
   @object : Nil = nil
-  @value : String
+  @value : String | Array(String)
   @root : String
   @property_path : String
   @constraint : AVD::Constraint
@@ -212,6 +212,12 @@ abstract struct Athena::Validator::Spec::ConstraintValidatorTestCase < ASPEC::Te
   # Returns an `AVD::Spec::ConstraintValidatorTestCase::Assertion` with the provided *message*, *code*, and *value* parameter preset.
   def build_violation(message : String, code : String, value : _) : AVD::Spec::ConstraintValidatorTestCase::Assertion
     self.build_violation(message).code(code).add_parameter("{{ value }}", value)
+  end
+
+  # Overrides the value/node currently being validated.
+  def value=(value) : Nil
+    @value = value
+    self.context.set_node(@value, @object, @metadata, @property_path)
   end
 
   # Returns a reference to the context used for the current test.
