@@ -99,11 +99,11 @@ class Athena::Validator::Constraints::Range < Athena::Validator::Constraint
   private def initialize(
     @min : Number::Primitive | Time | Nil,
     @max : Number::Primitive | Time | Nil,
-    @not_in_range_message : String = "This value should be between {{ min }} and {{ max }}.",
-    @min_message : String = "This value should be {{ limit }} or more.",
-    @max_message : String = "This value should be {{ limit }} or less.",
-    groups : Array(String) | String | Nil = nil,
-    payload : Hash(String, String)? = nil
+    @not_in_range_message : String,
+    @min_message : String,
+    @max_message : String,
+    groups : Array(String) | String | Nil,
+    payload : Hash(String, String)?
   )
     super "", groups, payload
   end
