@@ -64,7 +64,7 @@
 #
 # **Type:** `Array(String) | String | Nil` **Default:** `nil`
 #
-# The `AVD::Constraint` this constraint belongs to.
+# The [validation groups](https://athena-framework.github.io/validator/Athena/Validator/Constraint.html#validation-groups) this constraint belongs to.
 # `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
 #
 # #### payload
@@ -72,7 +72,7 @@
 # **Type:** `Hash(String, String)?` **Default:** `nil`
 #
 # Any arbitrary domain-specific data that should be stored with this constraint.
-# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
+# The [payload](https://athena-framework.github.io/validator/Athena/Validator/Constraint.html#payload) is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::Size < Athena::Validator::Constraint
   TOO_SHORT_ERROR = "8ba31c71-1b37-4b76-8bc9-66896589b01f"
   TOO_LONG_ERROR  = "a1fa7a63-ea3b-46a0-adcc-5e1bcc26f73a"

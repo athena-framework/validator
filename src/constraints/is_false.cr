@@ -20,7 +20,7 @@
 #
 # **Type:** `Array(String) | String | Nil` **Default:** `nil`
 #
-# The `AVD::Constraint` this constraint belongs to.
+# The [validation groups](https://athena-framework.github.io/validator/Athena/Validator/Constraint.html#validation-groups) this constraint belongs to.
 # `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
 #
 # #### payload
@@ -28,7 +28,7 @@
 # **Type:** `Hash(String, String)?` **Default:** `nil`
 #
 # Any arbitrary domain-specific data that should be stored with this constraint.
-# The `AVD::Constraint@payload` is not used by `Athena::Validator`, but its processing is completely up to you.
+# The [payload](https://athena-framework.github.io/validator/Athena/Validator/Constraint.html#payload) is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::IsFalse < Athena::Validator::Constraint
   NOT_FALSE_ERROR = "55c076a0-dbaf-453c-90cf-b94664276dbc"
 
