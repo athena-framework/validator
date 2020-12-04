@@ -39,7 +39,7 @@
 #
 # **Type:** `Array(String) | String | Nil` **Default:** `nil`
 #
-# The `AVD:Constraint@validation-groups` this constraint belongs to.
+# The `AVD::Constraint` this constraint belongs to.
 # `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
 #
 # #### payload
