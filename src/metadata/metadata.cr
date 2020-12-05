@@ -1,5 +1,5 @@
 # :nodoc:
-struct Athena::Validator::Metadata::Metadata
+class Athena::Validator::Metadata::Metadata
   include Athena::Validator::Metadata::GenericMetadata
 
   def class_name : Nil
