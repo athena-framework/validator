@@ -8,7 +8,7 @@ license: MIT
 
 repository: https://github.com/athena-framework/validator
 
-documentation: https://athena-framework.github.io/validator/Athena/Validator.html
+documentation: https://athenaframework.org/Validator
 
 description: |
   Object/value validation library.
