@@ -24,7 +24,7 @@
 #
 # **Type:** `Array(String) | String | Nil` **Default:** `nil`
 #
-# The [validation groups](https://athena-framework.github.io/validator/Athena/Validator/Constraint.html#validation-groups) this constraint belongs to.
+# The [validation groups][Athena::Validator::Constraint--validation-groups] this constraint belongs to.
 # `AVD::Constraint::DEFAULT_GROUP` is assumed if `nil`.
 #
 # #### payload
@@ -32,7 +32,7 @@
 # **Type:** `Hash(String, String)?` **Default:** `nil`
 #
 # Any arbitrary domain-specific data that should be stored with this constraint.
-# The [payload](https://athena-framework.github.io/validator/Athena/Validator/Constraint.html#payload) is not used by `Athena::Validator`, but its processing is completely up to you.
+# The [payload][Athena::Validator::Constraint--payload] is not used by `Athena::Validator`, but its processing is completely up to you.
 class Athena::Validator::Constraints::Luhn < Athena::Validator::Constraint
   INVALID_CHARACTERS_ERROR = "c42b8d36-d9e9-4f5f-aad6-5190e27a1102"
   CHECKSUM_FAILED_ERROR    = "a4f089dd-fd63-4d50-ac30-34ed2a8dc9dd"
