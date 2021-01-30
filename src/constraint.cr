@@ -57,8 +57,8 @@
 # The message can also include placeholders, in the form of `{{ key }}`, that will be replaced when the message is rendered.
 # Most commonly this includes the invalid value itself, but some constraints have additional placeholders.
 # * The `payload` argument can be used to attach any domain specific data to the constraint; such as attaching a severity with each constraint
-# to have more serious violations be handled differently.  See the [Payload](./Constraint.html#payload) section.
-# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validation Groups](./Constraint.html#validation-groups) section.
+# to have more serious violations be handled differently.  See the [Payload][Athena::Validator::Constraint--payload] section.
+# * The `groups` argument can be used to run a subset of the defined constraints.  More on this in the [Validation Groups][Athena::Validator::Constraint--validation-groups] section.
 #
 # For example:
 #
