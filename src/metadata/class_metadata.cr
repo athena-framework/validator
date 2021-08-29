@@ -133,8 +133,8 @@ class Athena::Validator::Metadata::ClassMetadata(T)
 
   # Adds each of the provided *constraints* to `self`.
   def add_constraint(constraints : Array(AVD::Constraint)) : self
-    constraints.each do |constraint|
-      self.add_constraint constraint
+    constraints.each do |c|
+      self.add_constraint c
     end
 
     self
@@ -168,8 +168,8 @@ class Athena::Validator::Metadata::ClassMetadata(T)
 
   # Adds each of the provided *constraints* to the provided *property_name*.
   def add_property_constraint(property_name : String, constraints : Array(AVD::Constraint)) : self
-    constraints.each do |constraint|
-      self.add_property_constraint property_name, constraint
+    constraints.each do |c|
+      self.add_property_constraint property_name, c
     end
 
     self
