@@ -9,7 +9,7 @@ struct Athena::Validator::ConstraintValidatorFactory
   # :nodoc:
   #
   # Overload to support DI.
-  def initialize(constraint_validators : Array(AVD::ConstraintValidatorInterface) = [] of AVD::ConstraintValidatorInterface)
+  def initialize(constraint_validators : Array(AVD::ServiceConstraintValidator) = [] of AVD::ServiceConstraintValidator)
     constraint_validators.each do |validator|
       @validators[validator.class] = validator
     end

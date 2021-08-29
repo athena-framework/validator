@@ -383,6 +383,8 @@ alias Assert = AVD::Annotations
 #
 # NOTE: See the related types for more detailed information.
 module Athena::Validator
+  VERSION = "0.1.4"
+
   # :nodoc:
   #
   # Default namespace for constraint annotations.

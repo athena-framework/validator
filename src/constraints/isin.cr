@@ -80,7 +80,7 @@ class Athena::Validator::Constraints::ISIN < Athena::Validator::Constraint
     end
 
     private def is_correct_checksum(isin : String) : Bool
-      number = isin.chars.join { |char| char.to_i 36 }
+      number = isin.chars.join &.to_i 36
       @validator.validate(number, AVD::Constraints::Luhn.new).empty?
     end
   end
