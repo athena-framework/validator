@@ -1,6 +1,6 @@
 name: athena-validator
 
-version: 0.1.5
+version: 0.1.6
 
 crystal: '>= 0.35.0'
 
