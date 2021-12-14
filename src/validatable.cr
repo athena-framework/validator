@@ -21,6 +21,12 @@ module Athena::Validator::Validatable
   macro included
     extend AVD::Validatable::Class
 
-    class_getter validation_class_metadata : AVD::Metadata::ClassMetadata(self) { AVD::Metadata::ClassMetadata(self).build }
+    macro inherited
+      include AVD::Validatable
+    end
+
+    {% unless @type.abstract? %}
+      class_getter validation_class_metadata : AVD::Metadata::ClassMetadata(self) { AVD::Metadata::ClassMetadata(self).build }
+    {% end %}
   end
 end
